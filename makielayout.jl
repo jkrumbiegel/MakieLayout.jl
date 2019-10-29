@@ -1,5 +1,6 @@
 using Layered
 using BenchmarkTools
+using Random
 
 struct BBox
     left::Float64
@@ -293,8 +294,19 @@ function draw!(layer, sp::SpannedAlignable, debug)
 end
 
 function draw!(layer, a::SolvedAxis, debug=true)
-    rect!(layer, a.outer) + Fill("red", 0.1)
-    rect!(layer, a.inner) + Fill("blue", 0.1)
+    if debug
+        rect!(layer, a.outer) + Fill("red", 0.1)
+    end
+    r = rect!(layer, a.inner) + Fill("blue", 0.1)
+
+    txts!(layer, r) do r
+        [
+            Txt(fraction(rightline(r), 0.5), "y axis 2", a.outer.right - a.inner.right, :c, :t, deg(-90)),
+            Txt(fraction(leftline(r), 0.5), "y axis", a.inner.left - a.outer.left, :c, :b, deg(-90)),
+            Txt(fraction(topline(r), 0.5), "title", a.inner.top - a.outer.top, :c, :b, deg(0)),
+            Txt(fraction(bottomline(r), 0.5), "x axis", a.outer.bottom - a.inner.bottom, :c, :t, deg(0))
+        ]
+    end
 end
 
 function Layered.Rect(bb::Main.BBox)
@@ -328,6 +340,8 @@ end
 
 function test()
 
+    Random.seed!(1)
+
     c, tl = canvas(4, 4)
     w = 3.5 * 72
     h = 3.5 * 72
@@ -336,26 +350,27 @@ function test()
 
     bbox = Main.BBox(l, l + w, b - h, b)
 
-    ua() = UnsolvedAxis(BBox((rand(4) .* 10 .+ 5)...))
+    ua() = UnsolvedAxis(BBox((rand(4) .* 5 .+ 7)...))
 
-    ug = UnsolvedGrid([], 3, 3, [1, 1, 1.0], [1.5, 1.25, 1], 0.05, 0.05)
+    ug = UnsolvedGrid([], 3, 3, [1, 1, 1.0], [1.5, 1.25, 1], 0.1, 0.1)
 
 
     ug[1, 1:3] = ua()
     ug[2:3, 1] = ua()
 
 
-    ug2 = UnsolvedGrid([], 2, 3, [1, 1, 1], [1, 1], 0.05, 0.05)
+    ug2 = UnsolvedGrid([], 2, 3, [1, 1, 1], [1, 1], 0.1, 0.1)
     ug2[1, 1] = ua()
-    ug2[2, 1] = ua()
-    ug2[2, 2] = ua()
+    ug2[2, 1:2] = ua()
+    ug2[2, 3] = ua()
+    ug2[1, 2:3] = ua()
 
     ug[2:3, 2:3] = ug2
 
     sg = outersolve(ug, bbox)
 
-    draw!(tl, sg, false)
+    draw!(tl, sg, true)
 
-    c
+    png(c, "./MakieLayout/MakieLayout/with_placeholders.png", dpi=300)
 
 end; test()

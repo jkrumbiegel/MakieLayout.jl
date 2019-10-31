@@ -1,6 +1,6 @@
-using Layered
-using BenchmarkTools
 using Random
+using Animations
+using Makie
 
 struct BBox
     left::Float64
@@ -9,8 +9,16 @@ struct BBox
     bottom::Float64
 end
 
+mutable struct LayoutedAxis
+    parent::Scene
+    scene::Scene
+    xlabel::Node{String}
+    ylabel::Node{String}
+    limits::Node{FRect2D}
+end
+
 width(b::BBox) = b.right - b.left
-height(b::BBox) = b.bottom - b.top
+height(b::BBox) = b.top - b.bottom
 
 abstract type Alignable end
 
@@ -29,16 +37,18 @@ isrightmostin(sp::SpannedAlignable, grid) = sp.sp.cols.stop == grid.ncols
 isbottommostin(sp::SpannedAlignable, grid) = sp.sp.rows.stop == grid.nrows
 istopmostin(sp::SpannedAlignable, grid) = sp.sp.cols.start == 1
 
-struct SolvedAxis <: Alignable
+struct SolvedAxisLayout <: Alignable
     inner::BBox
     outer::BBox
+    axis::LayoutedAxis
 end
 
-struct UnsolvedAxis <: Alignable
+struct AxisLayout <: Alignable
     decorations::BBox
+    axis::LayoutedAxis
 end
 
-struct SolvedGrid <: Alignable
+struct SolvedGridLayout <: Alignable
     bbox::BBox
     content::Vector{SpannedAlignable}
     nrows::Int
@@ -49,7 +59,7 @@ struct SolvedGrid <: Alignable
     ybottomrows::Vector{Float64}
 end
 
-struct UnsolvedGrid <: Alignable
+struct GridLayout <: Alignable
     content::Vector{SpannedAlignable}
     nrows::Int
     ncols::Int
@@ -59,12 +69,12 @@ struct UnsolvedGrid <: Alignable
     rowgapfraction::Float64
 end
 
-leftprotrusion(u::UnsolvedAxis) = u.decorations.left
-leftprotrusion(s::SolvedAxis) = s.inner.left - s.outer.left
+leftprotrusion(u::AxisLayout) = u.decorations.left
+leftprotrusion(s::SolvedAxisLayout) = s.inner.left - s.outer.left
 leftprotrusion(sp::SpannedAlignable) = leftprotrusion(sp.al)
 
-function leftprotrusion(ug::UnsolvedGrid)
-    leftmosts = filter(x -> isleftmostin(x, ug), ug.content)
+function leftprotrusion(gl::GridLayout)
+    leftmosts = filter(x -> isleftmostin(x, gl), gl.content)
     if isempty(leftmosts)
         0.0
     else
@@ -72,12 +82,12 @@ function leftprotrusion(ug::UnsolvedGrid)
     end
 end
 
-rightprotrusion(u::UnsolvedAxis) = u.decorations.right
-rightprotrusion(s::SolvedAxis) = s.outer.right - s.inner.right
+rightprotrusion(u::AxisLayout) = u.decorations.right
+rightprotrusion(s::SolvedAxisLayout) = s.outer.right - s.inner.right
 rightprotrusion(sp::SpannedAlignable) = rightprotrusion(sp.al)
 
-function rightprotrusion(ug::UnsolvedGrid)
-    rightmosts = filter(x -> isrightmostin(x, ug), ug.content)
+function rightprotrusion(gl::GridLayout)
+    rightmosts = filter(x -> isrightmostin(x, gl), gl.content)
     if isempty(rightmosts)
         0.0
     else
@@ -85,12 +95,12 @@ function rightprotrusion(ug::UnsolvedGrid)
     end
 end
 
-topprotrusion(u::UnsolvedAxis) = u.decorations.top
-topprotrusion(s::SolvedAxis) = s.outer.top - s.inner.top
+topprotrusion(u::AxisLayout) = u.decorations.top
+topprotrusion(s::SolvedAxisLayout) = s.outer.top - s.inner.top
 topprotrusion(sp::SpannedAlignable) = topprotrusion(sp.al)
 
-function topprotrusion(ug::UnsolvedGrid)
-    topmosts = filter(x -> istopmostin(x, ug), ug.content)
+function topprotrusion(gl::GridLayout)
+    topmosts = filter(x -> istopmostin(x, gl), gl.content)
     if isempty(topmosts)
         0.0
     else
@@ -98,12 +108,12 @@ function topprotrusion(ug::UnsolvedGrid)
     end
 end
 
-bottomprotrusion(u::UnsolvedAxis) = u.decorations.bottom
-bottomprotrusion(s::SolvedAxis) = s.outer.bottom - s.inner.bottom
+bottomprotrusion(u::AxisLayout) = u.decorations.bottom
+bottomprotrusion(s::SolvedAxisLayout) = s.outer.bottom - s.inner.bottom
 bottomprotrusion(sp::SpannedAlignable) = bottomprotrusion(sp.al)
 
-function bottomprotrusion(ug::UnsolvedGrid)
-    bottommosts = filter(x -> isbottommostin(x, ug), ug.content)
+function bottomprotrusion(gl::GridLayout)
+    bottommosts = filter(x -> isbottommostin(x, gl), gl.content)
     if isempty(bottommosts)
         0.0
     else
@@ -111,13 +121,13 @@ function bottomprotrusion(ug::UnsolvedGrid)
     end
 end
 
-function solve(ug::UnsolvedGrid, bbox::BBox) # when the grid is inside some other grid
-    maxcollefts = zeros(ug.ncols)
-    maxcolrights = zeros(ug.ncols)
-    maxrowtops = zeros(ug.nrows)
-    maxrowbottoms = zeros(ug.nrows)
+function solve(gl::GridLayout, bbox::BBox) # when the grid is inside some other grid
+    maxcollefts = zeros(gl.ncols)
+    maxcolrights = zeros(gl.ncols)
+    maxrowtops = zeros(gl.nrows)
+    maxrowbottoms = zeros(gl.nrows)
 
-    for c in ug.content
+    for c in gl.content
         ileft = c.sp.cols.start
         iright = c.sp.cols.stop
         itop = c.sp.rows.start
@@ -135,35 +145,35 @@ function solve(ug::UnsolvedGrid, bbox::BBox) # when the grid is inside some othe
     maxcolgap = maximum(colgaps)
     maxrowgap = maximum(rowgaps)
 
-    sumcolgaps = maxcolgap * (ug.ncols - 1)
-    sumrowgaps = maxrowgap * (ug.nrows - 1)
+    sumcolgaps = maxcolgap * (gl.ncols - 1)
+    sumrowgaps = maxrowgap * (gl.nrows - 1)
 
     # removed prots
     remaininghorizontalspace = width(bbox) - sumcolgaps
     remainingverticalspace = height(bbox) - sumrowgaps
 
-    addedcolgap = ug.colgapfraction * remaininghorizontalspace
-    addedrowgap = ug.rowgapfraction * remainingverticalspace
+    addedcolgap = gl.colgapfraction * remaininghorizontalspace
+    addedrowgap = gl.rowgapfraction * remainingverticalspace
 
-    spaceforcolumns = remaininghorizontalspace - addedcolgap * (ug.ncols - 1)
-    spaceforrows = remainingverticalspace - addedrowgap * (ug.nrows - 1)
+    spaceforcolumns = remaininghorizontalspace - addedcolgap * (gl.ncols - 1)
+    spaceforrows = remainingverticalspace - addedrowgap * (gl.nrows - 1)
 
-    colwidths = ug.colratios ./ sum(ug.colratios) .* spaceforcolumns
-    rowheights = ug.rowratios ./ sum(ug.rowratios) .* spaceforrows
+    colwidths = gl.colratios ./ sum(gl.colratios) .* spaceforcolumns
+    rowheights = gl.rowratios ./ sum(gl.rowratios) .* spaceforrows
 
     colgap = maxcolgap + addedcolgap
     rowgap = maxrowgap + addedrowgap
 
     # removed leftprot
-    xleftcols = [bbox.left + sum(colwidths[1:i-1]) + (i - 1) * colgap for i in 1:ug.ncols]
+    xleftcols = [bbox.left + sum(colwidths[1:i-1]) + (i - 1) * colgap for i in 1:gl.ncols]
     xrightcols = xleftcols .+ colwidths
 
     # removed topprot
-    ytoprows = [bbox.top + sum(rowheights[1:i-1]) + (i - 1) * rowgap for i in 1:ug.nrows]
-    ybottomrows = ytoprows .+ rowheights
+    ytoprows = [bbox.top - sum(rowheights[1:i-1]) - (i - 1) * rowgap for i in 1:gl.nrows]
+    ybottomrows = ytoprows .- rowheights
 
     solvedcontent = SpannedAlignable[]
-    for c in ug.content
+    for c in gl.content
         ileft = c.sp.cols.start
         iright = c.sp.cols.stop
         itop = c.sp.rows.start
@@ -176,18 +186,18 @@ function solve(ug::UnsolvedGrid, bbox::BBox) # when the grid is inside some othe
         push!(solvedcontent, SpannedAlignable(solved, c.sp))
     end
 
-    # solvedcontent = solve.(ug.content)
-    SolvedGrid(bbox, solvedcontent, ug.nrows, ug.ncols, xleftcols,
+    # solvedcontent = solve.(gl.content)
+    SolvedGridLayout(bbox, solvedcontent, gl.nrows, gl.ncols, xleftcols,
         xrightcols, ytoprows, ybottomrows)
 end
 
-function outersolve(ug::UnsolvedGrid, bbox::BBox)
-    maxcollefts = zeros(ug.ncols)
-    maxcolrights = zeros(ug.ncols)
-    maxrowtops = zeros(ug.nrows)
-    maxrowbottoms = zeros(ug.nrows)
+function outersolve(gl::GridLayout, bbox::BBox)
+    maxcollefts = zeros(gl.ncols)
+    maxcolrights = zeros(gl.ncols)
+    maxrowtops = zeros(gl.nrows)
+    maxrowbottoms = zeros(gl.nrows)
 
-    for c in ug.content
+    for c in gl.content
         ileft = c.sp.cols.start
         iright = c.sp.cols.stop
         itop = c.sp.rows.start
@@ -207,35 +217,35 @@ function outersolve(ug::UnsolvedGrid, bbox::BBox)
     colgaps = maxcollefts[2:end] .+ maxcolrights[1:end-1]
     rowgaps = maxrowtops[2:end] .+ maxrowbottoms[1:end-1]
 
-    maxcolgap = maximum(colgaps)
-    maxrowgap = maximum(rowgaps)
+    maxcolgap = gl.ncols <= 1 ? 0 : maximum(colgaps)
+    maxrowgap = gl.nrows <= 1 ? 0 : maximum(rowgaps)
 
-    sumcolgaps = maxcolgap * (ug.ncols - 1)
-    sumrowgaps = maxrowgap * (ug.nrows - 1)
+    sumcolgaps = maxcolgap * (gl.ncols - 1)
+    sumrowgaps = maxrowgap * (gl.nrows - 1)
 
     remaininghorizontalspace = width(bbox) - sumcolgaps - leftprot - rightprot
     remainingverticalspace = height(bbox) - sumrowgaps - topprot - bottomprot
 
-    addedcolgap = ug.colgapfraction * remaininghorizontalspace
-    addedrowgap = ug.rowgapfraction * remainingverticalspace
+    addedcolgap = gl.colgapfraction * remaininghorizontalspace
+    addedrowgap = gl.rowgapfraction * remainingverticalspace
 
-    spaceforcolumns = remaininghorizontalspace - addedcolgap * (ug.ncols - 1)
-    spaceforrows = remainingverticalspace - addedrowgap * (ug.nrows - 1)
+    spaceforcolumns = remaininghorizontalspace - addedcolgap * (gl.ncols - 1)
+    spaceforrows = remainingverticalspace - addedrowgap * (gl.nrows - 1)
 
-    colwidths = ug.colratios ./ sum(ug.colratios) .* spaceforcolumns
-    rowheights = ug.rowratios ./ sum(ug.rowratios) .* spaceforrows
+    colwidths = gl.colratios ./ sum(gl.colratios) .* spaceforcolumns
+    rowheights = gl.rowratios ./ sum(gl.rowratios) .* spaceforrows
 
     colgap = maxcolgap + addedcolgap
     rowgap = maxrowgap + addedrowgap
 
-    xleftcols = [bbox.left + leftprot + sum(colwidths[1:i-1]) + (i - 1) * colgap for i in 1:ug.ncols]
+    xleftcols = [bbox.left + leftprot + sum(colwidths[1:i-1]) + (i - 1) * colgap for i in 1:gl.ncols]
     xrightcols = xleftcols .+ colwidths
 
-    ytoprows = [bbox.top + topprot + sum(rowheights[1:i-1]) + (i - 1) * rowgap for i in 1:ug.nrows]
-    ybottomrows = ytoprows .+ rowheights
+    ytoprows = [bbox.top - topprot - sum(rowheights[1:i-1]) - (i - 1) * rowgap for i in 1:gl.nrows]
+    ybottomrows = ytoprows .- rowheights
 
     solvedcontent = SpannedAlignable[]
-    for c in ug.content
+    for c in gl.content
         ileft = c.sp.cols.start
         iright = c.sp.cols.stop
         itop = c.sp.rows.start
@@ -248,72 +258,17 @@ function outersolve(ug::UnsolvedGrid, bbox::BBox)
         push!(solvedcontent, SpannedAlignable(solved, c.sp))
     end
 
-    # solvedcontent = solve.(ug.content)
-    SolvedGrid(bbox, solvedcontent, ug.nrows, ug.ncols, xleftcols,
+    # solvedcontent = solve.(gl.content)
+    SolvedGridLayout(bbox, solvedcontent, gl.nrows, gl.ncols, xleftcols,
         xrightcols, ytoprows, ybottomrows)
 end
 
-function solve(ua::UnsolvedAxis, innerbbox)
+function solve(ua::AxisLayout, innerbbox)
     ol = innerbbox.left - ua.decorations.left
     or = innerbbox.right + ua.decorations.right
     ot = innerbbox.top - ua.decorations.top
     ob = innerbbox.bottom + ua.decorations.bottom
-    SolvedAxis(innerbbox, Main.BBox(ol, or, ot, ob))
-end
-
-function draw!(layer, g::SolvedGrid, debug=true)
-    w = width(g.bbox)
-    h = height(g.bbox)
-    l = g.bbox.left
-    b = g.bbox.bottom
-    r = g.bbox.right
-    t = g.bbox.top
-
-    if debug
-        rect!(layer, Rect(g.bbox)) + Fill("green", 0.1)
-
-        for i in 1:g.ncols
-            xleft = g.xleftcols[i]
-            xright = g.xrightcols[i]
-            line!(layer, Line(P(xleft, b), P(xleft, t)))
-            line!(layer, Line(P(xright, b), P(xright, t))) + Stroke("red")
-        end
-
-        for i in 1:g.nrows
-            ytop = g.ytoprows[i]
-            ybottom = g.ybottomrows[i]
-            line!(layer, Line(P(l, ytop), P(r, ytop)))
-            line!(layer, Line(P(l, ybottom), P(r, ybottom))) + Stroke("red")
-        end
-    end
-    draw!.(layer, g.content, debug)
-end
-
-function draw!(layer, sp::SpannedAlignable, debug)
-    draw!(layer, sp.al, debug)
-end
-
-function draw!(layer, a::SolvedAxis, debug=true)
-    if debug
-        rect!(layer, a.outer) + Fill("red", 0.1)
-    end
-    r = rect!(layer, a.inner) + Fill("blue", 0.1)
-
-    txts!(layer, r) do r
-        [
-            Txt(fraction(rightline(r), 0.5), "y axis 2", a.outer.right - a.inner.right, :c, :t, deg(-90)),
-            Txt(fraction(leftline(r), 0.5), "y axis", a.inner.left - a.outer.left, :c, :b, deg(-90)),
-            Txt(fraction(topline(r), 0.5), "title", a.inner.top - a.outer.top, :c, :b, deg(0)),
-            Txt(fraction(bottomline(r), 0.5), "x axis", a.outer.bottom - a.inner.bottom, :c, :t, deg(0))
-        ]
-    end
-end
-
-function Layered.Rect(bb::Main.BBox)
-    center = P(0.5 * (bb.right + bb.left), 0.5 * (bb.top + bb.bottom))
-    w = width(bb)
-    h = height(bb)
-    Layered.Rect(center, w, h, deg(0))
+    SolvedAxisLayout(innerbbox, Main.BBox(ol, or, ot, ob), ua.axis)
 end
 
 Base.setindex!(g, a::Alignable, rows::S, cols::T) where {T<:Union{UnitRange,Int,Colon}, S<:Union{UnitRange,Int,Colon}} = begin
@@ -338,39 +293,109 @@ Base.setindex!(g, a::Alignable, rows::S, cols::T) where {T<:Union{UnitRange,Int,
     push!(g.content, SpannedAlignable(a, Span(rows, cols)))
 end
 
-function test()
 
-    Random.seed!(1)
-
-    c, tl = canvas(4, 4)
-    w = 3.5 * 72
-    h = 3.5 * 72
-    l = -3.5 / 2 * 72
-    b = 3.5 / 2 * 72
-
-    bbox = Main.BBox(l, l + w, b - h, b)
-
-    ua() = UnsolvedAxis(BBox((rand(4) .* 5 .+ 7)...))
-
-    ug = UnsolvedGrid([], 3, 3, [1, 1, 1.0], [1.5, 1.25, 1], 0.1, 0.1)
+function LayoutedAxis(parent::Scene)
+    scene = Scene(parent, Node(IRect(0, 0, 100, 100)))
+    limits = Node(FRect(0, 0, 100, 100))
+    xlabel = Node("x label")
+    ylabel = Node("y label")
+    LayoutedAxis(parent, scene, xlabel, ylabel, limits)
+end
 
 
-    ug[1, 1:3] = ua()
-    ug[2:3, 1] = ua()
+function applylayout(sg::SolvedGridLayout)
+    for c in sg.content
+        applylayout(c.al)
+    end
+end
+
+function IRect2D(bbox::BBox)
+    l = Int(round(bbox.left))
+    r = Int(round(bbox.right))
+    t = Int(round(bbox.top))
+    b = Int(round(bbox.bottom))
+    w = r - l
+    h = t - b
+    IRect(l, b, w, h)
+end
+
+function applylayout(sa::SolvedAxisLayout)
+    sa.axis.scene.px_area[] = IRect2D(sa.inner)
+end
+
+scene = Scene(resolution=(600, 600))
+campixel!(scene);
+
+la1 = LayoutedAxis(scene)
+la2 = LayoutedAxis(scene)
+la3 = LayoutedAxis(scene)
+la4 = LayoutedAxis(scene)
+la5 = LayoutedAxis(scene)
+
+lines!(la1.scene, rand(200, 2) .* 100, color=:black, show_axis=false);
+lines!(la2.scene, rand(200, 2) .* 100, color=:blue, show_axis=false);
+lines!(la3.scene, rand(200, 2) .* 100, color=:red, show_axis=false);
+lines!(la4.scene, rand(200, 2) .* 100, color=:orange, show_axis=false);
+lines!(la5.scene, rand(200, 2) .* 100, color=:pink, show_axis=false);
+
+gl = GridLayout([], 2, 2, [1, 1], [1, 1], 0.01, 0.01)
+
+gl[2, 1:2] = AxisLayout(BBox(25, 25, 25, 25), la1)
+gl[1, 2] = AxisLayout(BBox(25, 25, 25, 25), la2)
+
+gl2 = GridLayout([], 2, 2, [0.8, 0.2], [0.2, 0.8], 0.01, 0.01)
+gl2[2, 1] = AxisLayout(BBox(15, 0, 0, 15), la3)
+gl2[1, 1] = AxisLayout(BBox(0, 0, 0, 0), la4)
+gl2[2, 2] = AxisLayout(BBox(0, 0, 0, 0), la5)
+
+gl[1, 1] = gl2
 
 
-    ug2 = UnsolvedGrid([], 2, 3, [1, 1, 1], [1, 1], 0.1, 0.1)
-    ug2[1, 1] = ua()
-    ug2[2, 1:2] = ua()
-    ug2[2, 3] = ua()
-    ug2[1, 2:3] = ua()
+function BBox(i::Rect{2,Int64})
+    BBox(i.origin[1], i.origin[1] + i.widths[1], i.origin[2] + i.widths[2], i.origin[2])
+end
 
-    ug[2:3, 2:3] = ug2
+sg = outersolve(gl, BBox(pixelarea(scene)[]))
+applylayout(sg)
 
-    sg = outersolve(ug, bbox)
+on(scene.events.window_area) do area
+    sg = outersolve(gl, BBox(pixelarea(scene)[]))
+    applylayout(sg)
+end
 
-    draw!(tl, sg, true)
+function axislines!(scene, rect)
+    points = lift(rect) do r
+        p1 = Point2(r.origin[1], r.origin[2] + r.widths[2])
+        p2 = Point2(r.origin[1], r.origin[2])
+        p3 = Point2(r.origin[1] + r.widths[1], r.origin[2])
+        [p1, p2, p3]
+    end
+    lines!(scene, points, linewidth=2, show_axis=false)
+end
+axislines!(scene, la1.scene.px_area);
+axislines!(scene, la2.scene.px_area);
+axislines!(scene, la3.scene.px_area);
+axislines!(scene, la4.scene.px_area);
+axislines!(scene, la5.scene.px_area);
 
-    png(c, "./MakieLayout/MakieLayout/with_placeholders.png", dpi=300)
 
-end; test()
+
+
+
+
+
+
+
+t = text!(scene, "hello", textsize=20, show_axis=false)[end];
+ty = text!(scene, "y axis", textsize=20, position=(80, 250), rotation=3.1415/2, show_axis=false)[end];
+t.text[] = "x axis"
+t.position[] = (250, 80)
+t.align[] = [0.5, 0.5]
+ty.align[] = [0.5, 0.5]
+
+sc = scatter!(sub, rand(100, 2), show_axis=false);
+sc.color = :red;
+
+framelines = Makie.lines!(scene, [Point2(100, 400), Point2(100, 100), Point2(400, 100)], show_axis=false)[end];
+
+framelines.linewidth = 2

@@ -293,12 +293,39 @@ Base.setindex!(g, a::Alignable, rows::S, cols::T) where {T<:Union{UnitRange,Int,
     push!(g.content, SpannedAlignable(a, Span(rows, cols)))
 end
 
+function axislines!(scene, rect)
+    points = lift(rect) do r
+        p1 = Point2(r.origin[1], r.origin[2] + r.widths[2])
+        p2 = Point2(r.origin[1], r.origin[2])
+        p3 = Point2(r.origin[1] + r.widths[1], r.origin[2])
+        [p1, p2, p3]
+    end
+    lines!(scene, points, linewidth=2, show_axis=false)
+end
 
 function LayoutedAxis(parent::Scene)
     scene = Scene(parent, Node(IRect(0, 0, 100, 100)))
     limits = Node(FRect(0, 0, 100, 100))
     xlabel = Node("x label")
     ylabel = Node("y label")
+
+    labelgap = 10
+
+    xlabelpos = lift(scene.px_area) do a
+        Point2(a.origin[1] + a.widths[1] / 2, a.origin[2] - labelgap)
+    end
+
+    ylabelpos = lift(scene.px_area) do a
+        Point2(a.origin[1] - labelgap, a.origin[2] + a.widths[2] / 2)
+    end
+
+    tx = text!(parent, xlabel, textsize=20, position=xlabelpos, show_axis=false)[end]
+    tx.align = [0.5, 1]
+    ty = text!(parent, ylabel, textsize=20, position=ylabelpos, rotation=-pi/2, show_axis=false)[end]
+    ty.align = [0.5, 1]
+
+    axislines!(parent, scene.px_area)
+
     LayoutedAxis(parent, scene, xlabel, ylabel, limits)
 end
 
@@ -340,13 +367,13 @@ lines!(la5.scene, rand(200, 2) .* 100, color=:pink, show_axis=false);
 
 gl = GridLayout([], 2, 2, [1, 1], [1, 1], 0.01, 0.01)
 
-gl[2, 1:2] = AxisLayout(BBox(25, 25, 25, 25), la1)
-gl[1, 2] = AxisLayout(BBox(25, 25, 25, 25), la2)
+gl[2, 1:2] = AxisLayout(BBox(35, 0, 0, 35), la1)
+gl[1, 2] = AxisLayout(BBox(35, 0, 0, 35), la2)
 
 gl2 = GridLayout([], 2, 2, [0.8, 0.2], [0.2, 0.8], 0.01, 0.01)
-gl2[2, 1] = AxisLayout(BBox(15, 0, 0, 15), la3)
-gl2[1, 1] = AxisLayout(BBox(0, 0, 0, 0), la4)
-gl2[2, 2] = AxisLayout(BBox(0, 0, 0, 0), la5)
+gl2[2, 1] = AxisLayout(BBox(35, 0, 0, 35), la3)
+gl2[1, 1] = AxisLayout(BBox(35, 0, 0, 35), la4)
+gl2[2, 2] = AxisLayout(BBox(35, 0, 0, 35), la5)
 
 gl[1, 1] = gl2
 
@@ -355,47 +382,11 @@ function BBox(i::Rect{2,Int64})
     BBox(i.origin[1], i.origin[1] + i.widths[1], i.origin[2] + i.widths[2], i.origin[2])
 end
 
-sg = outersolve(gl, BBox(pixelarea(scene)[]))
-applylayout(sg)
+function shrinkbymargin(rect, margin)
+    IRect((rect.origin .+ margin)..., (rect.widths .- 2 .* margin)...)
+end
 
 on(scene.events.window_area) do area
-    sg = outersolve(gl, BBox(pixelarea(scene)[]))
+    sg = outersolve(gl, BBox(shrinkbymargin(pixelarea(scene)[], 30)))
     applylayout(sg)
 end
-
-function axislines!(scene, rect)
-    points = lift(rect) do r
-        p1 = Point2(r.origin[1], r.origin[2] + r.widths[2])
-        p2 = Point2(r.origin[1], r.origin[2])
-        p3 = Point2(r.origin[1] + r.widths[1], r.origin[2])
-        [p1, p2, p3]
-    end
-    lines!(scene, points, linewidth=2, show_axis=false)
-end
-axislines!(scene, la1.scene.px_area);
-axislines!(scene, la2.scene.px_area);
-axislines!(scene, la3.scene.px_area);
-axislines!(scene, la4.scene.px_area);
-axislines!(scene, la5.scene.px_area);
-
-
-
-
-
-
-
-
-
-t = text!(scene, "hello", textsize=20, show_axis=false)[end];
-ty = text!(scene, "y axis", textsize=20, position=(80, 250), rotation=3.1415/2, show_axis=false)[end];
-t.text[] = "x axis"
-t.position[] = (250, 80)
-t.align[] = [0.5, 0.5]
-ty.align[] = [0.5, 0.5]
-
-sc = scatter!(sub, rand(100, 2), show_axis=false);
-sc.color = :red;
-
-framelines = Makie.lines!(scene, [Point2(100, 400), Point2(100, 100), Point2(400, 100)], show_axis=false)[end];
-
-framelines.linewidth = 2

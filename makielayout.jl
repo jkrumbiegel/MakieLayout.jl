@@ -1,5 +1,6 @@
 using Random
 using Animations
+using PlotUtils
 using Makie
 
 struct BBox
@@ -309,7 +310,48 @@ function LayoutedAxis(parent::Scene)
     xlabel = Node("x label")
     ylabel = Node("y label")
 
-    labelgap = 10
+    cam = cam2d!(scene)
+
+    ticksnode = Node(Point2f0[])
+    ticks = linesegments!(parent, ticksnode, linewidth=2)[end]
+
+    on(cam.area) do a
+        xrange = (a.origin[1], a.origin[1] + a.widths[1])
+        width = xrange[2] - xrange[1]
+
+        if width == 0 || !isfinite(xrange[1]) || !isfinite(xrange[2])
+            return
+        end
+        tickvals, vminbest, vmaxbest = optimize_ticks(xrange...)
+        xfractions = (tickvals .- xrange[1]) ./ width
+        pxa = scene.px_area[]
+        xrange_scene = (pxa.origin[1], pxa.origin[1] + pxa.widths[1])
+        width_scene = xrange_scene[2] - xrange_scene[1]
+        xticks_scene = xrange_scene[1] .+ width_scene .* xfractions
+        ticksize = 10 # px
+        y = pxa.origin[2]
+        xtickstarts = [Point(x, y) for x in xticks_scene]
+        xtickends = [t + Point(0.0, -ticksize) for t in xtickstarts]
+
+        yrange = (a.origin[2], a.origin[2] + a.widths[2])
+        height = yrange[2] - yrange[1]
+        tickvals, vminbest, vmaxbest = optimize_ticks(yrange...)
+        yfractions = (tickvals .- yrange[1]) ./ height
+        pxa = scene.px_area[]
+        yrange_scene = (pxa.origin[2], pxa.origin[2] + pxa.widths[2])
+        height_scene = yrange_scene[2] - yrange_scene[1]
+        yticks_scene = yrange_scene[1] .+ height_scene .* yfractions
+        ticksize = 10 # px
+        x = pxa.origin[1]
+        ytickstarts = [Point(x, y) for y in yticks_scene]
+        ytickends = [t + Point(-ticksize, 0.0) for t in ytickstarts]
+
+        ticksnode[] = collect(Iterators.flatten(zip(
+           [xtickstarts; ytickstarts],
+           [xtickends; ytickends])))
+    end
+
+    labelgap = 15
 
     xlabelpos = lift(scene.px_area) do a
         Point2(a.origin[1] + a.widths[1] / 2, a.origin[2] - labelgap)
@@ -367,13 +409,13 @@ lines!(la5.scene, rand(200, 2) .* 100, color=:pink, show_axis=false);
 
 gl = GridLayout([], 2, 2, [1, 1], [1, 1], 0.01, 0.01)
 
-gl[2, 1:2] = AxisLayout(BBox(35, 0, 0, 35), la1)
-gl[1, 2] = AxisLayout(BBox(35, 0, 0, 35), la2)
+gl[2, 1:2] = AxisLayout(BBox(40, 0, 0, 40), la1)
+gl[1, 2] = AxisLayout(BBox(40, 0, 0, 40), la2)
 
 gl2 = GridLayout([], 2, 2, [0.8, 0.2], [0.2, 0.8], 0.01, 0.01)
-gl2[2, 1] = AxisLayout(BBox(35, 0, 0, 35), la3)
-gl2[1, 1] = AxisLayout(BBox(35, 0, 0, 35), la4)
-gl2[2, 2] = AxisLayout(BBox(35, 0, 0, 35), la5)
+gl2[2, 1] = AxisLayout(BBox(40, 0, 0, 40), la3)
+gl2[1, 1] = AxisLayout(BBox(40, 0, 0, 40), la4)
+gl2[2, 2] = AxisLayout(BBox(40, 0, 0, 40), la5)
 
 gl[1, 1] = gl2
 

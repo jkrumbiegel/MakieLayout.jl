@@ -445,8 +445,9 @@ function applylayout(sa::SolvedAxisLayout)
 end
 
 
-scene = Scene(resolution=(600, 600))
 begin
+    scene = Scene(resolution=(600, 600));
+    display(scene)
     campixel!(scene);
 
     la1 = LayoutedAxis(scene)

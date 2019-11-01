@@ -444,6 +444,13 @@ function applylayout(sa::SolvedAxisLayout)
     sa.axis.scene.px_area[] = IRect2D(sa.inner)
 end
 
+function BBox(i::Rect{2,Int64})
+    BBox(i.origin[1], i.origin[1] + i.widths[1], i.origin[2] + i.widths[2], i.origin[2])
+end
+
+function shrinkbymargin(rect, margin)
+    IRect((rect.origin .+ margin)..., (rect.widths .- 2 .* margin)...)
+end
 
 begin
     scene = Scene(resolution=(600, 600));
@@ -473,15 +480,6 @@ begin
     gl2[2, 2] = AxisLayout(BBox(65, 0, 0, 65), la5)
 
     gl[1, 1] = gl2
-
-
-    function BBox(i::Rect{2,Int64})
-        BBox(i.origin[1], i.origin[1] + i.widths[1], i.origin[2] + i.widths[2], i.origin[2])
-    end
-
-    function shrinkbymargin(rect, margin)
-        IRect((rect.origin .+ margin)..., (rect.widths .- 2 .* margin)...)
-    end
 
     sg = outersolve(gl, BBox(shrinkbymargin(pixelarea(scene)[], 30)))
     applylayout(sg)

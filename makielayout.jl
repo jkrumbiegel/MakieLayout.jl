@@ -2,6 +2,7 @@ using Random
 using Animations
 using PlotUtils
 using Makie
+import Showoff
 
 struct BBox
     left::Float64
@@ -304,6 +305,29 @@ function axislines!(scene, rect)
     lines!(scene, points, linewidth=2, show_axis=false)
 end
 
+function locateticks(xmin, xmax)
+    d = xmax - xmin
+    ex = log10(d)
+    exrounded = round(ex)
+    factor = 1 / 10 ^ (exrounded - 1)
+
+    xminf = ceil(xmin * factor)
+    xmaxf = floor(xmax * factor)
+
+    df = xmaxf - xminf
+
+    steps = [5, 4, 2, 1]
+
+    for s in steps
+        n, remainder = divrem(df, s)
+        if n >= 2
+            rang = 1:n
+            ticks = [xminf; [xminf + x * s for x in rang]] ./ factor
+            return ticks
+        end
+    end
+end
+
 function LayoutedAxis(parent::Scene)
     scene = Scene(parent, Node(IRect(0, 0, 100, 100)))
     limits = Node(FRect(0, 0, 100, 100))
@@ -315,15 +339,29 @@ function LayoutedAxis(parent::Scene)
     ticksnode = Node(Point2f0[])
     ticks = linesegments!(parent, ticksnode, linewidth=2)[end]
 
+    nmaxticks = 5
+
+    xticklabelnodes = [Node("0") for i in 1:nmaxticks]
+    xticklabelposnodes = [Node(Point(0.0, 0.0)) for i in 1:nmaxticks]
+    xticklabels = [text!(parent,
+        xticklabelnodes[i],
+        position = xticklabelposnodes[i],
+        align = (:center, :top),
+        textsize=20)[end]
+            for i in 1:nmaxticks]
+
     on(cam.area) do a
+        # @show a = scene.limits[]
         xrange = (a.origin[1], a.origin[1] + a.widths[1])
         width = xrange[2] - xrange[1]
 
         if width == 0 || !isfinite(xrange[1]) || !isfinite(xrange[2])
             return
         end
-        tickvals, vminbest, vmaxbest = optimize_ticks(xrange...)
-        xfractions = (tickvals .- xrange[1]) ./ width
+
+        xtickvals = locateticks(xrange...)
+        # xtickvals, vminbest, vmaxbest = optimize_ticks(xrange...)
+        xfractions = (xtickvals .- xrange[1]) ./ width
         pxa = scene.px_area[]
         xrange_scene = (pxa.origin[1], pxa.origin[1] + pxa.widths[1])
         width_scene = xrange_scene[2] - xrange_scene[1]
@@ -335,8 +373,9 @@ function LayoutedAxis(parent::Scene)
 
         yrange = (a.origin[2], a.origin[2] + a.widths[2])
         height = yrange[2] - yrange[1]
-        tickvals, vminbest, vmaxbest = optimize_ticks(yrange...)
-        yfractions = (tickvals .- yrange[1]) ./ height
+        ytickvals = locateticks(yrange...)
+        # ytickvals, vminbest, vmaxbest = optimize_ticks(yrange...)
+        yfractions = (ytickvals .- yrange[1]) ./ height
         pxa = scene.px_area[]
         yrange_scene = (pxa.origin[2], pxa.origin[2] + pxa.widths[2])
         height_scene = yrange_scene[2] - yrange_scene[1]
@@ -346,12 +385,25 @@ function LayoutedAxis(parent::Scene)
         ytickstarts = [Point(x, y) for y in yticks_scene]
         ytickends = [t + Point(-ticksize, 0.0) for t in ytickstarts]
 
+        xtickstrings = Showoff.showoff(xtickvals, :plain)
+        nxticks = length(xtickvals)
+        for i in 1:nmaxticks
+            if i <= nxticks
+                xticklabelnodes[i][] = xtickstrings[i]
+                xticklabelposnodes[i][] = xtickends[i] + Point(0.0, -10.0)
+                xticklabels[i].visible = true
+            else
+                xticklabels[i].visible = false
+            end
+        end
+
+
         ticksnode[] = collect(Iterators.flatten(zip(
            [xtickstarts; ytickstarts],
            [xtickends; ytickends])))
     end
 
-    labelgap = 15
+    labelgap = 40
 
     xlabelpos = lift(scene.px_area) do a
         Point2(a.origin[1] + a.widths[1] / 2, a.origin[2] - labelgap)
@@ -363,7 +415,7 @@ function LayoutedAxis(parent::Scene)
 
     tx = text!(parent, xlabel, textsize=20, position=xlabelpos, show_axis=false)[end]
     tx.align = [0.5, 1]
-    ty = text!(parent, ylabel, textsize=20, position=ylabelpos, rotation=-pi/2, show_axis=false)[end]
+    ty = text!(parent, ylabel, textsize=20, position=ylabelpos, rotation=pi/2, show_axis=false)[end]
     ty.align = [0.5, 1]
 
     axislines!(parent, scene.px_area)
@@ -392,43 +444,64 @@ function applylayout(sa::SolvedAxisLayout)
     sa.axis.scene.px_area[] = IRect2D(sa.inner)
 end
 
+
 scene = Scene(resolution=(600, 600))
-campixel!(scene);
+begin
+    campixel!(scene);
 
-la1 = LayoutedAxis(scene)
-la2 = LayoutedAxis(scene)
-la3 = LayoutedAxis(scene)
-la4 = LayoutedAxis(scene)
-la5 = LayoutedAxis(scene)
+    la1 = LayoutedAxis(scene)
+    la2 = LayoutedAxis(scene)
+    la3 = LayoutedAxis(scene)
+    la4 = LayoutedAxis(scene)
+    la5 = LayoutedAxis(scene)
 
-lines!(la1.scene, rand(200, 2) .* 100, color=:black, show_axis=false);
-lines!(la2.scene, rand(200, 2) .* 100, color=:blue, show_axis=false);
-lines!(la3.scene, rand(200, 2) .* 100, color=:red, show_axis=false);
-lines!(la4.scene, rand(200, 2) .* 100, color=:orange, show_axis=false);
-lines!(la5.scene, rand(200, 2) .* 100, color=:pink, show_axis=false);
+    lines!(la1.scene, rand(200, 2) .* 100, color=:black, show_axis=false);
+    lines!(la2.scene, rand(200, 2) .* 100, color=:blue, show_axis=false);
+    lines!(la3.scene, rand(200, 2) .* 100, color=:red, show_axis=false);
+    lines!(la4.scene, rand(200, 2) .* 100, color=:orange, show_axis=false);
+    lines!(la5.scene, rand(200, 2) .* 100, color=:pink, show_axis=false);
 
-gl = GridLayout([], 2, 2, [1, 1], [1, 1], 0.01, 0.01)
+    gl = GridLayout([], 2, 2, [1, 1], [1, 1], 0.01, 0.01)
 
-gl[2, 1:2] = AxisLayout(BBox(40, 0, 0, 40), la1)
-gl[1, 2] = AxisLayout(BBox(40, 0, 0, 40), la2)
+    gl[2, 1:2] = AxisLayout(BBox(65, 0, 0, 65), la1)
+    gl[1, 2] = AxisLayout(BBox(65, 0, 0, 65), la2)
 
-gl2 = GridLayout([], 2, 2, [0.8, 0.2], [0.2, 0.8], 0.01, 0.01)
-gl2[2, 1] = AxisLayout(BBox(40, 0, 0, 40), la3)
-gl2[1, 1] = AxisLayout(BBox(40, 0, 0, 40), la4)
-gl2[2, 2] = AxisLayout(BBox(40, 0, 0, 40), la5)
+    gl2 = GridLayout([], 2, 2, [0.8, 0.2], [0.2, 0.8], 0.01, 0.01)
+    gl2[2, 1] = AxisLayout(BBox(65, 0, 0, 65), la3)
+    gl2[1, 1] = AxisLayout(BBox(65, 0, 0, 65), la4)
+    gl2[2, 2] = AxisLayout(BBox(65, 0, 0, 65), la5)
 
-gl[1, 1] = gl2
+    gl[1, 1] = gl2
 
 
-function BBox(i::Rect{2,Int64})
-    BBox(i.origin[1], i.origin[1] + i.widths[1], i.origin[2] + i.widths[2], i.origin[2])
-end
+    function BBox(i::Rect{2,Int64})
+        BBox(i.origin[1], i.origin[1] + i.widths[1], i.origin[2] + i.widths[2], i.origin[2])
+    end
 
-function shrinkbymargin(rect, margin)
-    IRect((rect.origin .+ margin)..., (rect.widths .- 2 .* margin)...)
-end
+    function shrinkbymargin(rect, margin)
+        IRect((rect.origin .+ margin)..., (rect.widths .- 2 .* margin)...)
+    end
 
-on(scene.events.window_area) do area
     sg = outersolve(gl, BBox(shrinkbymargin(pixelarea(scene)[], 30)))
     applylayout(sg)
+
+    on(scene.events.window_area) do area
+        sg = outersolve(gl, BBox(shrinkbymargin(pixelarea(scene)[], 30)))
+        applylayout(sg)
+    end
+
 end
+
+
+
+using Makie
+scene = Scene(resolution=(500, 500))
+scene.backgroundcolor = :red;
+sub = Scene(scene, IRect(20, 20, 200, 200));
+sub.backgroundcolor = :gray;
+sub.clear = true;
+sub2 = Scene(scene, IRect(250, 250, 200, 200));
+sub2.backgroundcolor = :white
+sub2.clear = true;
+scatter!(sub, [1, 2, 3], show_axis = false);
+scene

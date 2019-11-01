@@ -490,19 +490,4 @@ begin
         sg = outersolve(gl, BBox(shrinkbymargin(pixelarea(scene)[], 30)))
         applylayout(sg)
     end
-
 end
-
-
-
-using Makie
-scene = Scene(resolution=(500, 500))
-scene.backgroundcolor = :red;
-sub = Scene(scene, IRect(20, 20, 200, 200));
-sub.backgroundcolor = :gray;
-sub.clear = true;
-sub2 = Scene(scene, IRect(250, 250, 200, 200));
-sub2.backgroundcolor = :white
-sub2.clear = true;
-scatter!(sub, [1, 2, 3], show_axis = false);
-scene

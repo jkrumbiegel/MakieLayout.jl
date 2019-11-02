@@ -339,7 +339,7 @@ function LayoutedAxis(parent::Scene)
     ticksnode = Node(Point2f0[])
     ticks = linesegments!(parent, ticksnode, linewidth=2)[end]
 
-    nmaxticks = 5
+    nmaxticks = 7
 
     xticklabelnodes = [Node("0") for i in 1:nmaxticks]
     xticklabelposnodes = [Node(Point(0.0, 0.0)) for i in 1:nmaxticks]

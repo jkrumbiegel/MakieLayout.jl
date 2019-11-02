@@ -1,6 +1,6 @@
-<mxfile host="www.draw.io" modified="2019-11-02T09:18:21.329Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:69.0) Gecko/20100101 Firefox/69.0" etag="N6awqg6TmsLwlmI2clv7" version="12.1.9" type="github" pages="1">
+<mxfile host="www.draw.io" modified="2019-11-02T09:28:07.670Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:69.0) Gecko/20100101 Firefox/69.0" etag="zYWPFRqV-D2EWUo3_PCk" version="12.1.9" type="github" pages="1">
   <diagram id="ya_K8qT7NDXAFuwK0zz7" name="Page-1">
-    <mxGraphModel dx="1172" dy="764" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="977" dy="637" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
@@ -27,11 +27,19 @@
         <mxCell id="6QXtoHnV72dtA-wBQa-R-8" value="Main Scene" style="text;html=1;strokeColor=#000000;fillColor=#A9C4EB;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="280" y="20" width="120" height="20" as="geometry"/>
         </mxCell>
+        <mxCell id="TAD7vaCS1jvDlmOlCeL6-25" style="edgeStyle=orthogonalEdgeStyle;curved=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TAD7vaCS1jvDlmOlCeL6-1" target="TAD7vaCS1jvDlmOlCeL6-18">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="640" y="85" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TAD7vaCS1jvDlmOlCeL6-28" style="edgeStyle=orthogonalEdgeStyle;curved=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TAD7vaCS1jvDlmOlCeL6-1" target="TAD7vaCS1jvDlmOlCeL6-27">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
         <mxCell id="TAD7vaCS1jvDlmOlCeL6-1" value="size" style="text;html=1;strokeColor=#666666;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=2;" vertex="1" parent="1">
           <mxGeometry x="480" y="40" width="120" height="20" as="geometry"/>
         </mxCell>
         <mxCell id="TAD7vaCS1jvDlmOlCeL6-2" value="Axis in Scene" style="text;html=1;strokeColor=#000000;fillColor=#A9C4EB;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=2;" vertex="1" parent="1">
-          <mxGeometry x="480" y="20" width="120" height="20" as="geometry"/>
+          <mxGeometry x="480" y="20" width="320" height="20" as="geometry"/>
         </mxCell>
         <mxCell id="TAD7vaCS1jvDlmOlCeL6-19" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TAD7vaCS1jvDlmOlCeL6-4" target="TAD7vaCS1jvDlmOlCeL6-18">
           <mxGeometry relative="1" as="geometry"/>
@@ -39,10 +47,19 @@
         <mxCell id="TAD7vaCS1jvDlmOlCeL6-4" value="data limits" style="text;html=1;strokeColor=#666666;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=2;" vertex="1" parent="1">
           <mxGeometry x="480" y="80" width="120" height="20" as="geometry"/>
         </mxCell>
+        <mxCell id="TAD7vaCS1jvDlmOlCeL6-26" style="edgeStyle=orthogonalEdgeStyle;curved=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TAD7vaCS1jvDlmOlCeL6-5" target="TAD7vaCS1jvDlmOlCeL6-18">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="TAD7vaCS1jvDlmOlCeL6-30" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="TAD7vaCS1jvDlmOlCeL6-5" target="TAD7vaCS1jvDlmOlCeL6-27">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
         <mxCell id="TAD7vaCS1jvDlmOlCeL6-5" value="position in layout" style="text;html=1;strokeColor=#666666;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=2;" vertex="1" parent="1">
           <mxGeometry x="480" y="60" width="120" height="20" as="geometry"/>
         </mxCell>
         <mxCell id="TAD7vaCS1jvDlmOlCeL6-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="TAD7vaCS1jvDlmOlCeL6-7" target="TAD7vaCS1jvDlmOlCeL6-5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="TAD7vaCS1jvDlmOlCeL6-29" style="edgeStyle=orthogonalEdgeStyle;curved=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TAD7vaCS1jvDlmOlCeL6-7" target="TAD7vaCS1jvDlmOlCeL6-1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
         <mxCell id="TAD7vaCS1jvDlmOlCeL6-7" value="layout" style="text;html=1;strokeColor=#666666;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=2;" vertex="1" parent="1">
@@ -67,7 +84,7 @@
           <mxGeometry x="80" y="120" width="120" height="20" as="geometry"/>
         </mxCell>
         <mxCell id="TAD7vaCS1jvDlmOlCeL6-18" value="ticks / ticklabels / grid" style="text;html=1;strokeColor=#666666;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=2;" vertex="1" parent="1">
-          <mxGeometry x="640" y="80" width="120" height="20" as="geometry"/>
+          <mxGeometry x="680" y="60" width="120" height="20" as="geometry"/>
         </mxCell>
         <mxCell id="TAD7vaCS1jvDlmOlCeL6-21" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="TAD7vaCS1jvDlmOlCeL6-20" target="TAD7vaCS1jvDlmOlCeL6-4">
           <mxGeometry relative="1" as="geometry"/>
@@ -83,6 +100,9 @@
         </mxCell>
         <mxCell id="TAD7vaCS1jvDlmOlCeL6-22" value="Add plot with axis" style="text;html=1;strokeColor=#666666;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=2;" vertex="1" parent="1">
           <mxGeometry x="80" y="140" width="120" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="TAD7vaCS1jvDlmOlCeL6-27" value="axis labels / titles" style="text;html=1;strokeColor=#666666;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="680" y="40" width="120" height="20" as="geometry"/>
         </mxCell>
       </root>
     </mxGraphModel>

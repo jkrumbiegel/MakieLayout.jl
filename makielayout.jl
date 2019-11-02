@@ -3,6 +3,7 @@ using Animations
 using PlotUtils
 using Makie
 import Showoff
+using Printf
 
 struct BBox
     left::Float64
@@ -354,6 +355,8 @@ function LayoutedAxis(parent::Scene)
         # @show a = scene.limits[]
         xrange = (a.origin[1], a.origin[1] + a.widths[1])
         width = xrange[2] - xrange[1]
+        # @printf("cam %.1f, %.1f, %.1f, %.1f\n", a.origin..., a.widths...)
+        # @printf("pix %.1f, %.1f, %.1f, %.1f\n", pxa.origin..., pxa.widths...)
 
         if width == 0 || !isfinite(xrange[1]) || !isfinite(xrange[2])
             return

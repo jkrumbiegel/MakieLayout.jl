@@ -351,12 +351,27 @@ function LayoutedAxis(parent::Scene)
         textsize=20)[end]
             for i in 1:nmaxticks]
 
+    yticklabelnodes = [Node("0") for i in 1:nmaxticks]
+    yticklabelposnodes = [Node(Point(0.0, 0.0)) for i in 1:nmaxticks]
+    yticklabels = [text!(parent,
+        yticklabelnodes[i],
+        position = yticklabelposnodes[i],
+        align = (:center, :bottom),
+        rotation = pi/2,
+        textsize=20)[end]
+            for i in 1:nmaxticks]
+
     on(cam.area) do a
-        # @show a = scene.limits[]
-        xrange = (a.origin[1], a.origin[1] + a.widths[1])
-        width = xrange[2] - xrange[1]
+
+        pxa = scene.px_area[]
+        px_aspect = pxa.widths[1] / pxa.widths[2]
+
         # @printf("cam %.1f, %.1f, %.1f, %.1f\n", a.origin..., a.widths...)
         # @printf("pix %.1f, %.1f, %.1f, %.1f\n", pxa.origin..., pxa.widths...)
+
+        width = px_aspect > 1 ? a.widths[1] / px_aspect : a.widths[1]
+        xrange = (a.origin[1], a.origin[1] + width)
+
 
         if width == 0 || !isfinite(xrange[1]) || !isfinite(xrange[2])
             return
@@ -365,7 +380,6 @@ function LayoutedAxis(parent::Scene)
         xtickvals = locateticks(xrange...)
         # xtickvals, vminbest, vmaxbest = optimize_ticks(xrange...)
         xfractions = (xtickvals .- xrange[1]) ./ width
-        pxa = scene.px_area[]
         xrange_scene = (pxa.origin[1], pxa.origin[1] + pxa.widths[1])
         width_scene = xrange_scene[2] - xrange_scene[1]
         xticks_scene = xrange_scene[1] .+ width_scene .* xfractions
@@ -374,12 +388,13 @@ function LayoutedAxis(parent::Scene)
         xtickstarts = [Point(x, y) for x in xticks_scene]
         xtickends = [t + Point(0.0, -ticksize) for t in xtickstarts]
 
-        yrange = (a.origin[2], a.origin[2] + a.widths[2])
-        height = yrange[2] - yrange[1]
+        height = px_aspect < 1 ? a.widths[2] * px_aspect : a.widths[2]
+        yrange = (a.origin[2], a.origin[2] + height)
+
+
         ytickvals = locateticks(yrange...)
         # ytickvals, vminbest, vmaxbest = optimize_ticks(yrange...)
         yfractions = (ytickvals .- yrange[1]) ./ height
-        pxa = scene.px_area[]
         yrange_scene = (pxa.origin[2], pxa.origin[2] + pxa.widths[2])
         height_scene = yrange_scene[2] - yrange_scene[1]
         yticks_scene = yrange_scene[1] .+ height_scene .* yfractions
@@ -387,6 +402,7 @@ function LayoutedAxis(parent::Scene)
         x = pxa.origin[1]
         ytickstarts = [Point(x, y) for y in yticks_scene]
         ytickends = [t + Point(-ticksize, 0.0) for t in ytickstarts]
+
 
         xtickstrings = Showoff.showoff(xtickvals, :plain)
         nxticks = length(xtickvals)
@@ -400,13 +416,25 @@ function LayoutedAxis(parent::Scene)
             end
         end
 
+        ytickstrings = Showoff.showoff(ytickvals, :plain)
+        nyticks = length(ytickvals)
+        for i in 1:nmaxticks
+            if i <= nyticks
+                yticklabelnodes[i][] = ytickstrings[i]
+                yticklabelposnodes[i][] = ytickends[i] + Point(-10.0, 0.0)
+                yticklabels[i].visible = true
+            else
+                yticklabels[i].visible = false
+            end
+        end
+
 
         ticksnode[] = collect(Iterators.flatten(zip(
            [xtickstarts; ytickstarts],
            [xtickends; ytickends])))
     end
 
-    labelgap = 40
+    labelgap = 50
 
     xlabelpos = lift(scene.px_area) do a
         Point2(a.origin[1] + a.widths[1] / 2, a.origin[2] - labelgap)
@@ -419,7 +447,7 @@ function LayoutedAxis(parent::Scene)
     tx = text!(parent, xlabel, textsize=20, position=xlabelpos, show_axis=false)[end]
     tx.align = [0.5, 1]
     ty = text!(parent, ylabel, textsize=20, position=ylabelpos, rotation=pi/2, show_axis=false)[end]
-    ty.align = [0.5, 1]
+    ty.align = [0.5, 0]
 
     axislines!(parent, scene.px_area)
 
@@ -466,21 +494,23 @@ begin
     la4 = LayoutedAxis(scene)
     la5 = LayoutedAxis(scene)
 
-    lines!(la1.scene, rand(200, 2) .* 100, color=:black, show_axis=false);
-    lines!(la2.scene, rand(200, 2) .* 100, color=:blue, show_axis=false);
-    lines!(la3.scene, rand(200, 2) .* 100, color=:red, show_axis=false);
-    lines!(la4.scene, rand(200, 2) .* 100, color=:orange, show_axis=false);
-    lines!(la5.scene, rand(200, 2) .* 100, color=:pink, show_axis=false);
+    # lines!(la1.scene, rand(200, 2) .* 100, color=:black, show_axis=false)
+    img = rand(100, 100)
+    image!(la1.scene, img, show_axis=false)
+    lines!(la2.scene, rand(200, 2) .* 100, color=:blue, show_axis=false)
+    scatter!(la3.scene, rand(200, 2) .* 100, markersize=3, color=:red, show_axis=false)
+    lines!(la4.scene, rand(200, 2) .* 100, color=:orange, show_axis=false)
+    lines!(la5.scene, rand(200, 2) .* 100, color=:pink, show_axis=false)
 
     gl = GridLayout([], 2, 2, [1, 1], [1, 1], 0.01, 0.01)
 
-    gl[2, 1:2] = AxisLayout(BBox(65, 0, 0, 65), la1)
-    gl[1, 2] = AxisLayout(BBox(65, 0, 0, 65), la2)
+    gl[2, 1:2] = AxisLayout(BBox(75, 0, 0, 75), la1)
+    gl[1, 2] = AxisLayout(BBox(75, 0, 0, 75), la2)
 
     gl2 = GridLayout([], 2, 2, [0.8, 0.2], [0.2, 0.8], 0.01, 0.01)
-    gl2[2, 1] = AxisLayout(BBox(65, 0, 0, 65), la3)
-    gl2[1, 1] = AxisLayout(BBox(65, 0, 0, 65), la4)
-    gl2[2, 2] = AxisLayout(BBox(65, 0, 0, 65), la5)
+    gl2[2, 1] = AxisLayout(BBox(75, 0, 0, 75), la3)
+    gl2[1, 1] = AxisLayout(BBox(75, 0, 0, 75), la4)
+    gl2[2, 2] = AxisLayout(BBox(75, 0, 0, 75), la5)
 
     gl[1, 1] = gl2
 

@@ -5,6 +5,7 @@ using AbstractPlotting
 import Showoff
 using Printf
 using AbstractPlotting: Rect2D
+import AbstractPlotting: IRect2D
 
 const BBox = Rect2D{Float64}
 
@@ -44,6 +45,13 @@ function BBox(left::Number, right::Number, top::Number, bottom::Number)
     return BBox(mini, maxi .- mini)
 end
 
+function IRect2D(bbox::Rect2D)
+    return IRect2D(
+        round.(Int, minimum(bbox)),
+        round.(Int, widths(bbox))
+    )
+end
+
 struct RowCols{T <: Union{Number, Vector{Float64}}}
     lefts::T
     rights::T
@@ -59,17 +67,38 @@ function RowCols(ncols::Int, nrows::Int)
         zeros(nrows)
     )
 end
+
 Base.getindex(rowcols::RowCols, ::Left) = rowcols.lefts
 Base.getindex(rowcols::RowCols, ::Right) = rowcols.rights
 Base.getindex(rowcols::RowCols, ::Top) = rowcols.tops
 Base.getindex(rowcols::RowCols, ::Bottom) = rowcols.bottoms
 
-const WithSides = Union{Rect2D, RowCols}
+"""
+    eachside(f)
+Calls f over all sides (Left, Right, Top, Bottom), and creates a BBox from the result of f(side)
+"""
+function eachside(f)
+    return BBox(map(f, (Left(), Right(), Top(), Bottom()))...)
+end
 
-function perside(f, bbox::WithSides, others::WithSides)
-    return BBox(map((Left(), Right(), Top(), Bottom())) do side
-        f(side, getindex.((bbox, others), (side,))...)
-    end...)
+"""
+mapsides(
+       f, first::Union{Rect2D, RowCols}, rest::Union{Rect2D, RowCols}...
+   )::BBox
+Maps f over all sides of the rectangle like arguments.
+e.g.
+```
+mapsides(BBox(left, right, top, bottom)) do side::Side, side_val::Number
+    return ...
+end::BBox
+```
+"""
+function mapsides(
+        f, first::Union{Rect2D, RowCols}, rest::Union{Rect2D, RowCols}...
+    )
+    return eachside() do side
+        f(side, getindex.((first, rest...), (side,))...)
+    end
 end
 
 abstract type Alignable end
@@ -130,10 +159,7 @@ struct SolvedGridLayout <: Alignable
     content::Vector{SpannedAlignable}
     nrows::Int
     ncols::Int
-    xleftcols::Vector{Float64}
-    xrightcols::Vector{Float64}
-    ytoprows::Vector{Float64}
-    ybottomrows::Vector{Float64}
+    grid::RowCols{Vector{Float64}}
 end
 
 struct GridLayout <: Alignable
@@ -186,7 +212,7 @@ function solve(gl::GridLayout, bbox::BBox)
     # go through all the layout objects placed in the grid
     for c in gl.content
         idx_rect = side_indices(c)
-        perside(idx_rect, maxgrid) do side, idx, grid
+        mapsides(idx_rect, maxgrid) do side, idx, grid
             grid[idx] = max(grid[idx], protrusion(c.al, side))
         end
     end
@@ -243,14 +269,14 @@ function solve(gl::GridLayout, bbox::BBox)
     # but we know the protrusions before we know how much space each plot actually has
     # because the protrusions should be static (like tick labels etc don't change size with the plot)
 
-    xyboxes = RowCols(
+    gridboxes = RowCols(
         xleftcols, xrightcols,
         ytoprows, ybottomrows
     )
     solvedcontent = map(gl.content) do c
         idx_rect = side_indices(c)
-        bbox_cell = perside(idx_rect, xyboxes) do side, idx, xy
-            xy[idx]
+        bbox_cell = mapsides(idx_rect, gridboxes) do side, idx, gridside
+            gridside[idx]
         end
         solved = solve(c.al, bbox_cell)
         return SpannedAlignable(solved, c.sp)
@@ -258,8 +284,8 @@ function solve(gl::GridLayout, bbox::BBox)
     # return a solved grid layout in which all objects are also solved layout objects
     return SolvedGridLayout(
         bbox, solvedcontent,
-        gl.nrows, gl.ncols, xleftcols,
-        xrightcols, ytoprows, ybottomrows
+        gl.nrows, gl.ncols,
+        gridboxes
     )
 end
 
@@ -275,7 +301,7 @@ function outersolve(gl::GridLayout, bbox::BBox)
     maxgrid = RowCols(gl.ncols, gl.nrows)
     for c in gl.content
         idx_rect = side_indices(c)
-        perside(idx_rect, maxgrid) do side, idx, grid
+        mapsides(idx_rect, maxgrid) do side, idx, grid
             grid[idx] = max(grid[idx], protrusion(c.al, side))
         end
     end
@@ -319,14 +345,14 @@ function outersolve(gl::GridLayout, bbox::BBox)
     end
 
     ybottomrows = ytoprows .- rowheights
-    xyboxes = RowCols(
+    gridboxes = RowCols(
         xleftcols, xrightcols,
         ytoprows, ybottomrows
     )
     solvedcontent = map(gl.content) do c
         idx_rect = side_indices(c)
-        bbox_cell = perside(idx_rect, xyboxes) do side, idx, xy
-            xy[idx]
+        bbox_cell = mapsides(idx_rect, gridboxes) do side, idx, gridside
+            gridside[idx]
         end
         solved = solve(c.al, bbox_cell)
         return SpannedAlignable(solved, c.sp)
@@ -334,14 +360,14 @@ function outersolve(gl::GridLayout, bbox::BBox)
     # solvedcontent = solve.(gl.content)
     SolvedGridLayout(
         bbox, solvedcontent, gl.nrows, gl.ncols,
-        xleftcols, xrightcols, ytoprows, ybottomrows
+        gridboxes
     )
 end
 
 
 
 function solve(ua::AxisLayout, innerbbox)
-    bbox = perside(innerbbox, ua.decorations) do side, iside, decside
+    bbox = mapsides(innerbbox, ua.decorations) do side, iside, decside
         op = side isa Union{Left, Top} ? (-) : (+)
         return op(iside, decside)
     end
@@ -580,17 +606,13 @@ function LayoutedAxis(parent::Scene)
 end
 
 
+
+
+
 function applylayout(sg::SolvedGridLayout)
     for c in sg.content
         applylayout(c.al)
     end
-end
-
-function IRect2D(bbox::Rect2D)
-    return AbstractPlotting.IRect2D(
-        round.(Int, minimum(bbox)),
-        round.(Int, widths(bbox))
-    )
 end
 
 function applylayout(sa::SolvedAxisLayout)
@@ -600,7 +622,7 @@ end
 
 
 function shrinkbymargin(rect, margin)
-    IRect((rect.origin .+ margin)..., (rect.widths .- 2 .* margin)...)
+    IRect((rect.origin .+ margin), (rect.widths .- 2 .* margin))
 end
 
 begin
@@ -622,6 +644,7 @@ begin
     lines!(la4.scene, rand(200, 2) .* 100, color=:orange, show_axis=false)
     lines!(la5.scene, rand(200, 2) .* 100, color=:pink, show_axis=false)
     update!(scene)
+
     gl = GridLayout([], 2, 2, [1, 1], [1, 1], 0.01, 0.01)
 
     gl[2, 1:2] = AxisLayout(BBox(75, 0, 0, 75), la1)
@@ -636,7 +659,6 @@ begin
 
     sg = outersolve(gl, BBox(shrinkbymargin(pixelarea(scene)[], 30)))
     applylayout(sg)
-
     # when the scene is resized, apply the outersolve'd outermost grid layout
     # this recursively updates all layout objects that are contained in the grid
     on(scene.events.window_area) do area

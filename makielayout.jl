@@ -1,16 +1,31 @@
 using Random
-using Animations
 using PlotUtils
 using Makie
+using AbstractPlotting
 import Showoff
 using Printf
+using AbstractPlotting: Rect2D
+import AbstractPlotting: IRect2D
 
-struct BBox
-    left::Float64
-    right::Float64
-    top::Float64
-    bottom::Float64
-end
+const BBox = Rect2D{Float64}
+
+left(rect::Rect2D) = minimum(rect)[1]
+right(rect::Rect2D) = maximum(rect)[1]
+
+bottom(rect::Rect2D) = minimum(rect)[2]
+top(rect::Rect2D) = maximum(rect)[2]
+
+abstract type Side end
+
+struct Left <: Side end
+struct Right <: Side end
+struct Top <: Side end
+struct Bottom <: Side end
+
+Base.getindex(bbox::Rect2D, ::Left) = left(bbox)
+Base.getindex(bbox::Rect2D, ::Right) = right(bbox)
+Base.getindex(bbox::Rect2D, ::Bottom) = bottom(bbox)
+Base.getindex(bbox::Rect2D, ::Top) = top(bbox)
 
 mutable struct LayoutedAxis
     parent::Scene
@@ -20,8 +35,71 @@ mutable struct LayoutedAxis
     limits::Node{FRect2D} # these should steer the camera, not used yet
 end
 
-width(b::BBox) = b.right - b.left
-height(b::BBox) = b.top - b.bottom
+width(rect::Rect2D) = right(rect) - left(rect)
+height(rect::Rect2D) = top(rect) - bottom(rect)
+
+
+function BBox(left::Number, right::Number, top::Number, bottom::Number)
+    mini = (left, bottom)
+    maxi = (right, top)
+    return BBox(mini, maxi .- mini)
+end
+
+function IRect2D(bbox::Rect2D)
+    return IRect2D(
+        round.(Int, minimum(bbox)),
+        round.(Int, widths(bbox))
+    )
+end
+
+struct RowCols{T <: Union{Number, Vector{Float64}}}
+    lefts::T
+    rights::T
+    tops::T
+    bottoms::T
+end
+
+function RowCols(ncols::Int, nrows::Int)
+    return RowCols(
+        zeros(ncols),
+        zeros(ncols),
+        zeros(nrows),
+        zeros(nrows)
+    )
+end
+
+Base.getindex(rowcols::RowCols, ::Left) = rowcols.lefts
+Base.getindex(rowcols::RowCols, ::Right) = rowcols.rights
+Base.getindex(rowcols::RowCols, ::Top) = rowcols.tops
+Base.getindex(rowcols::RowCols, ::Bottom) = rowcols.bottoms
+
+"""
+    eachside(f)
+Calls f over all sides (Left, Right, Top, Bottom), and creates a BBox from the result of f(side)
+"""
+function eachside(f)
+    return BBox(map(f, (Left(), Right(), Top(), Bottom()))...)
+end
+
+"""
+mapsides(
+       f, first::Union{Rect2D, RowCols}, rest::Union{Rect2D, RowCols}...
+   )::BBox
+Maps f over all sides of the rectangle like arguments.
+e.g.
+```
+mapsides(BBox(left, right, top, bottom)) do side::Side, side_val::Number
+    return ...
+end::BBox
+```
+"""
+function mapsides(
+        f, first::Union{Rect2D, RowCols}, rest::Union{Rect2D, RowCols}...
+    )
+    return eachside() do side
+        f(side, getindex.((first, rest...), (side,))...)
+    end
+end
 
 abstract type Alignable end
 
@@ -38,20 +116,32 @@ end
 An object that can be aligned that also specifies how much space it occupies in
 a grid via its span.
 """
-struct SpannedAlignable{T<:Alignable}
+struct SpannedAlignable{T <: Alignable}
     al::T
     sp::Span
+end
+function side_indices(c::SpannedAlignable)
+    return RowCols(
+        c.sp.cols.start,
+        c.sp.cols.stop,
+        c.sp.rows.start,
+        c.sp.rows.stop,
+    )
 end
 
 """
 These functions tell whether an object in a grid touches the left, top, etc. border
 of the grid. This means that it is relevant for the grid's own protrusion on that side.
 """
+ismostin(sp::SpannedAlignable, grid, ::Left) = sp.sp.cols.start == 1
+ismostin(sp::SpannedAlignable, grid, ::Right) = sp.sp.cols.stop == grid.ncols
+ismostin(sp::SpannedAlignable, grid, ::Bottom) = sp.sp.rows.stop == grid.nrows
+ismostin(sp::SpannedAlignable, grid, ::Top) = sp.sp.cols.start == 1
 
-isleftmostin(sp::SpannedAlignable, grid) = sp.sp.cols.start == 1
-isrightmostin(sp::SpannedAlignable, grid) = sp.sp.cols.stop == grid.ncols
-isbottommostin(sp::SpannedAlignable, grid) = sp.sp.rows.stop == grid.nrows
-istopmostin(sp::SpannedAlignable, grid) = sp.sp.cols.start == 1
+isleftmostin(sp::SpannedAlignable, grid) = ismostin(sp, grid, Left())
+isrightmostin(sp::SpannedAlignable, grid) = ismostin(sp, grid, Right())
+isbottommostin(sp::SpannedAlignable, grid) = ismostin(sp, grid, Bottom())
+istopmostin(sp::SpannedAlignable, grid) = ismostin(sp, grid, Top())
 
 struct SolvedAxisLayout <: Alignable
     inner::BBox
@@ -69,10 +159,7 @@ struct SolvedGridLayout <: Alignable
     content::Vector{SpannedAlignable}
     nrows::Int
     ncols::Int
-    xleftcols::Vector{Float64}
-    xrightcols::Vector{Float64}
-    ytoprows::Vector{Float64}
-    ybottomrows::Vector{Float64}
+    grid::RowCols{Vector{Float64}}
 end
 
 struct GridLayout <: Alignable
@@ -85,65 +172,31 @@ struct GridLayout <: Alignable
     rowgapfraction::Float64
 end
 
+
 """
 All the protrusion functions calculate how much stuff "sticks out" of a layoutable object.
 This is so that collisions are avoided, while what is actually aligned is the
 "important" edges of the layout objects.
 """
+leftprotrusion(x) = protrusion(x, Left())
+rightprotrusion(x) = protrusion(x, Right())
+bottomprotrusion(x) = protrusion(x, Bottom())
+topprotrusion(x) = protrusion(x, Top())
 
-leftprotrusion(u::AxisLayout) = u.decorations.left
-leftprotrusion(s::SolvedAxisLayout) = s.inner.left - s.outer.left
-leftprotrusion(sp::SpannedAlignable) = leftprotrusion(sp.al)
+protrusion(u::AxisLayout, side::Side) = u.decorations[side]
+protrusion(sp::SpannedAlignable, side::Side) = protrusion(sp.al, side)
 
-function leftprotrusion(gl::GridLayout)
-    # any objects that stick out on this side?
-    leftmosts = filter(x -> isleftmostin(x, gl), gl.content)
-    if isempty(leftmosts)
-        # no protrusion
-        0.0
-    else
-        # use the biggest protrusion of all objects that stick out
-        maximum(leftprotrusion.(leftmosts))
+function protrusion(gl::GridLayout, side::Side)
+    return mapreduce(max, gl.content, init = 0.0) do elem
+        # we use only objects that stick out on this side
+        # And from those we use the maximum protrusion
+        ismostin(elem, gl, side) ? protrusion(elem, side) : 0.0
     end
 end
 
-rightprotrusion(u::AxisLayout) = u.decorations.right
-rightprotrusion(s::SolvedAxisLayout) = s.outer.right - s.inner.right
-rightprotrusion(sp::SpannedAlignable) = rightprotrusion(sp.al)
-
-function rightprotrusion(gl::GridLayout)
-    rightmosts = filter(x -> isrightmostin(x, gl), gl.content)
-    if isempty(rightmosts)
-        0.0
-    else
-        maximum(rightprotrusion.(rightmosts))
-    end
-end
-
-topprotrusion(u::AxisLayout) = u.decorations.top
-topprotrusion(s::SolvedAxisLayout) = s.outer.top - s.inner.top
-topprotrusion(sp::SpannedAlignable) = topprotrusion(sp.al)
-
-function topprotrusion(gl::GridLayout)
-    topmosts = filter(x -> istopmostin(x, gl), gl.content)
-    if isempty(topmosts)
-        0.0
-    else
-        maximum(topprotrusion.(topmosts))
-    end
-end
-
-bottomprotrusion(u::AxisLayout) = u.decorations.bottom
-bottomprotrusion(s::SolvedAxisLayout) = s.outer.bottom - s.inner.bottom
-bottomprotrusion(sp::SpannedAlignable) = bottomprotrusion(sp.al)
-
-function bottomprotrusion(gl::GridLayout)
-    bottommosts = filter(x -> isbottommostin(x, gl), gl.content)
-    if isempty(bottommosts)
-        0.0
-    else
-        maximum(bottomprotrusion.(bottommosts))
-    end
+protrusion(s::SolvedAxisLayout, ::Left) = left(s.inner) - left(s.outer)
+function protrusion(s::SolvedAxisLayout, side::Side)
+    return s.outer[side] - s.inner[side]
 end
 
 """
@@ -155,32 +208,17 @@ inside another grid.
 function solve(gl::GridLayout, bbox::BBox)
 
     # first determine how big the protrusions on each side of all columns and rows are
-    maxcollefts = zeros(gl.ncols)
-    maxcolrights = zeros(gl.ncols)
-    maxrowtops = zeros(gl.nrows)
-    maxrowbottoms = zeros(gl.nrows)
-
+    maxgrid = RowCols(gl.ncols, gl.nrows)
     # go through all the layout objects placed in the grid
     for c in gl.content
-        # determine the rows and columns where they start and end
-        ileft = c.sp.cols.start
-        iright = c.sp.cols.stop
-        itop = c.sp.rows.start
-        ibottom = c.sp.rows.stop
-
-        # increase the protrusions of those columns and rows if they are larger than
-        # what they were before.
-        # this way the gap between two columns is at least the largest protrusion
-        # sticking in from the left plus the largest sticking in from the right
-        maxcollefts[ileft] = max(maxcollefts[ileft], leftprotrusion(c.al))
-        maxcolrights[iright] = max(maxcolrights[iright], rightprotrusion(c.al))
-        maxrowtops[itop] = max(maxrowtops[itop], topprotrusion(c.al))
-        maxrowbottoms[ibottom] = max(maxrowbottoms[ibottom], bottomprotrusion(c.al))
+        idx_rect = side_indices(c)
+        mapsides(idx_rect, maxgrid) do side, idx, grid
+            grid[idx] = max(grid[idx], protrusion(c.al, side))
+        end
     end
-
     # compute what size the gaps between rows and columns need to be
-    colgaps = maxcollefts[2:end] .+ maxcolrights[1:end-1]
-    rowgaps = maxrowtops[2:end] .+ maxrowbottoms[1:end-1]
+    colgaps = maxgrid.lefts[2:end] .+ maxgrid.rights[1:end-1]
+    rowgaps = maxgrid.tops[2:end] .+ maxgrid.bottoms[1:end-1]
 
     # determine the biggest gap
     # using the biggest gap size for all gaps will make the layout more even, but one
@@ -218,11 +256,11 @@ function solve(gl::GridLayout, bbox::BBox)
     rowgap = maxrowgap + addedrowgap
 
     # compute the x values for all left and right column boundaries
-    xleftcols = [bbox.left + sum(colwidths[1:i-1]) + (i - 1) * colgap for i in 1:gl.ncols]
+    xleftcols = [left(bbox) + sum(colwidths[1:i-1]) + (i - 1) * colgap for i in 1:gl.ncols]
     xrightcols = xleftcols .+ colwidths
 
     # compute the y values for all top and bottom row boundaries
-    ytoprows = [bbox.top - sum(rowheights[1:i-1]) - (i - 1) * rowgap for i in 1:gl.nrows]
+    ytoprows = [top(bbox) - sum(rowheights[1:i-1]) - (i - 1) * rowgap for i in 1:gl.nrows]
     ybottomrows = ytoprows .- rowheights
 
     # now we can solve the content thats inside the grid because we know where each
@@ -230,31 +268,28 @@ function solve(gl::GridLayout, bbox::BBox)
     # note that what we did at the top was determine the protrusions of all grid content,
     # but we know the protrusions before we know how much space each plot actually has
     # because the protrusions should be static (like tick labels etc don't change size with the plot)
-    solvedcontent = SpannedAlignable[]
-    for c in gl.content
-        # determine in which rows and columns the content object lies
-        ileft = c.sp.cols.start
-        iright = c.sp.cols.stop
-        itop = c.sp.rows.start
-        ibottom = c.sp.rows.stop
 
-        # make a bounding box with the x and y values of the columns and rows
-        bbox_cell = Main.BBox(
-            xleftcols[ileft], xrightcols[iright], ytoprows[itop], ybottomrows[ibottom])
-
-        # solve the child object's layout
-        # this is what makes nested grids possible, because they just get solved from the top
-        # all the way down
+    gridboxes = RowCols(
+        xleftcols, xrightcols,
+        ytoprows, ybottomrows
+    )
+    solvedcontent = map(gl.content) do c
+        idx_rect = side_indices(c)
+        bbox_cell = mapsides(idx_rect, gridboxes) do side, idx, gridside
+            gridside[idx]
+        end
         solved = solve(c.al, bbox_cell)
-
-        # add the solved object to the list of solved child objects that gets saved in the solved layout
-        push!(solvedcontent, SpannedAlignable(solved, c.sp))
+        return SpannedAlignable(solved, c.sp)
     end
-
     # return a solved grid layout in which all objects are also solved layout objects
-    SolvedGridLayout(bbox, solvedcontent, gl.nrows, gl.ncols, xleftcols,
-        xrightcols, ytoprows, ybottomrows)
+    return SolvedGridLayout(
+        bbox, solvedcontent,
+        gl.nrows, gl.ncols,
+        gridboxes
+    )
 end
+
+
 
 """
 This function solves a grid layout so that it fits exactly inside a bounding box.
@@ -263,30 +298,21 @@ also have to fit into the bounding box. This is needed if the grid is the outerm
 object in the layout, the bounding box would then be the scene boundary.
 """
 function outersolve(gl::GridLayout, bbox::BBox)
-    maxcollefts = zeros(gl.ncols)
-    maxcolrights = zeros(gl.ncols)
-    maxrowtops = zeros(gl.nrows)
-    maxrowbottoms = zeros(gl.nrows)
-
+    maxgrid = RowCols(gl.ncols, gl.nrows)
     for c in gl.content
-        ileft = c.sp.cols.start
-        iright = c.sp.cols.stop
-        itop = c.sp.rows.start
-        ibottom = c.sp.rows.stop
-
-        maxcollefts[ileft] = max(maxcollefts[ileft], leftprotrusion(c.al))
-        maxcolrights[iright] = max(maxcolrights[iright], rightprotrusion(c.al))
-        maxrowtops[itop] = max(maxrowtops[itop], topprotrusion(c.al))
-        maxrowbottoms[ibottom] = max(maxrowbottoms[ibottom], bottomprotrusion(c.al))
+        idx_rect = side_indices(c)
+        mapsides(idx_rect, maxgrid) do side, idx, grid
+            grid[idx] = max(grid[idx], protrusion(c.al, side))
+        end
     end
 
-    topprot = maxrowtops[1]
-    bottomprot = maxrowbottoms[end]
-    leftprot = maxcollefts[1]
-    rightprot = maxcolrights[end]
+    topprot = maxgrid.tops[1]
+    bottomprot = maxgrid.bottoms[end]
+    leftprot = maxgrid.lefts[1]
+    rightprot = maxgrid.rights[end]
 
-    colgaps = maxcollefts[2:end] .+ maxcolrights[1:end-1]
-    rowgaps = maxrowtops[2:end] .+ maxrowbottoms[1:end-1]
+    colgaps = maxgrid.lefts[2:end] .+ maxgrid.rights[1:end-1]
+    rowgaps = maxgrid.tops[2:end] .+ maxgrid.bottoms[1:end-1]
 
     maxcolgap = gl.ncols <= 1 ? 0 : maximum(colgaps)
     maxrowgap = gl.nrows <= 1 ? 0 : maximum(rowgaps)
@@ -309,38 +335,46 @@ function outersolve(gl::GridLayout, bbox::BBox)
     colgap = maxcolgap + addedcolgap
     rowgap = maxrowgap + addedrowgap
 
-    xleftcols = [bbox.left + leftprot + sum(colwidths[1:i-1]) + (i - 1) * colgap for i in 1:gl.ncols]
+    xleftcols = map(1:gl.ncols) do i
+        left(bbox) + leftprot + sum(colwidths[1:i-1]) + (i - 1) * colgap
+    end
     xrightcols = xleftcols .+ colwidths
 
-    ytoprows = [bbox.top - topprot - sum(rowheights[1:i-1]) - (i - 1) * rowgap for i in 1:gl.nrows]
-    ybottomrows = ytoprows .- rowheights
-
-    solvedcontent = SpannedAlignable[]
-    for c in gl.content
-        ileft = c.sp.cols.start
-        iright = c.sp.cols.stop
-        itop = c.sp.rows.start
-        ibottom = c.sp.rows.stop
-
-        bbox_cell = Main.BBox(
-            xleftcols[ileft], xrightcols[iright], ytoprows[itop], ybottomrows[ibottom])
-
-        solved = solve(c.al, bbox_cell)
-        push!(solvedcontent, SpannedAlignable(solved, c.sp))
+    ytoprows = map(1:gl.nrows) do i
+        top(bbox) - topprot - sum(rowheights[1:i-1]) - (i - 1) * rowgap
     end
 
+    ybottomrows = ytoprows .- rowheights
+    gridboxes = RowCols(
+        xleftcols, xrightcols,
+        ytoprows, ybottomrows
+    )
+    solvedcontent = map(gl.content) do c
+        idx_rect = side_indices(c)
+        bbox_cell = mapsides(idx_rect, gridboxes) do side, idx, gridside
+            gridside[idx]
+        end
+        solved = solve(c.al, bbox_cell)
+        return SpannedAlignable(solved, c.sp)
+    end
     # solvedcontent = solve.(gl.content)
-    SolvedGridLayout(bbox, solvedcontent, gl.nrows, gl.ncols, xleftcols,
-        xrightcols, ytoprows, ybottomrows)
+    SolvedGridLayout(
+        bbox, solvedcontent, gl.nrows, gl.ncols,
+        gridboxes
+    )
 end
 
+
+
 function solve(ua::AxisLayout, innerbbox)
-    ol = innerbbox.left - ua.decorations.left
-    or = innerbbox.right + ua.decorations.right
-    ot = innerbbox.top - ua.decorations.top
-    ob = innerbbox.bottom + ua.decorations.bottom
-    SolvedAxisLayout(innerbbox, Main.BBox(ol, or, ot, ob), ua.axis)
+    bbox = mapsides(innerbbox, ua.decorations) do side, iside, decside
+        op = side isa Union{Left, Top} ? (-) : (+)
+        return op(iside, decside)
+    end
+    SolvedAxisLayout(innerbbox, bbox, ua.axis)
 end
+
+const Indexables = Union{UnitRange, Int, Colon}
 
 """
 This function allows indexing syntax to add a layout object to a grid.
@@ -352,16 +386,15 @@ grid[1:3, 2:5] = obj
 
 and all combinations of the above
 """
-Base.setindex!(g, a::Alignable, rows::S, cols::T) where {T<:Union{UnitRange,Int,Colon}, S<:Union{UnitRange,Int,Colon}} = begin
-
-    if typeof(rows) <: Int
+function Base.setindex!(g, a::Alignable, rows::Indexables, cols::Indexables)
+    if rows isa Int
         rows = rows:rows
-    elseif typeof(rows) <: Colon
+    elseif rows isa Colon
         rows = 1:g.nrows
     end
-    if typeof(cols) <: Int
+    if cols isa Int
         cols = cols:cols
-    elseif typeof(cols) <: Colon
+    elseif cols isa Colon
         cols = 1:g.ncols
     end
 
@@ -371,6 +404,7 @@ Base.setindex!(g, a::Alignable, rows::S, cols::T) where {T<:Union{UnitRange,Int,
     if !((1 <= cols.start <= g.ncols) || (1 <= cols.stop <= g.ncols))
         error("invalid col span $cols for grid with $(g.ncols) columns")
     end
+
     push!(g.content, SpannedAlignable(a, Span(rows, cols)))
 end
 
@@ -381,7 +415,7 @@ function axislines!(scene, rect)
         p3 = Point2(r.origin[1] + r.widths[1], r.origin[2])
         [p1, p2, p3]
     end
-    lines!(scene, points, linewidth=2, show_axis=false)
+    lines!(scene, points, linewidth = 2, show_axis = false)
 end
 
 """
@@ -431,29 +465,39 @@ function LayoutedAxis(parent::Scene)
     cam = cam2d!(scene)
 
     ticksnode = Node(Point2f0[])
-    ticks = linesegments!(parent, ticksnode, linewidth=2)[end]
+    ticks = linesegments!(
+        parent, ticksnode, linewidth = 2, show_axis = false
+    )[end]
 
     # the algorithm from above seems to not give more than 7 ticks with the step sizes I chose
     nmaxticks = 7
 
     xticklabelnodes = [Node("0") for i in 1:nmaxticks]
     xticklabelposnodes = [Node(Point(0.0, 0.0)) for i in 1:nmaxticks]
-    xticklabels = [text!(parent,
-        xticklabelnodes[i],
-        position = xticklabelposnodes[i],
-        align = (:center, :top),
-        textsize=20)[end]
-            for i in 1:nmaxticks]
+    xticklabels = map(1:nmaxticks) do i
+        text!(
+            parent,
+            xticklabelnodes[i],
+            position = xticklabelposnodes[i],
+            align = (:center, :top),
+            textsize = 20,
+            show_axis = false
+        )[end]
+    end
 
     yticklabelnodes = [Node("0") for i in 1:nmaxticks]
     yticklabelposnodes = [Node(Point(0.0, 0.0)) for i in 1:nmaxticks]
-    yticklabels = [text!(parent,
-        yticklabelnodes[i],
-        position = yticklabelposnodes[i],
-        align = (:center, :bottom),
-        rotation = pi/2,
-        textsize=20)[end]
-            for i in 1:nmaxticks]
+    yticklabels = map(1:nmaxticks) do i
+        text!(
+            parent,
+            yticklabelnodes[i],
+            position = yticklabelposnodes[i],
+            align = (:center, :bottom),
+            rotation = pi/2,
+            textsize = 20,
+            show_axis = false
+        )[end]
+    end
 
     on(cam.area) do a
 
@@ -531,8 +575,9 @@ function LayoutedAxis(parent::Scene)
 
         # set tick mark positions
         ticksnode[] = collect(Iterators.flatten(zip(
-           [xtickstarts; ytickstarts],
-           [xtickends; ytickends])))
+            [xtickstarts; ytickstarts],
+            [xtickends; ytickends]
+        )))
     end
 
     labelgap = 50
@@ -545,9 +590,14 @@ function LayoutedAxis(parent::Scene)
         Point2(a.origin[1] - labelgap, a.origin[2] + a.widths[2] / 2)
     end
 
-    tx = text!(parent, xlabel, textsize=20, position=xlabelpos, show_axis=false)[end]
+    tx = text!(
+        parent, xlabel, textsize = 20, position = xlabelpos, show_axis = false
+    )[end]
     tx.align = [0.5, 1]
-    ty = text!(parent, ylabel, textsize=20, position=ylabelpos, rotation=pi/2, show_axis=false)[end]
+    ty = text!(
+        parent, ylabel, textsize = 20,
+        position = ylabelpos, rotation = pi/2, show_axis = false
+    )[end]
     ty.align = [0.5, 0]
 
     axislines!(parent, scene.px_area)
@@ -556,37 +606,28 @@ function LayoutedAxis(parent::Scene)
 end
 
 
+
+
+
 function applylayout(sg::SolvedGridLayout)
     for c in sg.content
         applylayout(c.al)
     end
 end
 
-function IRect2D(bbox::BBox)
-    l = Int(round(bbox.left))
-    r = Int(round(bbox.right))
-    t = Int(round(bbox.top))
-    b = Int(round(bbox.bottom))
-    w = r - l
-    h = t - b
-    IRect(l, b, w, h)
-end
-
 function applylayout(sa::SolvedAxisLayout)
     sa.axis.scene.px_area[] = IRect2D(sa.inner)
 end
 
-function BBox(i::Rect{2,Int64})
-    BBox(i.origin[1], i.origin[1] + i.widths[1], i.origin[2] + i.widths[2], i.origin[2])
-end
+
 
 function shrinkbymargin(rect, margin)
-    IRect((rect.origin .+ margin)..., (rect.widths .- 2 .* margin)...)
+    IRect((rect.origin .+ margin), (rect.widths .- 2 .* margin))
 end
 
 begin
     scene = Scene(resolution=(600, 600));
-    display(scene)
+    screen = display(scene)
     campixel!(scene);
 
     la1 = LayoutedAxis(scene)
@@ -602,6 +643,7 @@ begin
     scatter!(la3.scene, rand(200, 2) .* 100, markersize=3, color=:red, show_axis=false)
     lines!(la4.scene, rand(200, 2) .* 100, color=:orange, show_axis=false)
     lines!(la5.scene, rand(200, 2) .* 100, color=:pink, show_axis=false)
+    update!(scene)
 
     gl = GridLayout([], 2, 2, [1, 1], [1, 1], 0.01, 0.01)
 
@@ -617,11 +659,11 @@ begin
 
     sg = outersolve(gl, BBox(shrinkbymargin(pixelarea(scene)[], 30)))
     applylayout(sg)
-
     # when the scene is resized, apply the outersolve'd outermost grid layout
     # this recursively updates all layout objects that are contained in the grid
     on(scene.events.window_area) do area
         sg = outersolve(gl, BBox(shrinkbymargin(pixelarea(scene)[], 30)))
         applylayout(sg)
     end
+    # @profiler wait(screen)
 end

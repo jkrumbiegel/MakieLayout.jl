@@ -488,18 +488,9 @@ function add_pan!(scene::SceneLike, limits)
     end
 end
 
-function LayoutedAxis(parent::Scene)
-    scene = Scene(parent, Node(IRect(0, 0, 100, 100)), center=false)
-    limits = Node(FRect(0, 0, 100, 100))
-    xlabel = Node("x label")
-    ylabel = Node("y label")
-
-    disconnect!(camera(scene))
+function add_zoom!(scene::SceneLike, limits)
 
     e = events(scene)
-
-    add_pan!(scene, limits)
-
     cam = camera(scene)
     on(cam, e.scroll) do x
         # @extractvalue cam (zoomspeed, zoombutton, area)
@@ -538,10 +529,23 @@ function LayoutedAxis(parent::Scene)
         end
         return
     end
+end
+
+function LayoutedAxis(parent::Scene)
+    scene = Scene(parent, Node(IRect(0, 0, 100, 100)), center=false)
+    limits = Node(FRect(0, 0, 100, 100))
+    xlabel = Node("x label")
+    ylabel = Node("y label")
+
+    disconnect!(camera(scene))
+
+
+
+    add_pan!(scene, limits)
+    add_zoom!(scene, limits)
 
     cam = AbstractPlotting.PixelCamera()
     cameracontrols!(scene, cam)
-    ###############################
 
 
     ticksnode = Node(Point2f0[])

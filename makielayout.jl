@@ -481,7 +481,14 @@ function add_pan!(scene::SceneLike, limits)
                 diff_fraction = Vec2f0(diff) ./ Vec2f0(widths(pxa))
 
                 diff_limits = diff_fraction .* widths(limits[])
-                limits[] = FRect(limits[].origin .+ diff_limits, widths(limits[]))
+
+                if AbstractPlotting.ispressed(scene, AbstractPlotting.Keyboard.x)
+                    limits[] = FRect(Vec2f0(limits[].origin) .+ Vec2f0(diff_limits[1], 0), widths(limits[]))
+                elseif AbstractPlotting.ispressed(scene, AbstractPlotting.Keyboard.y)
+                    limits[] = FRect(Vec2f0(limits[].origin) .+ Vec2f0(0, diff_limits[2]), widths(limits[]))
+                else
+                    limits[] = FRect(Vec2f0(limits[].origin) .+ Vec2f0(diff_limits), widths(limits[]))
+                end
             end
         end
         return

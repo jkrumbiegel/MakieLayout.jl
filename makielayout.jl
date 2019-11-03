@@ -793,9 +793,11 @@ begin
     img = rand(100, 100)
     image!(la1.scene, img, show_axis=false)
     lines!(la2.scene, rand(200, 2) .* 100, color=:blue, show_axis=false)
-    scatter!(la3.scene, rand(200, 2) .* 100, markersize=3, color=:red, show_axis=false)
-    lines!(la4.scene, rand(200, 2) .* 100, color=:orange, show_axis=false)
-    lines!(la5.scene, rand(200, 2) .* 100, color=:pink, show_axis=false)
+
+    linkeddata = rand(200, 2) .* 100
+    scatter!(la3.scene, linkeddata, markersize=3, color=:red, show_axis=false)
+    scatter!(la4.scene, linkeddata, markersize=3, color=:orange, show_axis=false)
+    scatter!(la5.scene, linkeddata, markersize=3, color=:pink, show_axis=false)
     update!(scene)
 
     gl = GridLayout([], 2, 2, [1, 1], [1, 1], 0.01, 0.01)

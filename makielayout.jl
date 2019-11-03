@@ -668,9 +668,6 @@ function LayoutedAxis(parent::Scene)
 end
 
 
-
-
-
 function applylayout(sg::SolvedGridLayout)
     for c in sg.content
         applylayout(c.al)
@@ -681,10 +678,64 @@ function applylayout(sa::SolvedAxisLayout)
     sa.axis.scene.px_area[] = IRect2D(sa.inner)
 end
 
-
-
 function shrinkbymargin(rect, margin)
     IRect((rect.origin .+ margin), (rect.widths .- 2 .* margin))
+end
+
+function linkxaxes!(a::LayoutedAxis, b::LayoutedAxis)
+    on(a.limits) do alim
+        blim = b.limits[]
+
+        ao = alim.origin[1]
+        bo = blim.origin[1]
+        aw = alim.widths[1]
+        bw = blim.widths[1]
+
+        if ao != bo || aw != bw
+            b.limits[] = FRect(ao, blim.origin[2], aw, blim.widths[2])
+        end
+    end
+
+    on(b.limits) do blim
+        alim = a.limits[]
+
+        ao = alim.origin[1]
+        bo = blim.origin[1]
+        aw = alim.widths[1]
+        bw = blim.widths[1]
+
+        if ao != bo || aw != bw
+            a.limits[] = FRect(bo, alim.origin[2], bw, alim.widths[2])
+        end
+    end
+end
+
+function linkyaxes!(a::LayoutedAxis, b::LayoutedAxis)
+    on(a.limits) do alim
+        blim = b.limits[]
+
+        ao = alim.origin[2]
+        bo = blim.origin[2]
+        aw = alim.widths[2]
+        bw = blim.widths[2]
+
+        if ao != bo || aw != bw
+            b.limits[] = FRect(blim.origin[1], ao, blim.widths[1], aw)
+        end
+    end
+
+    on(b.limits) do blim
+        alim = a.limits[]
+
+        ao = alim.origin[2]
+        bo = blim.origin[2]
+        aw = alim.widths[2]
+        bw = blim.widths[2]
+
+        if ao != bo || aw != bw
+            a.limits[] = FRect(alim.origin[1], bo, alim.widths[1], bw)
+        end
+    end
 end
 
 begin
@@ -697,6 +748,9 @@ begin
     la3 = LayoutedAxis(scene)
     la4 = LayoutedAxis(scene)
     la5 = LayoutedAxis(scene)
+
+    linkxaxes!(la3, la4)
+    linkyaxes!(la3, la5)
 
     # lines!(la1.scene, rand(200, 2) .* 100, color=:black, show_axis=false)
     img = rand(100, 100)

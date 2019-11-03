@@ -1,0 +1,20 @@
+name = "MakieLayout"
+uuid = "5a521ce4-ebb9-4793-b5b7-b334dfe8393c"
+authors = ["Simon Danisch", "Julius Krumbiegel"]
+version = "0.1.0"
+
+[deps]
+AbstractPlotting = "537997a7-5e4e-5d89-9595-2241ea00577e"
+PlotUtils = "995b91a9-d308-5afd-9ec6-746e21dbc043"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Showoff = "992d4aef-0814-514b-bc4d-f2e9a6c4116f"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

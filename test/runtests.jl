@@ -1,7 +1,7 @@
 using MakieLayout
 using Makie
 
-scene = Scene(resolution=(600, 600));
+scene = Scene(resolution = (600, 600));
 screen = display(scene)
 campixel!(scene);
 
@@ -16,6 +16,7 @@ linkyaxes!(la3, la5)
 
 # lines!(la1.scene, rand(200, 2) .* 100, color=:black, show_axis=false)
 img = rand(100, 100)
+image(img)
 image!(la1.scene, img, show_axis=false)
 lines!(la2.scene, rand(200, 2) .* 100, color=:blue, show_axis=false)
 

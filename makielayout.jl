@@ -456,13 +456,61 @@ function locateticks(xmin, xmax)
     end
 end
 
+# struct LimitCamera <: AbstractCamera end
+
 function LayoutedAxis(parent::Scene)
-    scene = Scene(parent, Node(IRect(0, 0, 100, 100)))
+    scene = Scene(parent, Node(IRect(0, 0, 100, 100)), center=false)
     limits = Node(FRect(0, 0, 100, 100))
     xlabel = Node("x label")
     ylabel = Node("y label")
 
-    cam = cam2d!(scene)
+    disconnect!(camera(scene))
+
+    e = events(scene)
+
+    cam = camera(scene)
+    on(cam, e.scroll) do x
+        # @extractvalue cam (zoomspeed, zoombutton, area)
+        zoomspeed = 0.10f0
+        zoombutton = nothing
+        zoom = Float32(x[2])
+        if zoom != 0 && ispressed(scene, zoombutton) && AbstractPlotting.is_mouseinside(scene)
+            pa = pixelarea(scene)[]
+
+            # don't let z go negative
+            z = max(0.1f0, 1f0 + (zoom * zoomspeed))
+
+            # limits[] = FRect(limits[].origin..., (limits[].widths .* 0.99)...)
+            mp_fraction = (Vec2f0(e.mouseposition[]) - minimum(pa)) ./ widths(pa)
+
+            mp_data = limits[].origin .+ mp_fraction .* limits[].widths
+
+            xorigin = limits[].origin[1]
+            yorigin = limits[].origin[2]
+
+            xwidth = limits[].widths[1]
+            ywidth = limits[].widths[2]
+            newxwidth = xwidth * z
+            newywidth = ywidth * z
+
+            newxorigin = xorigin + mp_fraction[1] * (xwidth - newxwidth)
+            newyorigin = yorigin + mp_fraction[2] * (ywidth - newywidth)
+
+            if AbstractPlotting.ispressed(scene, AbstractPlotting.Keyboard.x)
+                limits[] = FRect(newxorigin, yorigin, newxwidth, ywidth)
+            elseif AbstractPlotting.ispressed(scene, AbstractPlotting.Keyboard.y)
+                limits[] = FRect(xorigin, newyorigin, xwidth, newywidth)
+            else
+                limits[] = FRect(newxorigin, newyorigin, newxwidth, newywidth)
+            end
+        end
+        return
+    end
+
+    cam = AbstractPlotting.PixelCamera()
+    cameracontrols!(scene, cam)
+    ###############################
+
 
     ticksnode = Node(Point2f0[])
     ticks = linesegments!(
@@ -499,16 +547,29 @@ function LayoutedAxis(parent::Scene)
         )[end]
     end
 
-    on(cam.area) do a
+    on(camera(scene), pixelarea(scene), limits) do pxa, lims
 
-        pxa = scene.px_area[]
+        nearclip = -10_000f0
+        farclip = 10_000f0
+
+        limox, limoy = Float32.(lims.origin)
+        limw, limh = Float32.(widths(lims))
+        l, b = Float32.(pxa.origin)
+        w, h = Float32.(widths(pxa))
+        # projection = AbstractPlotting.orthographicprojection(0f0, w * 2f0, 0f0, h, nearclip, farclip)
+        projection = AbstractPlotting.orthographicprojection(limox, limox + limw, limoy, limoy + limh, nearclip, farclip)
+        camera(scene).projection[] = projection
+        camera(scene).projectionview[] = projection
+
+        # pxa = scene.px_area[]
         px_aspect = pxa.widths[1] / pxa.widths[2]
 
         # @printf("cam %.1f, %.1f, %.1f, %.1f\n", a.origin..., a.widths...)
         # @printf("pix %.1f, %.1f, %.1f, %.1f\n", pxa.origin..., pxa.widths...)
 
-        width = px_aspect > 1 ? a.widths[1] / px_aspect : a.widths[1]
-        xrange = (a.origin[1], a.origin[1] + width)
+        width = lims.widths[1]
+        # width = px_aspect > 1 ? a.widths[1] / px_aspect : a.widths[1]
+        xrange = (lims.origin[1], lims.origin[1] + width)
 
 
         if width == 0 || !isfinite(xrange[1]) || !isfinite(xrange[2])
@@ -532,8 +593,9 @@ function LayoutedAxis(parent::Scene)
         xtickstarts = [Point(x, y) for x in xticks_scene]
         xtickends = [t + Point(0.0, -ticksize) for t in xtickstarts]
 
-        height = px_aspect < 1 ? a.widths[2] * px_aspect : a.widths[2]
-        yrange = (a.origin[2], a.origin[2] + height)
+        # height = px_aspect < 1 ? a.widths[2] * px_aspect : a.widths[2]
+        height = lims.widths[2]
+        yrange = (lims.origin[2], lims.origin[2] + height)
 
 
         ytickvals = locateticks(yrange...)

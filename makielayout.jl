@@ -458,6 +458,36 @@ end
 
 # struct LimitCamera <: AbstractCamera end
 
+function add_pan!(scene::SceneLike, limits)
+    startpos = Base.RefValue((0.0, 0.0))
+    e = events(scene)
+    on(
+        camera(scene),
+        # Node.((scene, cam, startpos))...,
+        Node.((scene, startpos))...,
+        e.mousedrag
+    ) do scene, startpos, dragging
+        # pan = cam.panbutton[]
+        pan = AbstractPlotting.Mouse.right
+        mp = e.mouseposition[]
+        if AbstractPlotting.ispressed(scene, pan) && AbstractPlotting.is_mouseinside(scene)
+            window_area = pixelarea(scene)[]
+            if dragging == Mouse.down
+                startpos[] = mp
+            elseif dragging == Mouse.pressed && AbstractPlotting.ispressed(scene, pan)
+                diff = startpos[] .- mp
+                startpos[] = mp
+                pxa = scene.px_area[]
+                diff_fraction = Vec2f0(diff) ./ Vec2f0(widths(pxa))
+
+                diff_limits = diff_fraction .* widths(limits[])
+                limits[] = FRect(limits[].origin .+ diff_limits, widths(limits[]))
+            end
+        end
+        return
+    end
+end
+
 function LayoutedAxis(parent::Scene)
     scene = Scene(parent, Node(IRect(0, 0, 100, 100)), center=false)
     limits = Node(FRect(0, 0, 100, 100))
@@ -467,6 +497,8 @@ function LayoutedAxis(parent::Scene)
     disconnect!(camera(scene))
 
     e = events(scene)
+
+    add_pan!(scene, limits)
 
     cam = camera(scene)
     on(cam, e.scroll) do x
@@ -737,6 +769,7 @@ function linkyaxes!(a::LayoutedAxis, b::LayoutedAxis)
         end
     end
 end
+
 
 begin
     scene = Scene(resolution=(600, 600));

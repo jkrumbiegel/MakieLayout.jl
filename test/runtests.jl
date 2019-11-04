@@ -1,5 +1,20 @@
 using MakieLayout
 using Makie
+using KernelDensity
+
+function kdepoly!(scene, vec, scalevalue, reverse=false; kwargs...)
+    kderesult = kde(vec; npoints=32)
+
+    x = kderesult.x
+    y = kderesult.density
+    y = y .* (1 / maximum(y)) .* scalevalue
+
+    if reverse
+        poly!(scene, Point2.(y, x); kwargs...)[end]
+    else
+        poly!(scene, Point2.(x, y); kwargs...)[end]
+    end
+end
 
 begin
     scene = Scene(resolution = (600, 600));
@@ -20,10 +35,12 @@ begin
     image!(la1.scene, img, show_axis=false)
     lines!(la2.scene, rand(200, 2) .* 100, color=:blue, show_axis=false)
 
-    linkeddata = rand(200, 2) .* 100
-    scatter!(la3.scene, linkeddata, markersize=3, color=:red, show_axis=false)
-    scatter!(la4.scene, linkeddata, markersize=3, color=:orange, show_axis=false)
-    scatter!(la5.scene, linkeddata, markersize=3, color=:pink, show_axis=false)
+    linkeddata = randn(200, 2) .* 15 .+ 50
+    green = RGBAf0(0.05, 0.8, 0.3, 0.6)
+    scatter!(la3.scene, linkeddata, markersize=3, color=green, show_axis=false)
+
+    kdepoly!(la4.scene, linkeddata[:, 1], 90, false, color=green, linewidth=2, show_axis=false)
+    kdepoly!(la5.scene, linkeddata[:, 2], 90, true, color=green, linewidth=2, show_axis=false)
     update!(scene)
 
     suptitle_pos = Node(Point2(0.0, 0.0))
@@ -50,7 +67,7 @@ begin
         [], 2, 1,
         [Auto(), Auto()],
         [Ratio(1)],
-        [Relative(0.03)],
+        [Fixed(15)],
         [],
         Inside(),
         (true, true))
@@ -62,10 +79,10 @@ begin
 
     gl2 = GridLayout(
         [], 2, 2,
-        [Fixed(150), Auto()],
-        Relative.([0.8, 0.2]),
-        [Relative(0.03)],
-        [Relative(0.03)],
+        [Relative(0.25), Auto()],
+        [Auto(), Relative(0.25)],
+        [Relative(0)],
+        [Relative(0)],
         Inside(),
         (true, true))
 

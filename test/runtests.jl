@@ -17,7 +17,7 @@ function kdepoly!(scene, vec, scalevalue, reverse=false; kwargs...)
 end
 
 begin
-    scene = Scene(resolution = (600, 600));
+    scene = Scene(resolution = (1000, 1000));
     screen = display(scene)
     campixel!(scene);
 
@@ -53,8 +53,8 @@ begin
 
     gl = GridLayout(
         [], 3, 2,
-        [Auto(), Ratio(3), Ratio(2)],
-        [Relative(0.6), Auto()],
+        [Auto(), Aspect(1, 1.0), Ratio(2)],
+        [Relative(0.5), Auto()],
         [Fixed(40), Fixed(20)],
         [Fixed(20)],
         Outside(),
@@ -79,8 +79,8 @@ begin
 
     gl2 = GridLayout(
         [], 2, 2,
-        [Relative(0.25), Auto()],
-        [Auto(), Relative(0.25)],
+        [Auto(), Relative(0.7)],
+        [Aspect(2, 1.0), Auto()],
         [Relative(0)],
         [Relative(0)],
         Inside(),

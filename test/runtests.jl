@@ -26,12 +26,12 @@ begin
     scatter!(la5.scene, linkeddata, markersize=3, color=:pink, show_axis=false)
     update!(scene)
 
-    gl = GridLayout([], 2, 2, [1, 1], [1, 1], 0.01, 0.01, Outside())
+    gl = GridLayout([], 2, 2, Ratio.([3, 2]), [Relative(0.6), Auto()], 0.01, 0.01, Outside())
 
     gl[2, 1:2] = AxisLayout(BBox(75, 0, 0, 75), la1)
     gl[1, 2] = AxisLayout(BBox(75, 0, 0, 75), la2)
 
-    gl2 = GridLayout([], 2, 2, [0.2, 0.8], [0.8, 0.2], 0.01, 0.01, Inside())
+    gl2 = GridLayout([], 2, 2, [Fixed(150), Ratio(5)], Relative.([0.8, 0.2]), 0.01, 0.01, Inside())
     gl2[2, 1] = AxisLayout(BBox(75, 0, 0, 75), la3)
     gl2[1, 1] = AxisLayout(BBox(75, 0, 0, 75), la4)
     gl2[2, 2] = AxisLayout(BBox(75, 0, 0, 75), la5)

@@ -35,15 +35,27 @@ begin
     image!(la1.scene, img, show_axis=false)
 
     sliderpos = Node(Point2(0.0, 0.0))
-    sllength = 300
+    sllength = Node(300.0)
     slheight = 20
     sl = slider!(scene, LinRange(0.2, 5, 301), position=sliderpos,
         sliderlength=sllength, sliderheight=slheight, raw=true,
         textsize = 20, start = 2
         )[end]
 
+    sliderpos2 = Node(Point2(0.0, 0.0))
+    sllength2 = Node(300.0)
+    slheight2 = 20
+    sl2 = slider!(scene, LinRange(0.1, 1, 301), position=sliderpos2,
+        sliderlength=sllength2, sliderheight=slheight2, raw=true,
+        textsize = 20, start = 1
+        )[end]
+
     xrange = LinRange(0, 2pi, 500)
-    lines!(la2.scene, xrange ./ 2pi .* 100, lift(x->sin.(xrange .* x) .* 40 .+ 50, sl.value), color=:blue, show_axis=false)
+    lines!(
+        la2.scene,
+        xrange ./ 2pi .* 100,
+        lift((x, y)->sin.(xrange .* x) .* 40 .* y .+ 50, sl.value, sl2.value),
+        color=:blue, linewidth=2, show_axis=false)
 
     linkeddata = randn(200, 2) .* 15 .+ 50
     green = RGBAf0(0.05, 0.8, 0.3, 0.6)
@@ -73,8 +85,8 @@ begin
     gl[1, :] = FixedSizeBox(suptitle_bbox, (0.5, 0.0), suptitle_pos)
 
     gl_slider = GridLayout(
-        [], 2, 1,
-        [Auto(), Auto()],
+        [], 3, 1,
+        [Auto(), Auto(), Auto()],
         [Relative(1)],
         [Fixed(15)],
         [],
@@ -83,7 +95,14 @@ begin
 
     gl_slider[1, 1] = AxisLayout(BBox(75, 0, 0, 75), la2)
 
-    gl_slider[2, 1] = FixedSizeBox(BBox(0, sllength, slheight, 0), (0.0, 0.0), sliderpos)
+    gl_slider[2, 1] = FixedHeightBox(slheight, 0.5, (ibbox, obbox)->begin ibbox, obbox
+        sllength[] = width(ibbox) - 30
+        sliderpos[] = Point2(left(ibbox), bottom(ibbox))
+    end)
+    gl_slider[3, 1] = FixedHeightBox(slheight2, 0.5, (ibbox, obbox)->begin ibbox, obbox
+        sllength2[] = width(ibbox) - 30
+        sliderpos2[] = Point2(left(ibbox), bottom(ibbox))
+    end)
 
     gl[2, 2] = gl_slider
 

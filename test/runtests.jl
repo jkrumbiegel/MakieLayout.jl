@@ -75,7 +75,7 @@ begin
 
     gl = GridLayout(
         [], 3, 2,
-        [Auto(), Aspect(1, 1.0), Ratio(2)],
+        [Auto(), Aspect(1, 1.0), Auto()],
         [Relative(0.5), Auto()],
         [Fixed(40), Fixed(20)],
         [Fixed(20)],
@@ -109,7 +109,7 @@ begin
     gl_sub = GridLayout(
         [], 2, 1,
         [Auto(), Auto()],
-        [Ratio(1)],
+        [Relative(1)],
         [Fixed(15)],
         [],
         Inside(),

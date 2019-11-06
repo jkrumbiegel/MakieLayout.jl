@@ -145,3 +145,38 @@ begin
         applylayout(sg)
     end
 end
+
+
+begin
+    scene = Scene(resolution = (1000, 1000), font="SF Hello");
+    screen = display(scene)
+    campixel!(scene);
+
+    ii = 1:4
+    jj = 1:4
+    las = [LayoutedAxis(scene) for i in ii, j in jj]
+
+    gl = GridLayout([], length(ii), length(jj),
+        [Relative(0.4), Auto(), Auto(), Auto()],
+        [Aspect(1, 0.75), Auto(3), Auto(2), Auto(1)],
+        [Fixed(20) for _ in 1:length(ii)-1],
+        [Fixed(20) for _ in 1:length(jj)-1],
+        Outside(),
+        (false, false)
+    )
+
+    for i in ii, j in jj
+        # n = j + length(ii) * (i - 1)
+        gl[i, j] = AxisLayout(BBox(75, 0, 0, 75), las[i, j])
+    end
+
+    padding = 30
+    sg = solve(gl, BBox(shrinkbymargin(pixelarea(scene)[], padding)))
+    applylayout(sg)
+    # when the scene is resized, apply the outersolve'd outermost grid layout
+    # this recursively updates all layout objects that are contained in the grid
+    on(scene.events.window_area) do area
+    sg = solve(gl, BBox(shrinkbymargin(pixelarea(scene)[], padding)))
+        applylayout(sg)
+    end
+end

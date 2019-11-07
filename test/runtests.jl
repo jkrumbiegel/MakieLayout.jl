@@ -152,31 +152,92 @@ begin
     screen = display(scene)
     campixel!(scene);
 
-    ii = 1:4
-    jj = 1:4
-    las = [LayoutedAxis(scene) for i in ii, j in jj]
-
-    gl = GridLayout([], length(ii), length(jj),
-        [Relative(0.4), Auto(), Auto(), Auto()],
-        [Aspect(1, 0.75), Auto(3), Auto(2), Auto(1)],
-        [Fixed(20) for _ in 1:length(ii)-1],
-        [Fixed(20) for _ in 1:length(jj)-1],
-        Outside(),
+    gl = GridLayout(
+        scene, 3, 3,
+        [Auto(), Auto(), Auto()],
+        [Auto(), Auto(), Auto()],
+        [Fixed(0), Fixed(0)],
+        [Fixed(0), Fixed(0)],
+        Outside(30, 30, 30, 30),
         (false, false)
     )
 
-    for i in ii, j in jj
-        # n = j + length(ii) * (i - 1)
-        gl[i, j] = AxisLayout(BBox(75, 0, 0, 75), las[i, j])
+    las = []
+    for i in 1:3, j in 1:3
+        # la =
+        # al = AxisLayout(gl, la.protrusions, la.bboxnode)
+        la = gl[i, j] = LayoutedAxis(scene)
+        scatter!(la.scene, rand(100, 2) .* 90 .+ 5, color=RGBf0(rand(3)...), raw=true, markersize=5)
+        push!(las, la)
     end
+end
 
-    padding = 30
-    sg = solve(gl, BBox(shrinkbymargin(pixelarea(scene)[], padding)))
-    applylayout(sg)
-    # when the scene is resized, apply the outersolve'd outermost grid layout
-    # this recursively updates all layout objects that are contained in the grid
-    on(scene.events.window_area) do area
-    sg = solve(gl, BBox(shrinkbymargin(pixelarea(scene)[], padding)))
-        applylayout(sg)
+
+begin
+    begin
+        for i in 1:9
+            las[i].ylabelvisible[] = false
+            las[i].xlabelvisible[] = false
+            sleep(0.05)
+        end
+
+        for i in 1:9
+            las[i].yticklabelsvisible[] = false
+            las[i].xticklabelsvisible[] = false
+            sleep(0.05)
+        end
+
+        for i in 1:9
+            las[i].titlevisible[] = false
+            sleep(0.05)
+        end
+
+        for i in 1:9
+            las[i].ylabelvisible[] = true
+            las[i].xlabelvisible[] = true
+            sleep(0.05)
+        end
+
+        for i in 1:9
+            las[i].yticklabelsvisible[] = true
+            las[i].xticklabelsvisible[] = true
+            sleep(0.05)
+        end
+
+        for i in 1:9
+            las[i].titlevisible[] = true
+            sleep(0.05)
+        end
+
+        for i in 1:9
+            las[i].title[] = "Big\nTitle"
+            las[i].ylabel[] = "Big\ny label"
+            las[i].xlabel[] = "Big\nx label"
+            sleep(0.05)
+        end
+
+        for i in 1:9
+            las[i].title[] = "Title"
+            las[i].ylabel[] = "y label"
+            las[i].xlabel[] = "x label"
+            sleep(0.05)
+        end
+    end
+    begin
+        for i in 1:9
+            las[i].ylabelsize[] = 30
+            las[i].xlabelsize[] = 30
+            las[i].yticklabelsize[] = 30
+            las[i].xticklabelsize[] = 30
+            sleep(0.05)
+        end
+
+        for i in 1:9
+            las[i].ylabelsize[] = 20
+            las[i].xlabelsize[] = 20
+            las[i].yticklabelsize[] = 20
+            las[i].xticklabelsize[] = 20
+            sleep(0.05)
+        end
     end
 end

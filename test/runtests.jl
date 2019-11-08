@@ -153,13 +153,12 @@ begin
     campixel!(scene);
 
     gl = GridLayout(
-        scene, 3, 4,
-        [Relative(1/3), Relative(1/3), Relative(1/3)],
-        [Auto(), Auto(), Auto(), Auto()],
-        [Fixed(20), Fixed(20)],
-        [Fixed(20), Fixed(20), Fixed(20)],
-        Outside(30, 30, 30, 30),
-        (false, false)
+        scene, 3, 4;
+        rowsizes = Relative(1/3),
+        colsizes = Auto(),
+        addedcolgaps = Fixed(50),
+        addedrowgaps = Fixed(20),
+        alignmode = Outside(30, 30, 30, 30)
     )
 
     las = []

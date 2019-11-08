@@ -92,8 +92,8 @@ begin
 
     gl_slider[1, 1] = la2
 
-    sl1 = gl_slider[2, 1] = LayoutedSlider(scene, 40, 0:0.01:10)
-    sl2 = gl_slider[3, 1] = LayoutedSlider(scene, 40, 0:0.01:1)
+    sl1 = gl_slider[2, 1] = LayoutedSlider(scene, 40, 1:0.01:10)
+    sl2 = gl_slider[3, 1] = LayoutedSlider(scene, 40, 0.1:0.01:1)
 
     xrange = LinRange(0, 2pi, 500)
     lines!(
@@ -149,11 +149,11 @@ begin
     campixel!(scene);
 
     gl = GridLayout(
-        scene, 3, 3,
-        [Auto(), Auto(), Auto()],
-        [Auto(), Auto(), Auto()],
-        [Fixed(0), Fixed(0)],
-        [Fixed(0), Fixed(0)],
+        scene, 3, 4,
+        [Relative(1/3), Relative(1/3), Relative(1/3)],
+        [Auto(), Auto(), Auto(), Auto()],
+        [Fixed(20), Fixed(20)],
+        [Fixed(20), Fixed(20), Fixed(20)],
         Outside(30, 30, 30, 30),
         (false, false)
     )
@@ -165,6 +165,14 @@ begin
         la = gl[i, j] = LayoutedAxis(scene)
         scatter!(la.scene, rand(100, 2) .* 90 .+ 5, color=RGBf0(rand(3)...), raw=true, markersize=5)
         push!(las, la)
+    end
+
+    # buttons need change in abstractplotting to correctly update frame position
+    but = gl[1, 4] = LayoutedButton(scene, 150, 50, "Toggle Titles")
+    on(but.button.clicks) do c
+        for la in las
+            la.titlevisible[] = !(la.titlevisible[])
+        end
     end
 end
 

@@ -89,7 +89,7 @@ begin
         3, 1,
         [Auto(), Auto(), Auto()],
         [Relative(1)],
-        [Fixed(15)],
+        [Fixed(15), Fixed(15)],
         [],
         Inside(),
         (false, false))

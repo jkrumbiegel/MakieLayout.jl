@@ -1,6 +1,10 @@
 using MakieLayout
 using Makie
 using KernelDensity
+using FreeTypeAbstraction
+
+
+boldface = newface(expanduser("~/Library/Fonts/SFHelloSemibold.ttf"))
 
 function kdepoly!(scene, vec, scalevalue, reverse=false; kwargs...)
     kderesult = kde(vec; npoints=32)
@@ -17,7 +21,7 @@ function kdepoly!(scene, vec, scalevalue, reverse=false; kwargs...)
 end
 
 begin
-    scene = Scene(resolution = (1000, 1000));
+    scene = Scene(resolution = (1000, 1000), font="SF Hello");
     screen = display(scene)
     campixel!(scene);
 

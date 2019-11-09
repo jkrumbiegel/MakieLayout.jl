@@ -153,14 +153,15 @@ begin
     campixel!(scene);
 
     maingl = GridLayout(
-        scene, 1, 2;
+        1, 2;
+        parent = scene,
         colsizes = [Auto(), Fixed(200)],
         addedcolgaps = Fixed(30),
         alignmode = Outside(30, 30, 30, 30)
     )
 
     gl = maingl[1, 1] = GridLayout(
-        maingl, 3, 3;
+        3, 3;
         rowsizes = Relative(1/3),
         colsizes = Auto(),
         addedcolgaps = Fixed(50),
@@ -179,7 +180,7 @@ begin
 
     # buttons need change in abstractplotting to correctly update frame position
 
-    glside = maingl[1, 2] = GridLayout(maingl, 5, 1, alignmode=Outside())
+    glside = maingl[1, 2] = GridLayout(5, 1, alignmode=Outside())
 
     but = glside[1, 1] = LayoutedButton(scene, 200, 50, "Toggle Titles")
     on(but.button.clicks) do c

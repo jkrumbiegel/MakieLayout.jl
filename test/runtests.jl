@@ -152,13 +152,20 @@ begin
     screen = display(scene)
     campixel!(scene);
 
-    gl = GridLayout(
-        scene, 3, 4;
+    maingl = GridLayout(
+        scene, 1, 2;
+        colsizes = [Auto(), Fixed(200)],
+        addedcolgaps = Fixed(30),
+        alignmode = Outside(30, 30, 30, 30)
+    )
+
+    gl = maingl[1, 1] = GridLayout(
+        maingl, 3, 3;
         rowsizes = Relative(1/3),
         colsizes = Auto(),
         addedcolgaps = Fixed(50),
         addedrowgaps = Fixed(20),
-        alignmode = Outside(30, 30, 30, 30)
+        alignmode = Outside()
     )
 
     las = []
@@ -171,10 +178,37 @@ begin
     end
 
     # buttons need change in abstractplotting to correctly update frame position
-    but = gl[1, 4] = LayoutedButton(scene, 150, 50, "Toggle Titles")
+
+    glside = maingl[1, 2] = GridLayout(maingl, 5, 1, alignmode=Outside())
+
+    but = glside[1, 1] = LayoutedButton(scene, 200, 50, "Toggle Titles")
     on(but.button.clicks) do c
         for la in las
-            la.titlevisible[] = !(la.titlevisible[])
+            la.titlevisible[] = !la.titlevisible[]
+        end
+    end
+
+    but2 = glside[2, 1] = LayoutedButton(scene, 200, 50, "Toggle Labels")
+    on(but2.button.clicks) do c
+        for la in las
+            la.xlabelvisible[] = !la.xlabelvisible[]
+            la.ylabelvisible[] = !la.ylabelvisible[]
+        end
+    end
+
+    but3 = glside[3, 1] = LayoutedButton(scene, 200, 50, "Toggle Ticklabels")
+    on(but3.button.clicks) do c
+        for la in las
+            la.xticklabelsvisible[] = !la.xticklabelsvisible[]
+            la.yticklabelsvisible[] = !la.yticklabelsvisible[]
+        end
+    end
+
+    but4 = glside[4, 1] = LayoutedButton(scene, 200, 50, "Toggle Ticks")
+    on(but4.button.clicks) do c
+        for la in las
+            la.xticksvisible[] = !la.xticksvisible[]
+            la.yticksvisible[] = !la.yticksvisible[]
         end
     end
 end

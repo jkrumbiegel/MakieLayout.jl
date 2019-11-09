@@ -74,25 +74,21 @@ begin
     # midtitle_bbox = BBox(boundingbox(midtitle))
 
     gl = GridLayout(
-        scene, 2, 2,
-        [Aspect(1, 1.0), Auto()],
-        [Relative(0.5), Auto()],
-        [Fixed(20)],
-        [Fixed(20)],
-        Outside(30, 30, 30, 30),
-        (false, true))
+        2, 2;
+        parent = scene,
+        rowsizes = [Aspect(1, 1.0), Auto()],
+        colsizes = [Relative(0.5), Auto()],
+        addedrowgaps = Fixed(20),
+        addedcolgaps = Fixed(20),
+        alignmode = Outside(30, 30, 30, 30))
 
     # gl[1, :] = FixedSizeBox(suptitle_bbox, (0.5, 0.0), suptitle_pos)
 
-    gl_slider = GridLayout(
-        gl,
-        3, 1,
-        [Auto(), Auto(), Auto()],
-        [Relative(1)],
-        [Fixed(15), Fixed(15)],
-        [],
-        Inside(),
-        (false, false))
+    gl_slider = gl[1, 2] = GridLayout(
+        3, 1;
+        rowsizes = [Auto(), Auto(), Auto()],
+        colsizes = [Relative(1)],
+        addedrowgaps = [Fixed(15), Fixed(15)])
 
     gl_slider[1, 1] = la2
 
@@ -116,19 +112,15 @@ begin
     #     sliderpos2[] = Point2(left(ibbox), bottom(ibbox))
     # end)
     #
-    gl[1, 2] = gl_slider
 
     gl[2, :] = la1
 
-    gl2 = GridLayout(
-        gl,
+    gl2 = gl[1, 1] = GridLayout(
         2, 2,
-        [Auto(), Relative(0.7)],
-        [Aspect(2, 1.0), Auto()],
-        [Fixed(10)],
-        [Fixed(10)],
-        Inside(),
-        (true, true))
+        rowsizes = [Auto(), Relative(0.7)],
+        colsizes = [Aspect(2, 1.0), Auto()],
+        addedrowgaps = [Fixed(10)],
+        addedcolgaps = [Fixed(10)])
 
     gl2[2, 1] = la3
     la3.titlevisible[] = false
@@ -142,8 +134,6 @@ begin
     la5.ylabelvisible[] = false
     la5.yticklabelsvisible[] = false
     la5.titlevisible[] = false
-
-    gl[1, 1] = gl2
 end
 
 

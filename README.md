@@ -1,4 +1,4 @@
-MakieLayout
+# MakieLayout
 
 Each layout object needs a certain type or certain types of observables when
 it gets created. For example:
@@ -43,14 +43,14 @@ These bounding boxes are connected to the plot objects, so the plots update corr
 
 Example:
 
-Change title font size of an axis
-Title font size is an observable connected to the top protrusion observable of the axis
-The top protrusion is connected to an AxisLayout and triggers its need_update
-The AxisLayout triggers its parent's GridLayout need_update
-The GridLayout triggers its own parent GridLayout
-This GridLayout is the root so it calls solve on itself with the window size
-The top grid is solved
-The second grid is solved
-The AxisLayout is solved
-The AxisLayout updates its inner boundingbox observable
-All plots connected with that axis update because they depend on the boundingbox
+- Change title font size of an axis
+- Title font size is an observable connected to the top protrusion observable of the axis
+- The top protrusion is connected to an AxisLayout and triggers its need_update
+- The AxisLayout triggers its parent's GridLayout need_update
+- The GridLayout triggers its own parent GridLayout
+- This GridLayout is the root so it calls solve on itself with the window size
+- The top grid is solved
+- The second grid is solved
+- The AxisLayout is solved
+- The AxisLayout updates its inner boundingbox observable
+- All plots connected with that axis update because they depend on the boundingbox

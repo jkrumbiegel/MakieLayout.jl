@@ -34,28 +34,9 @@ begin
     linkxaxes!(la3, la4)
     linkyaxes!(la3, la5)
 
-    # lines!(la1.scene, rand(200, 2) .* 100, color=:black, show_axis=false)
     img = rand(100, 100)
     image!(la1.scene, img, show_axis=false)
     la1.title[] = "Noise Image"
-
-    # sliderpos = Node(Point2(0.0, 0.0))
-    # sllength = Node(300.0)
-    # slheight = 20
-    # sl = slider!(scene, LinRange(0.2, 5, 301), position=sliderpos,
-    #     sliderlength=sllength, sliderheight=slheight, raw=true,
-    #     textsize = 20, start = 2, slidercolor=:red, buttonstroke=2,
-    #     )[end]
-
-    # sliderpos2 = Node(Point2(0.0, 0.0))
-    # sllength2 = Node(300.0)
-    # slheight2 = 20
-    # sl2 = slider!(scene, LinRange(0.1, 1, 301), position=sliderpos2,
-    #     sliderlength=sllength2, sliderheight=slheight2, raw=true,
-    #     textsize = 20, start = 1
-    #     )[end]
-
-
 
     linkeddata = randn(200, 2) .* 15 .+ 50
     green = RGBAf0(0.05, 0.8, 0.3, 0.6)
@@ -82,8 +63,6 @@ begin
         addedcolgaps = Fixed(20),
         alignmode = Outside(30, 30, 30, 30))
 
-    # gl[1, :] = FixedSizeBox(suptitle_bbox, (0.5, 0.0), suptitle_pos)
-
     gl_slider = gl[1, 2] = GridLayout(
         3, 1;
         rowsizes = [Auto(), Auto(), Auto()],
@@ -101,17 +80,6 @@ begin
         xrange ./ 2pi .* 100,
         lift((x, y)->sin.(xrange .* x) .* 40 .* y .+ 50, sl1.slider.value, sl2.slider.value),
         color=:blue, linewidth=2, show_axis=false)
-
-    #
-    # gl_slider[2, 1] = FixedHeightBox(slheight, 0.5, (ibbox, obbox)->begin ibbox, obbox
-    #     sllength[] = width(ibbox) - 30
-    #     sliderpos[] = Point2(left(ibbox), bottom(ibbox))
-    # end)
-    # gl_slider[3, 1] = FixedHeightBox(slheight2, 0.5, (ibbox, obbox)->begin ibbox, obbox
-    #     sllength2[] = width(ibbox) - 30
-    #     sliderpos2[] = Point2(left(ibbox), bottom(ibbox))
-    # end)
-    #
 
     gl[2, :] = la1
 

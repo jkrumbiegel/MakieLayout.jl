@@ -36,7 +36,7 @@ begin
 
     img = rand(100, 100)
     image!(la1.scene, img, show_axis=false)
-    la1.title[] = "Noise Image"
+    la1.attributes.title[] = "Noise Image"
 
     linkeddata = randn(200, 2) .* 15 .+ 50
     green = RGBAf0(0.05, 0.8, 0.3, 0.6)
@@ -54,14 +54,25 @@ begin
     # midtitle = text!(scene, "Left aligned subtitle", position=midtitle_pos, textsize=40, font=boldface)[end]
     # midtitle_bbox = BBox(boundingbox(midtitle))
 
-    gl = GridLayout(
+    maingl = GridLayout(2, 1, parent=scene, alignmode=Outside(40))
+
+    slalign = maingl[2, 1] = LayoutedSlider(scene, 30, LinRange(0.0, 60.0, 200))
+
+
+    gl = maingl[1, 1] = GridLayout(
         2, 2;
         parent = scene,
         rowsizes = [Aspect(1, 1.0), Auto()],
         colsizes = [Relative(0.5), Auto()],
         addedrowgaps = Fixed(20),
         addedcolgaps = Fixed(20),
-        alignmode = Outside(30, 30, 30, 30))
+        alignmode = Outside(0))
+
+    on(slalign.slider.value) do v
+        gl.addedrowgaps = [Fixed(v)]
+        gl.addedcolgaps = [Fixed(v)]
+        gl.needs_update[] = true
+    end
 
     gl_slider = gl[1, 2] = GridLayout(
         3, 1;
@@ -91,19 +102,18 @@ begin
         addedcolgaps = [Fixed(10)])
 
     gl2[2, 1] = la3
-    la3.titlevisible[] = false
+    la3.attributes.titlevisible[] = false
 
     gl2[1, 1] = la4
-    la4.xlabelvisible[] = false
-    la4.xticklabelsvisible[] = false
-    la4.titlevisible[] = false
+    la4.attributes.xlabelvisible[] = false
+    la4.attributes.xticklabelsvisible[] = false
+    la4.attributes.titlevisible[] = false
 
     gl2[2, 2] = la5
-    la5.ylabelvisible[] = false
-    la5.yticklabelsvisible[] = false
-    la5.titlevisible[] = false
+    la5.attributes.ylabelvisible[] = false
+    la5.attributes.yticklabelsvisible[] = false
+    la5.attributes.titlevisible[] = false
 end
-
 
 begin
     scene = Scene(resolution = (1000, 1000), font="SF Hello");
@@ -138,40 +148,51 @@ begin
 
     # buttons need change in abstractplotting to correctly update frame position
 
-    glside = maingl[1, 2] = GridLayout(5, 1, alignmode=Outside())
+    glside = maingl[1, 2] = GridLayout(6, 1, alignmode=Outside())
 
     but = glside[1, 1] = LayoutedButton(scene, 200, 50, "Toggle Titles")
     on(but.button.clicks) do c
         for la in las
-            la.titlevisible[] = !la.titlevisible[]
+            la.attributes.titlevisible[] = !la.attributes.titlevisible[]
         end
     end
 
     but2 = glside[2, 1] = LayoutedButton(scene, 200, 50, "Toggle Labels")
     on(but2.button.clicks) do c
         for la in las
-            la.xlabelvisible[] = !la.xlabelvisible[]
-            la.ylabelvisible[] = !la.ylabelvisible[]
+            la.attributes.xlabelvisible[] = !la.attributes.xlabelvisible[]
+            la.attributes.ylabelvisible[] = !la.attributes.ylabelvisible[]
         end
     end
 
     but3 = glside[3, 1] = LayoutedButton(scene, 200, 50, "Toggle Ticklabels")
     on(but3.button.clicks) do c
         for la in las
-            la.xticklabelsvisible[] = !la.xticklabelsvisible[]
-            la.yticklabelsvisible[] = !la.yticklabelsvisible[]
+            la.attributes.xticklabelsvisible[] = !la.attributes.xticklabelsvisible[]
+            la.attributes.yticklabelsvisible[] = !la.attributes.yticklabelsvisible[]
         end
     end
 
     but4 = glside[4, 1] = LayoutedButton(scene, 200, 50, "Toggle Ticks")
     on(but4.button.clicks) do c
         for la in las
-            la.xticksvisible[] = !la.xticksvisible[]
-            la.yticksvisible[] = !la.yticksvisible[]
+            la.attributes.xticksvisible[] = !la.attributes.xticksvisible[]
+            la.attributes.yticksvisible[] = !la.attributes.yticksvisible[]
+        end
+    end
+
+    but5 = glside[5, 1] = LayoutedButton(scene, 200, 50, "Toggle Tick Align")
+    on(but5.button.clicks) do c
+        for la in las
+            la.attributes.xtickalign[] = la.attributes.xtickalign[] == 1 ? 0 : 1
+            la.attributes.ytickalign[] = la.attributes.ytickalign[] == 1 ? 0 : 1
         end
     end
 end
 
+las[1].attributes.xtickalign[] = 0.5
+las[1].attributes.xticksize[] = 40
+gl.needs_update[] = true
 
 begin
     begin

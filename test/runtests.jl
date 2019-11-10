@@ -162,7 +162,7 @@ begin
 
     # buttons need change in abstractplotting to correctly update frame position
 
-    glside = maingl[1, 2] = GridLayout(6, 1, alignmode=Outside())
+    glside = maingl[1, 2] = GridLayout(7, 1, alignmode=Outside())
 
     but = glside[1, 1] = LayoutedButton(scene, 200, 50, "Toggle Titles")
     on(but.button.clicks) do c
@@ -200,6 +200,14 @@ begin
         for la in las
             la.attributes.xtickalign[] = la.attributes.xtickalign[] == 1 ? 0 : 1
             la.attributes.ytickalign[] = la.attributes.ytickalign[] == 1 ? 0 : 1
+        end
+    end
+
+    but6 = glside[6, 1] = LayoutedButton(scene, 200, 50, "Toggle Grids")
+    on(but6.button.clicks) do c
+        for la in las
+            la.attributes.xgridvisible[] = !la.attributes.xgridvisible[]
+            la.attributes.ygridvisible[] = !la.attributes.ygridvisible[]
         end
     end
 end

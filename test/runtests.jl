@@ -85,7 +85,7 @@ begin
 
     gl2 = gl[1, 1] = GridLayout(
         2, 2,
-        rowsizes = [Auto(), Relative(0.7)],
+        rowsizes = [Auto(), Relative(0.8)],
         colsizes = [Aspect(2, 1.0), Auto()],
         addedrowgaps = [Fixed(10)],
         addedcolgaps = [Fixed(10)])

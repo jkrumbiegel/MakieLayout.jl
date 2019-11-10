@@ -124,7 +124,7 @@ begin
     la5.attributes.xzoomlock[] = true
 end
 
-la1.attributes.spinewidth[] = 5
+la1.attributes.spinewidth[] = 1
 la1.attributes.titlealign[] = :center
 la1.attributes.title[] = "A fake audio signal"
 la1.attributes.xticksize[] = 10
@@ -215,6 +215,7 @@ end
 las[1].attributes.xtickalign[] = 0.5
 las[1].attributes.xticksize[] = 40
 gl.needs_update[] = true
+las[1].attributes.titlefont[] = boldface
 
 begin
     begin

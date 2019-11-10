@@ -124,9 +124,10 @@ begin
     la5.attributes.xzoomlock[] = true
 end
 
+la1.attributes.spinewidth[] = 5
 la1.attributes.titlealign[] = :center
-la1.attributes.title[] = "Title"
-la1.attributes.titlesize[] = 30
+la1.attributes.title[] = "A fake audio signal"
+la1.attributes.xticksize[] = 10
 
 begin
     scene = Scene(resolution = (1000, 1000), font="SF Hello");
@@ -210,67 +211,67 @@ gl.needs_update[] = true
 begin
     begin
         for i in 1:9
-            las[i].ylabelvisible[] = false
-            las[i].xlabelvisible[] = false
+            las[i].attributes.ylabelvisible[] = false
+            las[i].attributes.xlabelvisible[] = false
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].yticklabelsvisible[] = false
-            las[i].xticklabelsvisible[] = false
+            las[i].attributes.yticklabelsvisible[] = false
+            las[i].attributes.xticklabelsvisible[] = false
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].titlevisible[] = false
+            las[i].attributes.titlevisible[] = false
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].ylabelvisible[] = true
-            las[i].xlabelvisible[] = true
+            las[i].attributes.ylabelvisible[] = true
+            las[i].attributes.xlabelvisible[] = true
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].yticklabelsvisible[] = true
-            las[i].xticklabelsvisible[] = true
+            las[i].attributes.yticklabelsvisible[] = true
+            las[i].attributes.xticklabelsvisible[] = true
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].titlevisible[] = true
+            las[i].attributes.titlevisible[] = true
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].title[] = "Big\nTitle"
-            las[i].ylabel[] = "Big\ny label"
-            las[i].xlabel[] = "Big\nx label"
+            las[i].attributes.title[] = "Big\nTitle"
+            las[i].attributes.ylabel[] = "Big\ny label"
+            las[i].attributes.xlabel[] = "Big\nx label"
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].title[] = "Title"
-            las[i].ylabel[] = "y label"
-            las[i].xlabel[] = "x label"
+            las[i].attributes.title[] = "Title"
+            las[i].attributes.ylabel[] = "y label"
+            las[i].attributes.xlabel[] = "x label"
             sleep(0.05)
         end
     end
     begin
         for i in 1:9
-            las[i].ylabelsize[] = 30
-            las[i].xlabelsize[] = 30
-            las[i].yticklabelsize[] = 30
-            las[i].xticklabelsize[] = 30
+            las[i].attributes.ylabelsize[] = 30
+            las[i].attributes.xlabelsize[] = 30
+            las[i].attributes.yticklabelsize[] = 30
+            las[i].attributes.xticklabelsize[] = 30
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].ylabelsize[] = 20
-            las[i].xlabelsize[] = 20
-            las[i].yticklabelsize[] = 20
-            las[i].xticklabelsize[] = 20
+            las[i].attributes.ylabelsize[] = 20
+            las[i].attributes.xlabelsize[] = 20
+            las[i].attributes.yticklabelsize[] = 20
+            las[i].attributes.xticklabelsize[] = 20
             sleep(0.05)
         end
     end

@@ -34,9 +34,14 @@ begin
     linkxaxes!(la3, la4)
     linkyaxes!(la3, la5)
 
-    img = rand(100, 100)
-    image!(la1.scene, img, show_axis=false)
-    la1.attributes.title[] = "Noise Image"
+    fakeaudiox = LinRange(0f0, 1000f0, 100_000)
+    fakeaudioy = (rand(Float32, 100_000) .- 0.5f0) .+ 2 .* sin.(fakeaudiox .* 10)
+
+    lines!(la1.scene, fakeaudiox, fakeaudioy, show_axis=false)
+    la1.attributes.title[] = "A fake audio signal"
+    la1.limits[] = FRect(0f0, -3f0, 1000f0, 6f0)
+    la1.attributes.ypanlock[] = true
+    la1.attributes.yzoomlock[] = true
 
     linkeddata = randn(200, 2) .* 15 .+ 50
     green = RGBAf0(0.05, 0.8, 0.3, 0.6)
@@ -108,12 +113,20 @@ begin
     la4.attributes.xlabelvisible[] = false
     la4.attributes.xticklabelsvisible[] = false
     la4.attributes.titlevisible[] = false
+    la4.attributes.ypanlock[] = true
+    la4.attributes.yzoomlock[] = true
 
     gl2[2, 2] = la5
     la5.attributes.ylabelvisible[] = false
     la5.attributes.yticklabelsvisible[] = false
     la5.attributes.titlevisible[] = false
+    la5.attributes.xpanlock[] = true
+    la5.attributes.xzoomlock[] = true
 end
+
+la1.attributes.titlealign[] = :center
+la1.attributes.title[] = "Title"
+la1.attributes.titlesize[] = 30
 
 begin
     scene = Scene(resolution = (1000, 1000), font="SF Hello");

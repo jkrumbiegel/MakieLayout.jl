@@ -212,6 +212,8 @@ begin
     end
 end
 
+las[1].attributes.rightspinevisible = true
+las[1].attributes.spinewidth[] = 1
 las[1].attributes.xidealtickdistance[] = 100
 las[1].attributes.xticksize[] = 10
 gl.needs_update[] = true

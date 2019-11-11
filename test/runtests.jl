@@ -112,6 +112,7 @@ begin
     gl2[1, 1] = la4
     la4.attributes.xlabelvisible[] = false
     la4.attributes.xticklabelsvisible[] = false
+    la4.attributes.xticksvisible[] = false
     la4.attributes.titlevisible[] = false
     la4.attributes.ypanlock[] = true
     la4.attributes.yzoomlock[] = true
@@ -119,6 +120,7 @@ begin
     gl2[2, 2] = la5
     la5.attributes.ylabelvisible[] = false
     la5.attributes.yticklabelsvisible[] = false
+    la5.attributes.yticksvisible[] = false
     la5.attributes.titlevisible[] = false
     la5.attributes.xpanlock[] = true
     la5.attributes.xzoomlock[] = true

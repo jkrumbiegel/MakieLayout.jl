@@ -302,3 +302,23 @@ begin
         end
     end
 end
+
+prependrows!(maingl, 1)
+maingl.rowsizes
+
+begin
+    scene = Scene(resolution = (1000, 1000), font="SF Hello");
+    screen = display(scene)
+    campixel!(scene);
+
+    maingl = GridLayout(
+        1, 1;
+        parent = scene,
+        alignmode = Outside(30, 30, 30, 30)
+    )
+
+    for i in 1:4, j in 1:4
+        maingl[i, j] = LayoutedAxis(scene)
+    end
+
+end

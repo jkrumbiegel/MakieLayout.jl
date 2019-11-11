@@ -74,9 +74,10 @@ begin
         alignmode = Outside(0))
 
     on(slalign.slider.value) do v
-        gl.addedrowgaps = [Fixed(v)]
-        gl.addedcolgaps = [Fixed(v)]
-        gl.needs_update[] = true
+        with_updates_suspended(maingl) do
+            gl.addedrowgaps = [Fixed(v)]
+            gl.addedcolgaps = [Fixed(v)]
+        end
     end
 
     gl_slider = gl[1, 2] = GridLayout(
@@ -191,18 +192,27 @@ begin
 
     but4 = glside[4, 1] = LayoutedButton(scene, 200, 50, "Toggle Ticks")
     on(but4.button.clicks) do c
-        for la in las
-            la.attributes.xticksvisible[] = !la.attributes.xticksvisible[]
-            la.attributes.yticksvisible[] = !la.attributes.yticksvisible[]
+        t1 = time()
+        with_updates_suspended(maingl) do
+            for la in las
+                la.attributes.xticksvisible[] = !la.attributes.xticksvisible[]
+                la.attributes.yticksvisible[] = !la.attributes.yticksvisible[]
+            end
         end
+        println(time() - t1)
     end
 
     but5 = glside[5, 1] = LayoutedButton(scene, 200, 50, "Toggle Tick Align")
     on(but5.button.clicks) do c
+        t1 = time()
+        maingl.block_updates = true
         for la in las
             la.attributes.xtickalign[] = la.attributes.xtickalign[] == 1 ? 0 : 1
             la.attributes.ytickalign[] = la.attributes.ytickalign[] == 1 ? 0 : 1
         end
+        maingl.block_updates = true
+        maingl.needs_update[] = true
+        println(time() - t1)
     end
 
     but6 = glside[6, 1] = LayoutedButton(scene, 200, 50, "Toggle Grids")

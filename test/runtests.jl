@@ -86,7 +86,10 @@ begin
         colsizes = [Relative(1)],
         addedrowgaps = [Fixed(15), Fixed(15)])
 
-    gl_slider[1, 1] = la2
+    gl_colorbar = gl_slider[1, 1] = GridLayout(1, 2; colsizes=[Auto(), Relative(0.1)])
+
+    gl_colorbar[1, 1] = la2
+    gl_colorbar[1, 2] = LayoutedColorbar(scene)
 
     sl1 = gl_slider[2, 1] = LayoutedSlider(scene, 40, 1:0.01:10)
     sl2 = gl_slider[3, 1] = LayoutedSlider(scene, 40, 0.1:0.01:1)

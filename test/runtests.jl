@@ -212,8 +212,8 @@ begin
     end
 end
 
-las[1].attributes.xtickalign[] = 0.5
-las[1].attributes.xticksize[] = 40
+las[1].attributes.xidealtickdistance[] = 100
+las[1].attributes.xticksize[] = 10
 gl.needs_update[] = true
 las[1].attributes.titlefont[] = boldface
 

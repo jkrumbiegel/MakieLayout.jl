@@ -317,9 +317,18 @@ begin
         alignmode = Outside(30, 30, 30, 30)
     )
 
+    las = Array{LayoutedAxis, 2}(undef, 4, 4)
+
     for i in 1:4, j in 1:4
-        maingl[i, j] = LayoutedAxis(scene)
+        las[i, j] = maingl[i, j] = LayoutedAxis(scene)
     end
+end
+
+las[1, 1].attributes.aspect = AxisAspect(nothing)
+las[1, 1].attributes.maxsize = (Inf, Inf)
+las[1, 2].attributes.aspect = AxisAspect(nothing)
+las[1, 3].attributes.aspect = AxisAspect(nothing)
+
 begin
     subgl = nest_content_into_gridlayout!(maingl, 1, 1)
     subgl[:, 2] = LayoutedColorbar(scene)

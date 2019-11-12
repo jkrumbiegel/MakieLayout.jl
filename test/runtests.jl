@@ -320,5 +320,33 @@ begin
     for i in 1:4, j in 1:4
         maingl[i, j] = LayoutedAxis(scene)
     end
+begin
+    subgl = nest_content_into_gridlayout!(maingl, 1, 1)
+    subgl[:, 2] = LayoutedColorbar(scene)
+    subgl.colsizes[2] = Relative(0.1)
+    maingl.needs_update[] = true
+
+    sleep(2)
+
+    subgl2 = nest_content_into_gridlayout!(maingl, 1:2, 1:2)
+    subgl2[:, 3] = LayoutedColorbar(scene)
+    subgl2.colsizes[3] = Relative(0.1)
+    maingl.needs_update[] = true
+
+    sleep(2)
+
+    subgl3 = nest_content_into_gridlayout!(maingl, 1:3, 1:3)
+    subgl3[:, 4] = LayoutedColorbar(scene)
+    subgl3.colsizes[4] = Relative(0.1)
+    maingl.needs_update[] = true
+
+    sleep(2)
+
+    subgl4 = nest_content_into_gridlayout!(maingl, 1:4, 1:4)
+    subgl4[:, 5] = LayoutedColorbar(scene)
+    subgl4.colsizes[5] = Relative(0.1)
+    maingl.needs_update[] = true
+
+    sleep(2)
 
 end

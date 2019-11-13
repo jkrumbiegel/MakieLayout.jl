@@ -6,19 +6,20 @@ using FreeTypeAbstraction
 
 boldface = newface(expanduser("~/Library/Fonts/SFHelloSemibold.ttf"))
 
-function kdepoly!(scene, vec, scalevalue, reverse=false; kwargs...)
+function kdepoly!(la::LayoutedAxis, vec, reverse=false; kwargs...)
     kderesult = kde(vec; npoints=32)
 
     x = kderesult.x
     y = kderesult.density
-    y = y .* (1 / maximum(y)) .* scalevalue
 
     if reverse
-        poly!(scene, Point2.(y, x); kwargs...)[end]
+        poly!(la, Point2.(y, x); kwargs...)
     else
-        poly!(scene, Point2.(x, y); kwargs...)[end]
+        poly!(la, Point2.(x, y); kwargs...)
     end
 end
+
+length(la5.plots)
 
 begin
     scene = Scene(resolution = (1000, 1000), font="SF Hello");
@@ -37,19 +38,24 @@ begin
     fakeaudiox = LinRange(0f0, 1000f0, 100_000)
     fakeaudioy = (rand(Float32, 100_000) .- 0.5f0) .+ 2 .* sin.(fakeaudiox .* 10)
 
-    lines!(la1.scene, fakeaudiox, fakeaudioy, show_axis=false)
+    lines!(la1, fakeaudiox, fakeaudioy, show_axis=false)
     la1.attributes.title[] = "A fake audio signal"
-    la1.limits[] = FRect(0f0, -3f0, 1000f0, 6f0)
     la1.attributes.ypanlock[] = true
     la1.attributes.yzoomlock[] = true
 
     linkeddata = randn(200, 2) .* 15 .+ 50
     green = RGBAf0(0.05, 0.8, 0.3, 0.6)
-    scatter!(la3.scene, linkeddata, markersize=3, color=green, show_axis=false)
+    scatter!(la3, linkeddata, markersize=3, color=green, show_axis=false)
+    kdepoly!(la4, linkeddata[:, 1], false, color=green, linewidth=2, show_axis=false)
+    kdepoly!(la5, linkeddata[:, 2], true, color=green, linewidth=2, show_axis=false)
 
-    kdepoly!(la4.scene, linkeddata[:, 1], 90, false, color=green, linewidth=2, show_axis=false)
-    kdepoly!(la5.scene, linkeddata[:, 2], 90, true, color=green, linewidth=2, show_axis=false)
-    update!(scene)
+    linkeddata2 = randn(200, 2) .* 20 .+ 70
+    red = RGBAf0(0.9, 0.1, 0.05, 0.6)
+    scatter!(la3, linkeddata2, markersize=3, color=red, show_axis=false)
+    kdepoly!(la4, linkeddata2[:, 1], false, color=red, linewidth=2, show_axis=false)
+    kdepoly!(la5, linkeddata2[:, 2], true, color=red, linewidth=2, show_axis=false)
+
+
 
     # suptitle_pos = Node(Point2(0.0, 0.0))
     # suptitle = text!(scene, "Centered Super Title", position=suptitle_pos, textsize=50, font=boldface)[end]
@@ -96,7 +102,7 @@ begin
 
     xrange = LinRange(0, 2pi, 500)
     lines!(
-        la2.scene,
+        la2,
         xrange ./ 2pi .* 100,
         lift((x, y)->sin.(xrange .* x) .* 40 .* y .+ 50, sl1.slider.value, sl2.slider.value),
         color=:blue, linewidth=2, show_axis=false)

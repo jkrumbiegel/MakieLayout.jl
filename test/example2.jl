@@ -18,7 +18,7 @@ begin
         3, 3;
         rowsizes = Relative(1/3),
         colsizes = Auto(),
-        addedcolgaps = Fixed(50),
+        addedcolgaps = Fixed(20),
         addedrowgaps = Fixed(20),
         alignmode = Outside()
     )
@@ -95,7 +95,24 @@ begin
             la.attributes.ygridvisible[] = !la.attributes.ygridvisible[]
         end
     end
+
+    but7 = glside[7, 1] = LayoutedButton(scene, 200, 50, "Toggle Spines")
+    on(but7.button.clicks) do c
+        for la in las
+            la.attributes.topspinevisible[] = !la.attributes.topspinevisible[]
+            la.attributes.leftspinevisible[] = !la.attributes.leftspinevisible[]
+            la.attributes.bottomspinevisible[] = !la.attributes.bottomspinevisible[]
+            la.attributes.rightspinevisible[] = !la.attributes.rightspinevisible[]
+        end
+    end
 end
+
+map(la -> la.attributes.xticklabelpad = 5, las)
+map(la -> la.attributes.xlabelpadding = 0, las)
+map(la -> la.attributes.spinewidth = 1, las)
+map(la -> la.attributes.xticklabelrotation = pi/2, las)
+map(la -> la.attributes.xticklabelalign = (:right, :center), las)
+map(la -> la.attributes.xticklabelspace = 50, las)
 
 
 begin

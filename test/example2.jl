@@ -28,7 +28,11 @@ begin
         # la =
         # al = AxisLayout(gl, la.protrusions, la.bboxnode)
         la = gl[i, j] = LayoutedAxis(scene)
-        scatter!(la.scene, rand(100, 2) .* 90 .+ 5, color=RGBf0(rand(3)...), raw=true, markersize=5)
+        sc = scatter!(
+            la,
+            rand(100, 2) .* 90 .+ 5,
+            color=RGBf0(rand(3)...),
+            raw=true, markersize=5)
         push!(las, la)
     end
 

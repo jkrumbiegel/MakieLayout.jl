@@ -22,10 +22,18 @@ begin
     for i in 1:ni, j in 1:nj
         las[i, j] = maingl[i, j] = LayoutedAxis(scene, titlefont=boldface, titlesize=20)
     end
+
+    lines!(las[1, 1], 0:0.1:100, sin.((0:0.1:100) ./ 5) .+ 1)
+    lines!(las[1, 2], (0:0.1:100) .+ 50, -sin.((0:0.1:100) ./ 5), color=:blue)
+
+    scatter!(las[2, 1], rand(100, 2) .* 200, markersize=4)
+
+    las[2, 2].attributes.xautolimitmargin = (0, 0)
+    las[2, 2].attributes.yautolimitmargin = (0, 0)
+    image!(las[2, 2], rand(500, 400))
+
+    linkxaxes!(las[1, :]...)
+    linkyaxes!(las[1, :]...)
+
+    autolimits!(las[1, 1])
 end
-
-scatter!(las[1, 1], rand(100, 2) .* 200, markersize=4)
-lines!(las[1, 1], 0:0.1:100, sin.((0:0.1:100) ./ 5))
-lines!(las[1, 1], 0:0.1:100, -sin.((0:0.1:100) ./ 5), color=:blue)
-
-image!(las[3, 3], rand(500, 400))

@@ -13,6 +13,8 @@ begin
     )
 
     la = maingl[1, 1] = LayoutedAxis(scene)
+    la.attributes.yautolimitmargin = (0f0, 0.05f0)
+
 
     poly!(la, BBox(0, 1, 4, 0), color=:blue)
     poly!(la, BBox(1, 2, 7, 0), color=:red)

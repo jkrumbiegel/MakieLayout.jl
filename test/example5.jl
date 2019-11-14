@@ -30,7 +30,7 @@ begin
 
     las[2, 2].attributes.xautolimitmargin = (0, 0)
     las[2, 2].attributes.yautolimitmargin = (0, 0)
-    las[2, 2].attributes.aspect = AxisAspect(1)
+    las[2, 2].attributes.aspect = DataAspect()
     image!(las[2, 2], rand(500, 400))
 
     linkxaxes!(las[1, :]...)

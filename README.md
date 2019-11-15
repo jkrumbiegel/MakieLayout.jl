@@ -51,7 +51,7 @@ maingl[2:end, end+1] = LayoutedText(scene, text="Side Title", textsize=50, rotat
 save("layout.png", scene)
 ```
 
-![https://raw.githubusercontent.com/jkrumbiegel/MakieLayout.jl/master/exampleimg/layout.png]
+![example layout](https://raw.githubusercontent.com/jkrumbiegel/MakieLayout.jl/master/exampleimg/layout.png)
 
 ## How it works
 

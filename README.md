@@ -61,7 +61,7 @@ object should get within its parent.
 
 Some Layout objects can contain child layout objects (mostly the GridLayout, maybe others).
 When added to a parent layout, a child layout connects its own observables to the parent
-needs_update observable (or whatever).
+needs_update observable.
 This way, a necessary update can be signaled to the root layout from any child.
 
 Each layout object (maybe not the GridLayout because it doesn't relate directly to actual content)

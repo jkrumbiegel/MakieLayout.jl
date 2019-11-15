@@ -22,10 +22,10 @@ end
 las[4, 1].attributes.aspect = AxisAspect(1)
 las[4, 2].attributes.aspect = AxisAspect(2)
 las[4, 3].attributes.aspect = AxisAspect(0.5)
-las[4, 4].attributes.aspect = AxisAspect(nothing)
+las[4, 4].attributes.aspect = nothing
 las[1, 1].attributes.maxsize = (Inf, Inf)
-las[1, 2].attributes.aspect = AxisAspect(nothing)
-las[1, 3].attributes.aspect = AxisAspect(nothing)
+las[1, 2].attributes.aspect = nothing
+las[1, 3].attributes.aspect = nothing
 
 begin
     subgl = nest_content_into_gridlayout!(maingl, 1, 1)

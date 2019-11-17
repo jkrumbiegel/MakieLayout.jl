@@ -6,3 +6,5 @@
 /dev/
 
 test/Manifest.toml
+
+docs/build/

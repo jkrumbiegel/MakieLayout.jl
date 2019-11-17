@@ -1,5 +1,6 @@
 # MakieLayout.jl
 
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://jkrumbiegel.github.io/MakieLayout.jl/dev/)
 
 ## Purpose
 

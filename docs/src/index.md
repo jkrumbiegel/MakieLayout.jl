@@ -16,6 +16,8 @@ like you might know from ggplot :
 ```@example
 using MakieLayout
 using Makie
+using Random # hide
+Random.seed!(1) # hide
 
 scene = Scene(resolution = (1200, 900), camera=campixel!)
 

@@ -1,4 +1,4 @@
-using Documenter, MakieLayout, Makie
+using Documenter, MakieLayout, Makie, Animations
 
 makedocs(
     sitename="MakieLayout.jl",

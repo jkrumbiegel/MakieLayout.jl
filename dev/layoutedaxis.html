@@ -1,2 +1,112 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>LayoutedAxis · MakieLayout.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>MakieLayout.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="search.html"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="index.html">MakieLayout.jl</a></li><li><a class="toctext" href="grids.html">Grids</a></li><li class="current"><a class="toctext" href="layoutedaxis.html">LayoutedAxis</a><ul class="internal"><li><a class="toctext" href="#Layouted-Axis-1">Layouted Axis</a></li></ul></li></ul></nav><article id="docs"><header><nav><ul><li><a href="layoutedaxis.html">LayoutedAxis</a></li></ul><a class="edit-page" href="https://github.com/jkrumbiegel/MakieLayout/blob/master/docs/src/layoutedaxis.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>LayoutedAxis</span><a class="fa fa-bars" href="#"></a></div></header><h2><a class="nav-anchor" id="Layouted-Axis-1" href="#Layouted-Axis-1">Layouted Axis</a></h2><footer><hr/><a class="previous" href="grids.html"><span class="direction">Previous</span><span class="title">Grids</span></a></footer></article></body></html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>LayoutedAxis · MakieLayout.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>MakieLayout.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="search.html"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="index.html">MakieLayout.jl</a></li><li><a class="toctext" href="grids.html">Grids</a></li><li class="current"><a class="toctext" href="layoutedaxis.html">LayoutedAxis</a><ul class="internal"><li><a class="toctext" href="#Layouted-Axis-1">Layouted Axis</a></li><li><a class="toctext" href="#Hiding-axis-decorations-1">Hiding axis decorations</a></li><li><a class="toctext" href="#Axis-aspect-ratios-1">Axis aspect ratios</a></li></ul></li></ul></nav><article id="docs"><header><nav><ul><li><a href="layoutedaxis.html">LayoutedAxis</a></li></ul><a class="edit-page" href="https://github.com/jkrumbiegel/MakieLayout/blob/master/docs/src/layoutedaxis.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>LayoutedAxis</span><a class="fa fa-bars" href="#"></a></div></header><h2><a class="nav-anchor" id="Layouted-Axis-1" href="#Layouted-Axis-1">Layouted Axis</a></h2><p>This object represents a 2D axis that has many functions to make it more convenient to use with layouts. For a grid layout, the axis is a rectangle whose size is not yet determined, which has &quot;protrusions&quot; sticking out its sides. Those protrusions are the axis decorations like labels, ticks and titles. The protrusions only change if you change something about the axis attributes, but they stay the same when the layout is resized. Therefore, the main axis area will always be determined by the remaining space after the protrusions are subtracted.</p><p>The axis interacts in two directions with the layout. When the size of one of its protrusions changes, this will notify any associated AxisLayout object. This will then notify its parent GridLayout, and so on, until the full layout is recomputed. After that&#39;s done, the AxisLayout will have received a new bounding box in which to place its content. The LayoutedAxis has a bounding box node which determines the borders of the central plot area. This is now updated and the axis&#39; subscene is adjusted to its new size. All axis decorations also update their positions.</p><pre><code class="language-julia">using MakieLayout
+using Makie
+using Animations
+
+scene = Scene(resolution = (600, 600), camera=campixel!)
+
+maingl = GridLayout(
+    2, 2,
+    parent = scene,
+    alignmode = Outside(30, 30, 30, 30))
+
+las = [maingl[i, j] = LayoutedAxis(scene) for i in 1:2, j in 1:2]
+
+a_title = Animation([0, 2], [30.0, 50.0], sineio(n=2, yoyo=true, prewait=0.2))
+a_xlabel = Animation([2, 4], [20.0, 40.0], sineio(n=2, yoyo=true, prewait=0.2))
+a_ylabel = Animation([4, 6], [20.0, 40.0], sineio(n=2, yoyo=true, prewait=0.2))
+
+record(scene, &quot;example_protrusion_changes.mp4&quot;, 0:1/25:6) do t
+
+    las[1, 1].titlesize = a_title(t)
+    las[1, 1].xlabelsize = a_xlabel(t)
+    las[1, 1].ylabelsize = a_ylabel(t)
+
+end</code></pre><p><video src="example_protrusion_changes.mp4" controls="true" title="protrusion changes"><a href="example_protrusion_changes.mp4">protrusion changes</a></video></p><h2><a class="nav-anchor" id="Hiding-axis-decorations-1" href="#Hiding-axis-decorations-1">Hiding axis decorations</a></h2><p>Hiding axis decorations frees up the space for them in the layout if there are no other protrusions sticking into the same column or row gap that prevent enlarging the axis area. This makes it easy to achieve tight layouts that don&#39;t waste space. In this example, we set the column and row gaps to zero, so we can see the shrinking white space better.</p><pre><code class="language-julia">using MakieLayout
+using Makie
+
+scene = Scene(resolution = (600, 600), camera=campixel!)
+
+maingl = GridLayout(
+    2, 2,
+    parent = scene,
+    addedcolgaps = Fixed(0),
+    addedrowgaps = Fixed(0),
+    alignmode = Outside(30, 30, 30, 30))
+
+las = [maingl[i, j] = LayoutedAxis(scene) for j in 1:2, i in 1:2]
+
+record(scene, &quot;example_hiding_decorations.mp4&quot;, framerate=3) do io
+
+    recordframe!(io)
+    for la in las
+        la.titlevisible = false
+        recordframe!(io)
+    end
+    for la in las
+        la.xlabelvisible = false
+        recordframe!(io)
+    end
+    for la in las
+        la.ylabelvisible = false
+        recordframe!(io)
+    end
+    for la in las
+        la.xticklabelsvisible = false
+        recordframe!(io)
+    end
+    for la in las
+        la.yticklabelsvisible = false
+        recordframe!(io)
+    end
+    for la in las
+        la.xticksvisible = false
+        recordframe!(io)
+    end
+    for la in las
+        la.yticksvisible = false
+        recordframe!(io)
+    end
+    for la in las
+        la.rightspinevisible = false
+        la.leftspinevisible = false
+        la.bottomspinevisible = false
+        la.topspinevisible = false
+        recordframe!(io)
+    end
+end</code></pre><p><video src="example_hiding_decorations.mp4" controls="true" title="hiding decorations"><a href="example_hiding_decorations.mp4">hiding decorations</a></video></p><h2><a class="nav-anchor" id="Axis-aspect-ratios-1" href="#Axis-aspect-ratios-1">Axis aspect ratios</a></h2><p>If you&#39;re plotting images, you might want to force a specific aspect ratio of an axis, so that the images are not stretched. The default is that an axis uses all of the available space in the layout. You can use <code>AxisAspect</code> and <code>DataAspect</code> to control the aspect ratio. For example, <code>AxisAspect(1)</code> forces a square axis and <code>AxisAspect(2)</code> results in a rectangle with a width of two times the height. <code>DataAspect</code> uses the currently chosen axis limits and brings the axes into the same aspect ratio. This is the easiest to use with images. A different aspect ratio can only reduce the axis space that is being used, also it necessarily has to break the layout a little bit.</p><pre><code class="language-julia">using MakieLayout
+using Makie
+using FileIO
+
+scene = Scene(resolution = (1200, 900), camera=campixel!)
+
+maingl = GridLayout(
+    2, 3,
+    parent = scene,
+    alignmode = Outside(30, 30, 30, 30))
+
+las = [maingl[i, j] = LayoutedAxis(scene,
+    xautolimitmargin=(0, 0), yautolimitmargin=(0, 0)) for i in 1:2, j in 1:3]
+
+img = reverse(load(&quot;cow.png&quot;), dims=1)&#39;
+
+for la in las
+    image!(la, img)
+end
+
+las[1, 1].title = &quot;Default&quot;
+
+las[1, 2].title = &quot;DataAspect&quot;
+las[1, 2].aspect = DataAspect()
+
+las[1, 3].title = &quot;AxisAspect(418/348)&quot;
+las[1, 3].aspect = AxisAspect(418/348)
+
+las[2, 1].title = &quot;AxisAspect(1)&quot;
+las[2, 1].aspect = AxisAspect(1)
+
+las[2, 2].title = &quot;AxisAspect(2)&quot;
+las[2, 2].aspect = AxisAspect(2)
+
+las[2, 3].title = &quot;AxisAspect(0.5)&quot;
+las[2, 3].aspect = AxisAspect(0.5)</code></pre><p><img src="example_axis_aspects.png" alt="axis aspects"/></p><footer><hr/><a class="previous" href="grids.html"><span class="direction">Previous</span><span class="title">Grids</span></a></footer></article></body></html>

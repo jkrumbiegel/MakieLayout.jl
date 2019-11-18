@@ -49,13 +49,13 @@ for i in 1:nrows, j in 1:ncols
     # remove unnecessary decorations in some of the facets, this will have an
     # effect on the layout as the freed up space will be used to make the axes
     # bigger
-    i > 1 && (las[i, j].attributes.titlevisible = false)
-    j > 1 && (las[i, j].attributes.ylabelvisible = false)
-    j > 1 && (las[i, j].attributes.yticklabelsvisible = false)
-    j > 1 && (las[i, j].attributes.yticksvisible = false)
-    i < nrows && (las[i, j].attributes.xticklabelsvisible = false)
-    i < nrows && (las[i, j].attributes.xticksvisible = false)
-    i < nrows && (las[i, j].attributes.xlabelvisible = false)
+    i > 1 && (las[i, j].titlevisible = false)
+    j > 1 && (las[i, j].ylabelvisible = false)
+    j > 1 && (las[i, j].yticklabelsvisible = false)
+    j > 1 && (las[i, j].yticksvisible = false)
+    i < nrows && (las[i, j].xticklabelsvisible = false)
+    i < nrows && (las[i, j].xticksvisible = false)
+    i < nrows && (las[i, j].xlabelvisible = false)
 end
 
 # index into the 0th row, thereby adding a new row into the layout and place

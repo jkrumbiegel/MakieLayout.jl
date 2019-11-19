@@ -6,8 +6,8 @@ begin
     screen = display(scene)
     campixel!(scene);
 
-    nrows = 4
-    ncols = 5
+    nrows = 3
+    ncols = 3
 
     maingl = GridLayout(
         nrows, ncols,
@@ -21,7 +21,7 @@ begin
 
     for i in 1:nrows, j in 1:ncols
 
-        scatter!(las[i, j], rand(200, 2) .+ [i j])
+        scatter!(las[i, j], rand(200, 2) .+ [i j], markersize=20, color=(:black, 0.3))
 
         i > 1 && (las[i, j].titlevisible = false)
         j > 1 && (las[i, j].ylabelvisible = false)
@@ -32,8 +32,22 @@ begin
         i < nrows && (las[i, j].xlabelvisible = false)
     end
 
-    maingl[0, :] = LayoutedText(scene, text="Super Title", textsize=50)
-    maingl[2:end, end+1] = LayoutedText(scene, text="Side Title", textsize=50, rotation=-pi/2)
+    tl = maingl[0, :] = LayoutedText(scene, text="Super Title", textsize=50)
+    stl = maingl[2:end, end+1] = LayoutedText(scene, text="Side Title", textsize=50, rotation=-pi/2)
+
+    slgl = maingl[end+1, 1:end-1] = GridLayout(1, 2)
+
+    slgl[1, 1] = LayoutedText(scene, text="Supertitle Size", halign=:left)
+    sl1 = slgl[1, 2] = LayoutedSlider(scene, 30, 1:200)
+    on(sl1.slider.value) do val
+        tl.attributes.textsize = val
+    end
+
+    slgl[2, 1] = LayoutedText(scene, text="Sidetitle Size", halign=:left)
+    sl2 = slgl[2, 2] = LayoutedSlider(scene, 30, 1:200)
+    on(sl2.slider.value) do val
+        stl.attributes.textsize = val
+    end
 
     nothing
 end

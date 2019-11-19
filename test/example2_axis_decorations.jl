@@ -9,6 +9,7 @@ begin
     maingl = GridLayout(
         1, 2;
         parent = scene,
+        rowsizes = Relative(1),
         colsizes = [Auto(), Fixed(200)],
         addedcolgaps = Fixed(30),
         alignmode = Outside(30, 30, 30, 30)

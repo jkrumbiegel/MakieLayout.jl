@@ -26,7 +26,7 @@ begin
     las = []
     for i in 1:3, j in 1:3
         # la =
-        # al = AxisLayout(gl, la.protrusions, la.bboxnode)
+        # al = ProtrusionLayout(gl, la.protrusions, la.bboxnode)
         la = gl[i, j] = LayoutedAxis(scene)
         sc = scatter!(
             la,

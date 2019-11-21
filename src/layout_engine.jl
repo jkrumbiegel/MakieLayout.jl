@@ -881,3 +881,10 @@ function detachfromparent!(l::AbstractLayout)
         l.parent = nothing
     end
 end
+
+defaultlayout(s::AbstractPlotting.Scene) = ProtrusionLayout(s::Scene)
+
+function align_to_bbox!(s::AbstractPlotting.Scene, bbox::BBox)
+    @show IRect2D(bbox)
+    s.px_area[] = IRect2D(bbox)
+end

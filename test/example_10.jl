@@ -6,12 +6,14 @@ begin
     screen = display(scene)
     campixel!(scene);
 
-    nrows = 3
-    ncols = 3
+    nrows = 1
+    ncols = 1
 
     maingl = GridLayout(
         nrows, ncols,
         parent = scene,
+        colsizes = Auto(false, 1),
+        rowsizes = Auto(false, 1),
         alignmode = Outside(30, 30, 30, 30))
 
     las = [maingl[i, j] = LayoutedAxis(scene, sidelabelvisible=true, sidelabelalign=:center) for i in 1:nrows, j in 1:ncols]

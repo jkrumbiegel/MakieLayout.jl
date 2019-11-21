@@ -19,8 +19,6 @@ function kdepoly!(la::LayoutedAxis, vec, reverse=false; kwargs...)
     end
 end
 
-length(la5.plots)
-
 begin
     scene = Scene(resolution = (1000, 1000), font="SF Hello");
     screen = display(scene)
@@ -72,7 +70,6 @@ begin
 
     gl = maingl[1, 1] = GridLayout(
         2, 2;
-        parent = scene,
         rowsizes = [Aspect(1, 1.0), Auto()],
         colsizes = [Relative(0.5), Auto()],
         addedrowgaps = Fixed(20),
@@ -95,7 +92,7 @@ begin
     gl_colorbar = gl_slider[1, 1] = GridLayout(1, 2; colsizes=[Auto(), Relative(0.1)])
 
     gl_colorbar[1, 1] = la2
-    gl_colorbar[1, 2] = LayoutedColorbar(scene)
+    # gl_colorbar[1, 2] = LayoutedColorbar(scene)
 
     sl1 = gl_slider[2, 1] = LayoutedSlider(scene, 40, 1:0.01:10)
     sl2 = gl_slider[3, 1] = LayoutedSlider(scene, 40, 0.1:0.01:1)

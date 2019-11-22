@@ -34,7 +34,8 @@ begin
         i < nrows && (las[i, j].xlabelvisible = false)
     end
 
-    tl = maingl[0, :] = LayoutedText(scene, text="Super Title", textsize=50)
+    tl = maingl[0, :] = LayoutedText(scene, text="Super Title", padding=(10, 10, 20, 20), textsize=50)
+    maingl[1, :] = LayoutedRect(scene, strokevisible=false)
     stl = maingl[2:end, end+1] = LayoutedText(scene, text="Side Title", textsize=50, rotation=-pi/2)
 
     slgl = maingl[end+1, 1:end-1] = GridLayout(1, 2)

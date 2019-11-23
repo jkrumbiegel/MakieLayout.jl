@@ -1,8 +1,5 @@
 using MakieLayout
 using Makie
-using FreeTypeAbstraction
-
-boldface = newface(expanduser("~/Library/Fonts/SFHelloSemibold.ttf"))
 
 begin
     scene = Scene(resolution = (1000, 1000), font="SF Hello");
@@ -21,10 +18,10 @@ begin
         las[i, j] = maingl[i, j] = LayoutedAxis(scene)
     end
 
-    lt = maingl[0, :] = LayoutedText(scene, text="Suptitle", textsize=50, font=boldface)
+    lt = maingl[0, :] = LayoutedText(scene, text="Suptitle", textsize=50)
     lt2 = maingl[2:5, 5] = LayoutedText(scene, text="Side Title", textsize=50,
-        rotation = -pi/2, font=boldface)
-    lt3 = maingl[6, 1:4] = LayoutedText(scene, text="Sub Title", textsize=50, font=boldface)
+        rotation = -pi/2)
+    lt3 = maingl[6, 1:4] = LayoutedText(scene, text="Sub Title", textsize=50)
     lt3 = maingl[2:5, 0] = LayoutedText(scene, text="Left Title", textsize=50,
-        rotation=pi/2, font=boldface)
+        rotation=pi/2)
 end

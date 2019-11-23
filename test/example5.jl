@@ -1,8 +1,5 @@
 using MakieLayout
 using Makie
-using FreeTypeAbstraction
-
-boldface = newface(expanduser("~/Library/Fonts/SFHelloSemibold.ttf"))
 
 begin
     scene = Scene(resolution = (1000, 1000), font="SF Hello");
@@ -20,7 +17,7 @@ begin
     las = Array{LayoutedAxis, 2}(undef, ni, nj)
 
     for i in 1:ni, j in 1:nj
-        las[i, j] = maingl[i, j] = LayoutedAxis(scene, titlefont=boldface, titlesize=20)
+        las[i, j] = maingl[i, j] = LayoutedAxis(scene, titlesize=20)
     end
 
     lines!(las[1, 1], 0:0.1:100, sin.((0:0.1:100) ./ 5) .+ 1)

@@ -41,14 +41,14 @@ begin
 
     glside = maingl[1, 2] = GridLayout(7, 1, alignmode=Outside())
 
-    but = glside[1, 1] = LayoutedButton(scene, 200, 50, "Toggle Titles")
+    but = glside[1, 1] = LayoutedButton(scene, width = 200, height = 50, label = "Toggle Titles")
     on(but.button.clicks) do c
         for la in las
             la.attributes.titlevisible[] = !la.attributes.titlevisible[]
         end
     end
 
-    but2 = glside[2, 1] = LayoutedButton(scene, 200, 50, "Toggle Labels")
+    but2 = glside[2, 1] = LayoutedButton(scene, width = 200, height = 50, label = "Toggle Labels")
     on(but2.button.clicks) do c
         for la in las
             la.attributes.xlabelvisible[] = !la.attributes.xlabelvisible[]
@@ -56,7 +56,7 @@ begin
         end
     end
 
-    but3 = glside[3, 1] = LayoutedButton(scene, 200, 50, "Toggle Ticklabels")
+    but3 = glside[3, 1] = LayoutedButton(scene, width = 200, height = 50, label = "Toggle Ticklabels")
     on(but3.button.clicks) do c
         for la in las
             la.attributes.xticklabelsvisible[] = !la.attributes.xticklabelsvisible[]
@@ -64,7 +64,7 @@ begin
         end
     end
 
-    but4 = glside[4, 1] = LayoutedButton(scene, 200, 50, "Toggle Ticks")
+    but4 = glside[4, 1] = LayoutedButton(scene, width = 200, height = 50, label = "Toggle Ticks")
     on(but4.button.clicks) do c
         t1 = time()
         with_updates_suspended(maingl) do
@@ -76,7 +76,7 @@ begin
         println(time() - t1)
     end
 
-    but5 = glside[5, 1] = LayoutedButton(scene, 200, 50, "Toggle Tick Align")
+    but5 = glside[5, 1] = LayoutedButton(scene, width = 200, height = 50, label = "Toggle Tick Align")
     on(but5.button.clicks) do c
         t1 = time()
         maingl.block_updates = true
@@ -89,7 +89,7 @@ begin
         println(time() - t1)
     end
 
-    but6 = glside[6, 1] = LayoutedButton(scene, 200, 50, "Toggle Grids")
+    but6 = glside[6, 1] = LayoutedButton(scene, width = 200, height = 50, label = "Toggle Grids")
     on(but6.button.clicks) do c
         for la in las
             la.attributes.xgridvisible[] = !la.attributes.xgridvisible[]
@@ -97,7 +97,7 @@ begin
         end
     end
 
-    but7 = glside[7, 1] = LayoutedButton(scene, 200, 50, "Toggle Spines")
+    but7 = glside[7, 1] = LayoutedButton(scene, width = 200, height = 50, label = "Toggle Spines")
     on(but7.button.clicks) do c
         for la in las
             la.attributes.topspinevisible[] = !la.attributes.topspinevisible[]

@@ -1,10 +1,7 @@
 using MakieLayout
 using Makie
 using KernelDensity
-using FreeTypeAbstraction
 
-
-boldface = newface(expanduser("~/Library/Fonts/SFHelloSemibold.ttf"))
 
 function kdepoly!(la::LayoutedAxis, vec, reverse=false; kwargs...)
     kderesult = kde(vec; npoints=32)
@@ -52,16 +49,6 @@ begin
     scatter!(la3, linkeddata2, markersize=3, color=red, show_axis=false)
     kdepoly!(la4, linkeddata2[:, 1], false, color=red, linewidth=2, show_axis=false)
     kdepoly!(la5, linkeddata2[:, 2], true, color=red, linewidth=2, show_axis=false)
-
-
-
-    # suptitle_pos = Node(Point2(0.0, 0.0))
-    # suptitle = text!(scene, "Centered Super Title", position=suptitle_pos, textsize=50, font=boldface)[end]
-    # suptitle_bbox = BBox(boundingbox(suptitle))
-    #
-    # midtitle_pos = Node(Point2(0.0, 0.0))
-    # midtitle = text!(scene, "Left aligned subtitle", position=midtitle_pos, textsize=40, font=boldface)[end]
-    # midtitle_bbox = BBox(boundingbox(midtitle))
 
     maingl = GridLayout(2, 1, parent=scene, alignmode=Outside(40))
 

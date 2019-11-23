@@ -1,10 +1,7 @@
 using MakieLayout
 using Makie
 using KernelDensity
-using FreeTypeAbstraction
 
-
-boldface = newface(expanduser("~/Library/Fonts/SFHelloSemibold.ttf"))
 
 function kdepoly!(la::LayoutedAxis, vec, reverse=false; kwargs...)
     kderesult = kde(vec; npoints=32)
@@ -59,7 +56,7 @@ begin
     la3.attributes.xpanlock[] = true
     la3.attributes.xzoomlock[] = true
 
-    maingl[0, 1] = LayoutedText(scene, text="Auto Limits", font=boldface, textsize=50)
+    maingl[0, 1] = LayoutedText(scene, text="Auto Limits", textsize=50)
 
     sleep(3)
     linkeddata = randn(200, 2) .* 15 .+ 50

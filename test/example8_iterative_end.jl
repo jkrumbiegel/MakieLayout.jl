@@ -13,9 +13,9 @@ begin
 
     for i in 1:7
         maingl[i, 1:end] = LayoutedAxis(scene)
-        sleep(1)
+        sleep(0.3)
         maingl[1:end, i + 1] = LayoutedAxis(scene)
-        sleep(1)
+        sleep(0.3)
     end
 
     # maingl[2:end-1, 0] = LayoutedAxis(scene)

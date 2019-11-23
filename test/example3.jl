@@ -34,7 +34,7 @@ begin
     cb1.attributes.aspect = AxisAspect(1/10)
     maingl.needs_update[] = true
 
-    # sleep(2)
+    sleep(0.5)
 
     subgl2 = nest_content_into_gridlayout!(maingl, 1:2, 1:2)
     cb2 = subgl2[:, 3] = LayoutedColorbar(scene)
@@ -42,7 +42,7 @@ begin
     cb2.attributes.aspect = AxisAspect(1/10)
     maingl.needs_update[] = true
 
-    # sleep(2)
+    sleep(0.5)
 
     subgl3 = nest_content_into_gridlayout!(maingl, 1:3, 1:3)
     cb3 = subgl3[:, 4] = LayoutedColorbar(scene)
@@ -50,7 +50,7 @@ begin
     cb3.attributes.aspect = AxisAspect(1/10)
     maingl.needs_update[] = true
 
-    # sleep(2)
+    sleep(0.5)
 
     subgl4 = nest_content_into_gridlayout!(maingl, 1:4, 1:4)
     cb4 = subgl4[:, 5] = LayoutedColorbar(scene)
@@ -58,6 +58,6 @@ begin
     cb4.attributes.aspect = AxisAspect(1/10)
     maingl.needs_update[] = true
 
-    # sleep(2)
+    sleep(0.5)
 
 end

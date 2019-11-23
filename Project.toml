@@ -17,6 +17,7 @@ julia = "1"
 [extras]
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+KernelDensity = "5ab0869b-81aa-558d-bb23-cbf5423bbe9b"
 
 [targets]
-test = ["Test", "Makie"]
+test = ["Test", "Makie", "KernelDensity"]

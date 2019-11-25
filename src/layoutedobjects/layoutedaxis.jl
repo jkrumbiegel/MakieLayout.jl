@@ -69,38 +69,28 @@ function LayoutedAxis(parent::Scene; kwargs...)
     )[end]
     decorations[:ygridlines] = yticklines
 
-    nmaxticks = 20
+    xticklabelannosnode = Node{Vector{Tuple{String, Point2f0}}}([("temp", Point2f0(0, 0))])
+    xticklabels = annotations!(
+        parent,
+        xticklabelannosnode,
+        align = xticklabelalign,
+        rotation = xticklabelrotation,
+        textsize = xticklabelsize,
+        show_axis = false,
+        visible = xticklabelsvisible)[end]
 
-    xticklabelnodes = [Node("0") for i in 1:nmaxticks]
-    xticklabelposnodes = [Node(Point(0.0, 0.0)) for i in 1:nmaxticks]
-    xticklabels = map(1:nmaxticks) do i
-        text!(
-            parent,
-            xticklabelnodes[i],
-            position = xticklabelposnodes[i],
-            align = xticklabelalign,
-            rotation = xticklabelrotation,
-            textsize = xticklabelsize,
-            show_axis = false,
-            visible = xticklabelsvisible
-        )[end]
-    end
     decorations[:xticklabels] = xticklabels
 
-    yticklabelnodes = [Node("0") for i in 1:nmaxticks]
-    yticklabelposnodes = [Node(Point(0.0, 0.0)) for i in 1:nmaxticks]
-    yticklabels = map(1:nmaxticks) do i
-        text!(
-            parent,
-            yticklabelnodes[i],
-            position = yticklabelposnodes[i],
-            align = yticklabelalign,
-            rotation = yticklabelrotation,
-            textsize = yticklabelsize,
-            show_axis = false,
-            visible = yticklabelsvisible
-        )[end]
-    end
+    yticklabelannosnode = Node{Vector{Tuple{String, Point2f0}}}([("temp", Point2f0(0, 0))])
+    yticklabels = annotations!(
+        parent,
+        yticklabelannosnode,
+        align = yticklabelalign,
+        rotation = yticklabelrotation,
+        textsize = yticklabelsize,
+        show_axis = false,
+        visible = yticklabelsvisible)[end]
+        
     decorations[:yticklabels] = yticklabels
 
     xlabelpos = lift(scene.px_area, xlabelvisible, xticklabelsvisible,
@@ -364,19 +354,11 @@ function LayoutedAxis(parent::Scene; kwargs...)
 
         xtickspace = xticksvisible ? max(0f0, xticksize * (1f0 - xtickalign)) : 0f0
 
-        for i in 1:length(xticklabels)
-            if i <= nxticks
-                xticklabelnodes[i][] = xtickstrings[i]
+        xticklabelgap = spinewidth + xtickspace + xticklabelpad
 
-                xticklabelgap = spinewidth + xtickspace + xticklabelpad
+        xticklabelpositions = xtickpositions[] .+ Ref(Point2f0(0f0, -xticklabelgap))
 
-                xticklabelposnodes[i][] = xtickpositions[][i] +
-                    Point(0f0, -xticklabelgap)
-                xticklabels[i].visible = true && xticklabelsvisible
-            else
-                xticklabels[i].visible = false
-            end
-        end
+        xticklabelannosnode[] = [(s, p) for (s, p) in zip(xtickstrings, xticklabelpositions)]
     end
 
     onany(ytickstrings, yticklabelpad, spinewidth, yticklabelsvisible, yticksize, ytickalign, yticksvisible) do ytickstrings,
@@ -386,19 +368,11 @@ function LayoutedAxis(parent::Scene; kwargs...)
 
         ytickspace = yticksvisible ? max(0f0, yticksize * (1f0 - ytickalign)) : 0f0
 
-        for i in 1:length(yticklabels)
-            if i <= nyticks
-                yticklabelnodes[i][] = ytickstrings[i]
+        yticklabelgap = spinewidth + ytickspace + yticklabelpad
 
-                yticklabelgap = spinewidth + ytickspace + yticklabelpad
+        yticklabelpositions = ytickpositions[] .+ Ref(Point2f0(-yticklabelgap, 0f0))
 
-                yticklabelposnodes[i][] = ytickpositions[][i] +
-                    Point(-yticklabelgap, 0f0)
-                yticklabels[i].visible = true && yticklabelsvisible
-            else
-                yticklabels[i].visible = false
-            end
-        end
+        yticklabelannosnode[] = [(s, p) for (s, p) in zip(ytickstrings, yticklabelpositions)]
     end
 
     # update tick geometry when positions or parameters change
@@ -829,17 +803,11 @@ end
 
 
 function tight_yticklabel_spacing!(la::LayoutedAxis)
-    maxwidth = maximum(la.decorations[:yticklabels]) do yt
-        boundingbox(yt).widths[1]
-    end
-    la.yticklabelspace = maxwidth
+    la.yticklabelspace = boundingbox(la.decorations[:yticklabels]).widths[1]
 end
 
 function tight_xticklabel_spacing!(la::LayoutedAxis)
-    maxheight = maximum(la.decorations[:xticklabels]) do xt
-        boundingbox(xt).widths[2]
-    end
-    la.xticklabelspace = maxheight
+    la.xticklabelspace = boundingbox(la.decorations[:xticklabels]).widths[2]
 end
 
 function tight_ticklabel_spacing!(la::LayoutedAxis)

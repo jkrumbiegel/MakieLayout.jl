@@ -34,7 +34,7 @@ function MakieLayout.align_to_bbox!(s::Scene, bbox)
 end
 
 begin
-    scene = Scene(resolution = (1800, 1800));
+    scene = Scene(resolution = (1000, 1000));
     screen = display(scene)
     campixel!(scene);
 
@@ -54,9 +54,18 @@ begin
     subscene.clear = true
     gridgl[2, 2] = subscene
 
-    scatter!(subscene, rand(100, 3), markersize=10, show_axis=false)
+    scatter!(subscene, rand(100, 3), markersize=10, show_axis=true)
 
     display(scene)
+
+    slidergl = gridgl[3, :] = GridLayout(1, 1)
+    slidergl[1, 1] = LayoutedText(scene, text="Turbulence", halign=:left)
+    slidergl[1, 2] = LayoutedSlider(scene, 30, 0.0:0.1:100.0; buttonsize=20, textsize=20)
+    slidergl[2, 1] = LayoutedText(scene, text="Gamma Factor", halign=:left)
+    slidergl[2, 2] = LayoutedSlider(scene, 30, 0.0:0.1:100.0; buttonsize=20, textsize=20)
+    slidergl[3, 1] = LayoutedText(scene, text="Precision", halign=:left)
+    slidergl[3, 2] = LayoutedSlider(scene, 30, 0.0:0.1:100.0; buttonsize=20, textsize=20)
+
     nothing
 end
 

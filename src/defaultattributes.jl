@@ -129,20 +129,22 @@ Attributes(
         autolimitmargin = (0.05ff0, 0.05f0),
         size    = (10f0, 10f0),
         visible = (true, true),
+        font    = ("DejaVu Sans", "DejaVu Sans"),
         color   = (RGBf0(0, 0, 0), RGBf0(0, 0, 0)),
         align   = (0f0, 0f0),
         width   = (1f0, 1f0),
 
         # tick labels
         labels = (
-            size     = (20f0, 20f0),
+            size      = (20f0, 20f0),
             formatter = (Formatters.format, Formatters.format)
-            visible  = (true, true),
-            color    = (RGBf0(0, 0, 0), RGBf0(0, 0, 0)),
-            spacing  = (20f0, 50f0),
-            padding  = (5f0, 5f0),
-            rotation = (0f0, 0f0),
-            align    = ((:center, :top), (:right, :center)),
+            visible   = (true, true),
+            font      = ("DejaVu Sans", "DejaVu Sans"),
+            color     = (RGBf0(0, 0, 0), RGBf0(0, 0, 0)),
+            spacing   = (20f0, 50f0),
+            padding   = (5f0, 5f0),
+            rotation  = (0f0, 0f0),
+            align     = ((:center, :top), (:right, :center)),
         ),
     ),
 

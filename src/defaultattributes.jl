@@ -1,3 +1,6 @@
+# # Default attributes for layouted objects
+# Here, we are essentially implementing the expansion done by the `@recipe` macro.
+
 function default_attributes(::Type{LayoutedAxis})
     Attributes(
         xlabel = "x label",
@@ -78,6 +81,99 @@ function default_attributes(::Type{LayoutedAxis})
         sidelabelrotation = -pi/2,
     )
 end
+
+# Nested Axis theme structure:
+
+Attributes(
+    # Top-level attributes
+    aspect = nothing,
+    alignment = (0.5f0, 0.5f0),
+    maxsize = (Inf32, Inf32),
+
+    # Nested attributes
+    title = (
+        text    = "Title",
+        visible = true,
+        font    = "DejaVu Sans",
+        color   = RGBf0(0, 0, 0),
+        size    = 30f0,
+        gap     = 10f0,
+        align   = :center,
+    ),
+
+    # Side label
+    sidelabel = (
+        text = "Side Label",
+        size = 30f0,
+        gap = 10f0,
+        visible = false,
+        align = :center,
+        font = "Dejavu Sans",
+        rotation = -pi/2
+    ),
+
+    # axis labels
+    labels = (
+        text    = ("x label", "y label"),
+        visible = (true, true),
+        font    = ("DejaVu Sans", "DejaVu Sans"),
+        color   = (RGBf0(0, 0, 0), RGBf0(0, 0, 0)),
+        size    = (20f0, 20f0),
+        padding = (5f0, 5f0)
+    ),
+
+    # tick marks and labels
+    ticks = (
+        # tick marks
+        ticks   = (AutoLinearTicks(100f0), AutoLinearTicks(100f0)),
+        autolimitmargin = (0.05ff0, 0.05f0),
+        size    = (10f0, 10f0),
+        visible = (true, true),
+        color   = (RGBf0(0, 0, 0), RGBf0(0, 0, 0)),
+        align   = (0f0, 0f0),
+        width   = (1f0, 1f0),
+
+        # tick labels
+        labels = (
+            size     = (20f0, 20f0),
+            formatter = (Formatters.format, Formatters.format)
+            visible  = (true, true),
+            color    = (RGBf0(0, 0, 0), RGBf0(0, 0, 0)),
+            spacing  = (20f0, 50f0),
+            padding  = (5f0, 5f0),
+            rotation = (0f0, 0f0),
+            align    = ((:center, :top), (:right, :center)),
+        ),
+    ),
+
+    # grid of minor tick lines
+    grid = (
+        visible = (true, true),
+        color   = (RGBf0(0, 0, 0), RGBf0(0, 0, 0)),
+        width   = (1f0, 1f0),
+        style   = (nothing, nothing)
+    ),
+
+    # frame
+    frame = ( # top,right, bottom, left?
+        visible = (true, true, true, true)
+        color   = (RGBf0(0, 0, 0), RGBf0(0, 0, 0), RGBf0(0, 0, 0), RGBf0(0, 0, 0)).
+        size    = (1f0, 1f0, 1f0, 1f0),
+        style   = (nothing, nothing, nothing, nothing)
+    ),
+
+    actions = (
+        pan = (
+            lock = (false, false),
+            key  = (Button.x, Button.y),
+            button = Mouse.right
+        ),
+        zoom = (
+            lock = (false, false),
+            key  = (Button.x, Button.y)
+        ),
+    ),
+)
 
 function default_attributes(::Type{LayoutedColorbar})
     Attributes(

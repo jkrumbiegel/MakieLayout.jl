@@ -489,11 +489,11 @@ function compute_tick_values(ticks::ManualTicks, vmin, vmax, pxwidth)
     end
 end
 
-function get_tick_labels(ticks::T, tickvalues) where T
+function get_tick_labels(ticks::T, tickvalues; kwargs...) where T
     error("No behavior implemented for ticks of type $T")
 end
 
-function get_tick_labels(ticks::AutoLinearTicks, tickvalues)
+function get_tick_labels(ticks::AutoLinearTicks, tickvalues; formatter = Formatting.format)
 
     # take difference of first two values (they are equally spaced anyway)
     dif = diff(view(tickvalues, 1:2))[1]
@@ -516,11 +516,15 @@ function get_tick_labels(ticks::AutoLinearTicks, tickvalues)
     sigdigits = max(0, -safety_expo_int)
 
     strings = map(tickvalues) do v
-        Formatting.format(v, precision=sigdigits)
+        if formatter == Formatter.format
+            formatter(v, precision=sigdigits)
+        else
+            formatter(v)
+        end
     end
 end
 
-function get_tick_labels(ticks::ManualTicks, tickvalues)
+function get_tick_labels(ticks::ManualTicks, tickvalues; kwargs...)
     # remove labels of ticks that are not shown because the limits cut them off
     String[ticks.labels[findfirst(x -> x == tv, ticks.values)] for tv in tickvalues]
 end

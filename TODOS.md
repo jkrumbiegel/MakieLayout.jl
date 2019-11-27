@@ -1,2 +1,2 @@
-- add single protrusion layout object, e.g. for placing a title centered
-  over a grid plot without introducing a new row for it
+- fix AxisContent, maybe just introduce necessary attributes into the standard
+plot objects, or will that mess with them somehow?

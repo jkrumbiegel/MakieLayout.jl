@@ -34,7 +34,7 @@ function MakieLayout.align_to_bbox!(s::Scene, bbox)
 end
 
 begin
-    scene = Scene(resolution = (1800, 1800));
+    scene = Scene(resolution = (1000, 1000));
     screen = display(scene)
     campixel!(scene);
 
@@ -46,17 +46,36 @@ begin
     gridgl = maingl[1, 1] = GridLayout(
         nrows, ncols)
 
-    gridgl[1:2, 1] = LayoutedAxis(scene)
-    gridgl[1, 2] = LayoutedAxis(scene)
+    la1 = gridgl[1, :] = LayoutedAxis(scene)
+    la2 = gridgl[2, 1] = LayoutedAxis(scene)
+
+    # linkxaxes!(la1, la2)
+    # linkyaxes!(la1, la2)
+
+    scatter!(la1, rand(10_000, 2), markersize=10)
 
     subscene = stupid_subscenes(scene, Node(IRect2D(BBox(0, 100, 100, 0))))
     subscene.backgroundcolor = RGBf0(0.96, 0.96, 0.96)
     subscene.clear = true
     gridgl[2, 2] = subscene
 
-    scatter!(subscene, rand(100, 3), markersize=10, show_axis=false)
+    scatter!(subscene, rand(100, 3), markersize=10, show_axis=true)
 
-    display(scene)
+    # display(scene)
+
+    slidergl = gridgl[3, :] = GridLayout(1, 1)
+    slidergl[1, 1] = LayoutedText(scene, text="Turbulence", halign=:left)
+    slidergl[1, 2] = LayoutedSlider(scene, 30, 0.0:0.1:100.0; buttonsize=20, textsize=20)
+    slidergl[1, 3] = LayoutedButton(scene, label="Press this")
+    slidergl.colsizes[3] = Fixed(200)
+    slidergl[2, 1] = LayoutedText(scene, text="Gamma Factor", halign=:left)
+    slidergl[2, 2] = LayoutedSlider(scene, 30, 0.0:0.1:100.0; buttonsize=20, textsize=20)
+    slidergl[2, 3] = LayoutedButton(scene, label="Press that")
+    slidergl[3, 1] = LayoutedText(scene, text="Precision", halign=:left)
+    slidergl[3, 2] = LayoutedSlider(scene, 30, 0.0:0.1:100.0; buttonsize=20, textsize=20)
+    slidergl[3, 3] = LayoutedButton(scene, label="And this too")
+
+
     nothing
 end
 

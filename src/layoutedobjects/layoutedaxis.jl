@@ -17,6 +17,13 @@ function LayoutedAxis(parent::Scene; kwargs...)
         aspect, alignment, maxsize, xticks, yticks, panbutton, xpankey, ypankey, xzoomkey, yzoomkey
     )
 
+    @extract attrs (
+        aspect, alignment, maxsize,
+        title, sidelabel, labels, ticks, grid, frame, actions
+    )
+
+    # TODO reword all of these
+
     decorations = Dict{Symbol, Any}()
 
     bboxnode = Node(BBox(0, 100, 0, 100))
@@ -35,8 +42,8 @@ function LayoutedAxis(parent::Scene; kwargs...)
     xaxislinks = LayoutedAxis[]
     yaxislinks = LayoutedAxis[]
 
-    add_pan!(scene, limits, xpanlock, ypanlock, panbutton, xpankey, ypankey)
-    add_zoom!(scene, limits, xzoomlock, yzoomlock, xzoomkey, yzoomkey)
+    add_pan!(scene, limits, actions.pan.lock.x, actions.pan.lock.y, actions.pan.button, actions.pan.keys.x, actions.pan.keys.y)
+    add_zoom!(scene, limits, actions.zoom.lock.x, actions.zoom.lock.y, actions.zoom.keys.x, actions.zoom.keys.y)
 
     campixel!(scene)
 

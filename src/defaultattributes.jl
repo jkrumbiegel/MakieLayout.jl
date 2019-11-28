@@ -84,11 +84,21 @@ end
 
 # Nested Axis theme structure:
 
+# First, we define some helper macros:
+macro xy(arg)
+    return esc(:((x = $arg, y = $arg)))
+end
+
+macro xy(x, y)
+    return esc(:((x = $x, y = $y)))
+end
+
+# For the layouted axis:
 Attributes(
     # Top-level attributes
     aspect = nothing,
-    alignment = (0.5f0, 0.5f0),
-    maxsize = (Inf32, Inf32),
+    alignment = @xy(0.5f0, 0.5f0),
+    maxsize = @xy(Inf32, Inf32),
 
     # Nested attributes
     title = (
@@ -114,68 +124,89 @@ Attributes(
 
     # axis labels
     labels = (
-        text    = ("x label", "y label"),
-        visible = (true, true),
-        font    = ("DejaVu Sans", "DejaVu Sans"),
-        color   = (RGBf0(0, 0, 0), RGBf0(0, 0, 0)),
-        size    = (20f0, 20f0),
-        padding = (5f0, 5f0)
+        text    = @xy("x label", "y label"),
+        visible = @xy(true, true),
+        font    = @xy("DejaVu Sans", "DejaVu Sans"),
+        color   = @xy(RGBf0(0, 0, 0), RGBf0(0, 0, 0)),
+        size    = @xy(20f0, 20f0),
+        padding = @xy(5f0, 5f0)
     ),
 
     # tick marks and labels
     ticks = (
         # tick marks
-        ticks   = (AutoLinearTicks(100f0), AutoLinearTicks(100f0)),
-        autolimitmargin = (0.05ff0, 0.05f0),
-        size    = (10f0, 10f0),
-        visible = (true, true),
-        font    = ("DejaVu Sans", "DejaVu Sans"),
-        color   = (RGBf0(0, 0, 0), RGBf0(0, 0, 0)),
-        align   = (0f0, 0f0),
-        width   = (1f0, 1f0),
+        ticks   = @xy(AutoLinearTicks(100f0), AutoLinearTicks(100f0)),
+        autolimitmargin = @xy(0.05f0, 0.05f0),
+        size    = @xy(10f0),
+        visible = @xy(true),
+        color   = @xy(RGBf0(0, 0, 0)),
+        align   = @xy(0f0),
+        width   = @xy(1f0, 1f0),
+        style   = @xy(nothing),
 
         # tick labels
         labels = (
-            size      = (20f0, 20f0),
-            formatter = (Formatters.format, Formatters.format)
-            visible   = (true, true),
-            font      = ("DejaVu Sans", "DejaVu Sans"),
-            color     = (RGBf0(0, 0, 0), RGBf0(0, 0, 0)),
-            spacing   = (20f0, 50f0),
-            padding   = (5f0, 5f0),
-            rotation  = (0f0, 0f0),
-            align     = ((:center, :top), (:right, :center)),
+            size      = @xy(20f0, 20f0),
+            formatter = @xy(Formatting.format, Formatting.format),
+            visible   = @xy(true, true),
+            font      = @xy("DejaVu Sans", "DejaVu Sans"),
+            color     = @xy(RGBf0(0, 0, 0), RGBf0(0, 0, 0)),
+            spacing   = @xy(20f0, 50f0),
+            padding   = @xy(5f0, 5f0),
+            rotation  = @xy(0f0, 0f0),
+            align     = @xy((:center, :top), (:right, :center)),
         ),
     ),
 
     # grid of minor tick lines
     grid = (
-        visible = (true, true),
-        color   = (RGBf0(0, 0, 0), RGBf0(0, 0, 0)),
-        width   = (1f0, 1f0),
-        style   = (nothing, nothing)
+        visible = @xy(true, true),
+        color   = @xy(RGBf0(0, 0, 0), RGBf0(0, 0, 0)),
+        width   = @xy(1f0, 1f0),
+        style   = @xy(nothing, nothing)
     ),
 
     # frame
-    frame = ( # top,right, bottom, left?
-        visible = (true, true, true, true)
-        color   = (RGBf0(0, 0, 0), RGBf0(0, 0, 0), RGBf0(0, 0, 0), RGBf0(0, 0, 0)).
-        size    = (1f0, 1f0, 1f0, 1f0),
-        style   = (nothing, nothing, nothing, nothing)
+    frame = ( # top,right, bottom, left
+        visible = (
+            top    = true,
+            right  = true,
+            bottom = true,
+            left   = true
+            ),
+        color = (
+            top    = RGBf0(0, 0, 0),
+            right  = RGBf0(0, 0, 0),
+            bottom =  RGBf0(0, 0, 0),
+            left   = RGBf0(0, 0, 0)
+            ),
+        size = (
+            top    = 1f0,
+            right  = 1f0,
+            bottom = 1f0,
+            left   = 1f0),
+        style = (
+            top    = nothing,
+            right  = nothing,
+            bottom = nothing,
+            left   = nothing
+            )
     ),
 
-    actions = (
-        pan = (
-            lock = (false, false),
-            key  = (Button.x, Button.y),
-            button = Mouse.right
-        ),
-        zoom = (
-            lock = (false, false),
-            key  = (Button.x, Button.y)
-        ),
+    pan = (
+        lock = @xy(false),
+        keys = @xy(Keyboard.x, Keyboard.y),
+        button = Mouse.right
+    ),
+    zoom = (
+        lock = @xy(false),
+        keys = @xy(Keyboard.x, Keyboard.y)
     ),
 )
+
+function nested2sym(syms::Vector{Symbol})
+    return Symbol(join([String(syms[end]), String.(syms[1:end-1])...]))
+end
 
 function default_attributes(::Type{LayoutedColorbar})
     Attributes(

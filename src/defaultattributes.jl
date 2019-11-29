@@ -69,13 +69,10 @@ function default_attributes(::Type{LayoutedAxis})
         ypankey = AbstractPlotting.Keyboard.y,
         xzoomkey = AbstractPlotting.Keyboard.x,
         yzoomkey = AbstractPlotting.Keyboard.y,
-        sidelabel = "Side Label",
-        sidelabelsize = 30f0,
-        sidelabelgap = 10f0,
-        sidelabelvisible = false,
-        sidelabelalign = :center,
-        sidelabelfont = "Dejavu Sans",
-        sidelabelrotation = -pi/2,
+        xaxisposition = :bottom,
+        yaxisposition = :left,
+        xoppositespinevisible = true,
+        yoppositespinevisible = true,
     )
 end
 
@@ -157,5 +154,31 @@ function default_attributes(::Type{AxisContent})
     Attributes(
         xautolimit = true,
         yautolimit = true,
+    )
+end
+
+function default_attributes(::Type{LineAxis})
+    Attributes(
+        endpoints = (Point2f0(0, 0), Point2f0(100, 0)),
+        limits = (0f0, 100f0),
+        flipped = false,
+        ticksize = 10f0,
+        tickwidth = 1f0,
+        tickcolor = RGBf0(0, 0, 0),
+        tickalign = 0f0,
+        ticks = AutoLinearTicks(100f0),
+        ticklabelalign = (:center, :top),
+        ticksvisible = true,
+        ticklabelrotation = 0f0,
+        ticklabelsize = 20f0,
+        ticklabelsvisible = true,
+        spinewidth = 1f0,
+        label = "label",
+        labelsize = 20f0,
+        labelcolor = RGBf0(0, 0, 0),
+        labelvisible = true,
+        ticklabelspace = 30f0,
+        ticklabelpad = 5f0,
+        labelpadding = 10f0,
     )
 end

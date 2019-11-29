@@ -13,11 +13,11 @@ begin
     las = innergrid[:, 1] = [LayoutedAxis(scene) for i in 1:3]
 
     alignedgrid1 = innergrid[:, 2] = GridLayout(2, 1; rowsizes=Relative(0.33), valign=:center)
-    alignedgrid1[1, 1] = LayoutedAxis(scene)
+    alignedgrid1[1, 1] = LayoutedAxis(scene, yaxisposition=:right, yticklabelalign=(:left, :center))
     alignedgrid1[2, 1] = LayoutedAxis(scene)
 
     alignedgrid2 = innergrid[:, 3] = GridLayout(rowsizes=Relative(0.5); valign=:bottom)
-    alignedgrid2[1, 1] = LayoutedAxis(scene)
+    alignedgrid2[1, 1] = LayoutedAxis(scene, xaxisposition=:top, xticklabelalign=(:center, :bottom))
 
     buttonsgl = innergrid[end+1, :] = GridLayout()
 

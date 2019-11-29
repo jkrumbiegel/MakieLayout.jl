@@ -16,7 +16,7 @@ begin
         rowsizes = Auto(false, 1),
         alignmode = Outside(30, 30, 30, 30))
 
-    las = [maingl[i, j] = LayoutedAxis(scene, sidelabelvisible=true, sidelabelalign=:center) for i in 1:nrows, j in 1:ncols]
+    las = [maingl[i, j] = LayoutedAxis(scene) for i in 1:nrows, j in 1:ncols]
 
     linkxaxes!(las...)
     linkyaxes!(las...)

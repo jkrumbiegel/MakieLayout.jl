@@ -79,7 +79,7 @@ begin
     nothing
 end
 
-tight_ticklabel_spacing!(gridgl[1:2, 1].content)
+tight_ticklabel_spacing!(gridgl[1, 1:2].content)
 
 gridgl[1:2, 1].content.xticklabelrotation = pi/8
 gridgl[1:2, 1].content.xticklabelalign = (:top, :center)

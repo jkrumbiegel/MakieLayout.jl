@@ -21,7 +21,7 @@ of the grid. This means that it is relevant for the grid's own protrusion on tha
 ismostin(sp::SpannedLayout, grid, ::Left) = sp.sp.cols.start == 1
 ismostin(sp::SpannedLayout, grid, ::Right) = sp.sp.cols.stop == grid.ncols
 ismostin(sp::SpannedLayout, grid, ::Bottom) = sp.sp.rows.stop == grid.nrows
-ismostin(sp::SpannedLayout, grid, ::Top) = sp.sp.cols.start == 1
+ismostin(sp::SpannedLayout, grid, ::Top) = sp.sp.rows.start == 1
 
 isleftmostin(sp::SpannedLayout, grid) = ismostin(sp, grid, Left())
 isrightmostin(sp::SpannedLayout, grid) = ismostin(sp, grid, Right())
@@ -220,11 +220,15 @@ function protrusion(gl::GridLayout, side::Side)
     if gl.alignmode isa Outside
         return 0.0
     elseif gl.alignmode isa Inside
-        return mapreduce(max, gl.content, init = 0.0) do elem
-            # we use only objects that stick out on this side
-            # And from those we use the maximum protrusion
-            ismostin(elem, gl, side) ? protrusion(elem, side) : 0.0
+        prot = 0.0
+        for elem in gl.content
+            if ismostin(elem, gl, side)
+                # take the max protrusion of all elements that are sticking
+                # out at this side
+                prot = max(protrusion(elem, side), prot)
+            end
         end
+        return prot
     end
 end
 

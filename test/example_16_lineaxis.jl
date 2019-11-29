@@ -12,15 +12,15 @@ begin
 
     poly!(scene, bbox, color=RGBAf0(0.1, 0.1, 0.8, 0.2), raw=true)
 
-    bl(bbox) = Point2f0(left(bbox), bottom(bbox))
-    tl(bbox) = Point2f0(left(bbox), top(bbox))
-    br(bbox) = Point2f0(right(bbox), bottom(bbox))
-    tr(bbox) = Point2f0(right(bbox), top(bbox))
+    bottomleft(bbox) = Point2f0(left(bbox), bottom(bbox))
+    topleft(bbox) = Point2f0(left(bbox), top(bbox))
+    bottomright(bbox) = Point2f0(right(bbox), bottom(bbox))
+    topright(bbox) = Point2f0(right(bbox), top(bbox))
 
-    topline(bbox) = (tl(bbox), tr(bbox))
-    bottomline(bbox) = (bl(bbox), br(bbox))
-    leftline(bbox) = (bl(bbox), tl(bbox))
-    rightline(bbox) = (br(bbox), tr(bbox))
+    topline(bbox) = (topleft(bbox), topright(bbox))
+    bottomline(bbox) = (bottomleft(bbox), bottomright(bbox))
+    leftline(bbox) = (bottomleft(bbox), topleft(bbox))
+    rightline(bbox) = (bottomright(bbox), topright(bbox))
 
     xlim = lift(x -> MakieLayout.limits(x, 1), bbox)
     ylim = lift(x -> MakieLayout.limits(x, 2), bbox)

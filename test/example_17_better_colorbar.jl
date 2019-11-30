@@ -48,7 +48,7 @@ begin
     hm4 = heatmap!(las[2, 2], vals, colormap=:rainbow)
     cb4 = gl4[1, 0] = LayoutedColorbar(scene, hm4,
         flipaxisposition = false, ticklabelalign = (:right, :center), width=30f0,
-        label = "amplitude")
+        label = "amplitude", ticklabelspace=60)
 
     innergrid[0, :] = LayoutedText(scene, text="Colorbars", textsize=50)
 end

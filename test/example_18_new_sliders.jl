@@ -10,11 +10,11 @@ begin
 
     innergrid = outergrid[1, 1] = GridLayout(2, 2)
 
-    innergrid[1, :] = LayoutedAxis(scene)
+    la = innergrid[1, :] = LayoutedAxis(scene)
     ls1 = innergrid[2, :] = LayoutedSlider(scene, range=50:0.01:100, height=50)
-    ls2 = innergrid[3, :] = LayoutedSlider(scene, range=50:0.01:100, height=50)
+    ls2 = innergrid[3, :] = LayoutedSlider(scene, range=LinRange(0.1, 3, 1000), startvalue=1, height=50)
 
     innergrid[0, :] = LayoutedText(scene, textsize=ls1.value)
-    innergrid[2, end+1] = LayoutedText(scene, textsize=ls2.value)
-    rowsize!(innergrid, 2, Auto(false, 1))
+
+    lines!(la, lift(x -> sin.((0:0.05:10) .* x), ls2.value))
 end

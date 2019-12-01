@@ -17,14 +17,15 @@ begin
     ls1 = slidergrid[1, 1] = LayoutedSlider(scene, range=50:0.01:100, height=50)
     slidergrid[1, 2] = LayoutedText(scene, text=lift(x->@sprintf("%.2f", x), ls1.value),
         alignment=(:right, :center), width=140, padding=(5, 5, 5, 5))
-    slidergrid[1, 2] = LayoutedRect(scene, color=:white)
+    slidergrid[1, 2] = LayoutedRect(scene, color=:white, strokewidth=1f0)
 
     ls2 = slidergrid[2, 1] = LayoutedSlider(scene, range=LinRange(0.1, 3, 1000), startvalue=1, height=50)
     slidergrid[2, 2] = LayoutedText(scene, text=lift(x->@sprintf("%.2f", x), ls2.value),
         alignment=(:right, :center), width=140, padding=(5, 5, 5, 5))
-    slidergrid[2, 2] = LayoutedRect(scene, color=:white)
+    slidergrid[2, 2] = LayoutedRect(scene, color=:white, strokewidth=1f0)
 
-    lines!(la, lift(x -> sin.((0:0.05:10) .* x), ls2.value))
+    ls3 = innergrid[1, end+1] = LayoutedSlider(scene, range=0:0.01:1, width=50, horizontal=false)
 
-    innergrid[:, end+1] = LayoutedSlider(scene, range=0:100, width=50, horizontal=false)
+    lines!(la, lift((x, y)-> sin.((0:0.05:10) .* x) .* y, ls2.value, ls3.value))
+
 end

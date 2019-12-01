@@ -1,3 +1,6 @@
+# # Default attributes for layouted objects
+# Here, we are essentially implementing the expansion done by the `@recipe` macro.
+
 function default_attributes(::Type{LayoutedAxis})
     Attributes(
         xlabel = "x label",
@@ -75,6 +78,132 @@ function default_attributes(::Type{LayoutedAxis})
         yoppositespinevisible = true,
     )
 end
+
+# Nested Axis theme structure:
+
+axis_attrs = (
+    alignment = 0.5f0,
+    maxsize = Inf32,
+    # axis labels
+    label = (
+        text    = "x label",
+        visible = true,
+        font    = "DejaVu Sans",
+        color   = RGBf0(0, 0, 0),
+        size    = 20f0,
+        padding = 5f0
+    ),
+
+    # tick marks and labels
+    ticks = (
+        # tick marks
+        ticks   = AutoLinearTicks(100f0),
+        autolimitmargin = 0.05f0,
+        size    = 10f0,
+        visible = true,
+        color   = RGBf0(0, 0, 0),
+        align   = 0f0,
+        width   = 1f0,
+        style   = nothing,
+
+        # tick labels
+        label = (
+            size      = 20f0,
+            formatter = Formatting.format,
+            visible   = true,
+            font      = "DejaVu Sans",
+            color     = RGBf0(0, 0, 0),
+            spacing   = 20f0, 50f0,
+            padding   = 5f0,
+            rotation  = 0f0,
+            align     = (:center, :top)
+        ),
+    ),
+
+    # grid of minor tick lines
+    grid = (
+        visible = true,
+        color   = RGBf0(0, 0, 0),
+        width   = 1f0,
+        style   = nothing
+    ),
+
+    pan = (
+        lock = false,
+        key = Keyboard.x
+    ),
+    zoom = (
+        lock = false,
+        key = Keyboard.x
+    )
+)
+
+yaxis_diff = (
+    ticks = (
+        label = (
+            text    = "y label",
+            spacing = 50f0,
+            align = (:right, :center),
+        ),
+    ),
+    pan = (
+        key = Keyboard.y
+    ),
+    zoom = (
+        key = Keyboard.y
+    )
+
+)
+
+xaxis_attrs = axis_attrs
+yaxis_attrs = merge(axis_attrs, yaxis_diff)
+
+# Frames
+frame = (visible = true, color = RGBAf0(0, 0, 0), size = 1f0, style = nothing)
+
+
+# For the layouted axis:
+
+
+Attributes(
+    # Top-level attributes
+    aspect = nothing,
+    panbutton = Mouse.right,
+
+    # Nested attributes
+    title = (
+        text     = "Title",
+        visible  = true,
+        font     = "DejaVu Sans",
+        color    = RGBf0(0, 0, 0),
+        size     = 30f0,
+        gap      = 10f0,
+        align    = :center,
+    ),
+
+    # Side label
+    sidelabel = (
+        text     = "Side Label",
+        size     = 30f0,
+        gap      = 10f0,
+        visible  = false,
+        align    = :center,
+        font     = "Dejavu Sans",
+        rotation = -pi/2
+    ),
+
+    # frames
+    frames = (
+        top    = frame,
+        bottom = frame,
+        left   = frame,
+        right  = frame,
+    ),
+
+    # Per-axis attributes
+    x = xaxis_attrs,
+    y = yaxis_attrs
+)
 
 function default_attributes(::Type{LayoutedColorbar})
     Attributes(

@@ -66,8 +66,8 @@ mapsides(
    )::BBox
 Maps f over all sides of the rectangle like arguments.
 e.g.
-```
-mapsides(BBox(left, right, bottom, top)) do side::Side, side_val::Number
+```julia
+mapsides(BBox(left, right, top, bottom)) do side::Side, side_val::Number
     return ...
 end::BBox
 ```

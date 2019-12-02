@@ -21,7 +21,6 @@ begin
     la.yautolimitmargin = (0, 0)
 
 
-
     slidergrid = innergrid[2, 1] = GridLayout()
 
     ls1 = slidergrid[1, 1] = LayoutedSlider(scene, range=50:0.01:100, height=50)
@@ -46,7 +45,8 @@ begin
 
     hmap = heatmap!(la, data)
 
-    lagrid[1, 2] = LayoutedColorbar(scene, hmap, width=40)
+    lc = lagrid[1, 2] = LayoutedColorbar(scene, hmap, width=40)
+    tight_ticklabel_spacing!(lc)
 
     on(b2.clicks) do c
         hmap.colormap = rand(setdiff([:viridis, :heat, :rainbow, :blues], [hmap.colormap[]]))

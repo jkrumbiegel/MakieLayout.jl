@@ -25,12 +25,12 @@ begin
 
     ls1 = slidergrid[1, 1] = LayoutedSlider(scene, range=50:0.01:100, height=50)
     slidergrid[1, 2] = LayoutedText(scene, text=lift(x->@sprintf("%.2f", x), ls1.value),
-        alignment=(:right, :center), width=140, padding=(5, 5, 5, 5))
+        alignment=(:right, :center), width=140, height=40, padding=(10, 10, 5, 5))
     slidergrid[1, 2] = LayoutedRect(scene, color=:white, strokewidth=2f0, strokecolor=RGBf0(0.9, 0.9, 0.9))
 
     ls2 = slidergrid[2, 1] = LayoutedSlider(scene, range=LinRange(0.1, 3, 1000), startvalue=1, height=50)
-    slidergrid[2, 2] = LayoutedText(scene, text=lift(x->@sprintf("%.2f", x), ls2.value),
-        alignment=(:right, :center), width=140, padding=(5, 5, 5, 5))
+    t2 = slidergrid[2, 2] = LayoutedText(scene, text=lift(x->@sprintf("%.2f", x), ls2.value),
+        alignment=(:right, :center), width=140, height=40, padding=(10, 10, 5, 5))
     slidergrid[2, 2] = LayoutedRect(scene, color=:white, strokewidth=2f0, strokecolor=RGBf0(0.9, 0.9, 0.9))
 
     ls3 = innergrid[1, end+1] = LayoutedSlider(scene, range=0:0.01:1, width=50, horizontal=false)

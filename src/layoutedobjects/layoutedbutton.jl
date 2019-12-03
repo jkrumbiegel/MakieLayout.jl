@@ -175,5 +175,5 @@ function Base.getproperty(lb::LayoutedButton, s::Symbol)
     end
 end
 function Base.propertynames(lb::LayoutedButton)
-    [fieldnames(LayoutedButton)..., keys(lb.attributes)...]
+    vcat(fieldnames(LayoutedButton, keys(lb.attributes))
 end

@@ -41,14 +41,14 @@ begin
     slgl = maingl[end+1, 1:end-1] = GridLayout(1, 2)
 
     slgl[1, 1] = LayoutedText(scene, text="Supertitle Size", halign=:left)
-    sl1 = slgl[1, 2] = LayoutedSlider(scene, 30, 1:200)
-    on(sl1.slider.value) do val
+    sl1 = slgl[1, 2] = LayoutedSlider(scene, height = 30, range = 1:200)
+    on(sl1.value) do val
         tl.attributes.textsize = val
     end
 
     slgl[2, 1] = LayoutedText(scene, text="Sidetitle Size", halign=:left)
-    sl2 = slgl[2, 2] = LayoutedSlider(scene, 30, 1:200)
-    on(sl2.slider.value) do val
+    sl2 = slgl[2, 2] = LayoutedSlider(scene, height = 30, range = 1:200)
+    on(sl2.value) do val
         stl.attributes.textsize = val
     end
 

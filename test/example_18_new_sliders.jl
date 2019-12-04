@@ -33,7 +33,7 @@ begin
         alignment=(:right, :center), width=140, height=40, padding=(10, 10, 5, 5))
     slidergrid[2, 2] = LayoutedRect(scene, color=:white, strokewidth=2f0, strokecolor=RGBf0(0.9, 0.9, 0.9))
 
-    ls3 = innergrid[1, end+1] = LayoutedSlider(scene, range=0:0.01:1, width=50, horizontal=false)
+    ls3 = innergrid[1, end+1] = LayoutedSlider(scene, range=0.1:0.01:1, width=50, horizontal=false)
 
     buttongrid = slidergrid[3, :] = GridLayout()
     buttongrid[1, 1] = LayoutedButton(scene, height=40)

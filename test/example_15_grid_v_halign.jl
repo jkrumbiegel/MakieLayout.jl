@@ -26,7 +26,7 @@ begin
     buttons = buttonsgl[1, 1:3] = [LayoutedButton(scene; height=40, label="$v") for v in valigns]
 
     for (button, align) in zip(buttons, valigns)
-        on(button.button.clicks) do c
+        on(button.clicks) do c
             alignedgrid1.valign[] = align
             alignedgrid2.valign[] = align
         end

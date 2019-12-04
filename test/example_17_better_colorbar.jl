@@ -28,9 +28,9 @@ begin
     gl2 = nest_content_into_gridlayout!(innergrid, 1, 2)
 
     hm2 = heatmap!(las[1, 2], vals, colormap=:heat)
-    cb2 = gl2[2, 1] = LayoutedColorbar(scene, hm2, vertical = false,
-        flipaxisposition=false, ticklabelalign = (:center, :top), height=30f0,
-        width=Relative(0.66), alignment=(:center, :center), label = "amplitude")
+
+    gl2[2, 1] = LayoutedSlider(scene, height = 30, range = 0:100)
+
 
     gl3 = nest_content_into_gridlayout!(innergrid, 2, 1)
 
@@ -51,8 +51,8 @@ begin
         label = "amplitude", ticklabelspace=60)
 
     innergrid[0, :] = LayoutedText(scene, text="Colorbars", textsize=50)
+
+    cb2 = innergrid[0, :] = LayoutedColorbar(scene, hm2, vertical = false,
+        flipaxisposition=false, ticklabelalign = (:center, :top), height=30f0,
+        alignment=(:center, :center), label = "amplitude")
 end
-
-MakieLayout.protrusion(gl1, MakieLayout.Right())
-
-MakieLayout.determinedirsize(gl1.content[2].al, MakieLayout.Col())

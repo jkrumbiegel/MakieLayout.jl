@@ -39,19 +39,19 @@ begin
     h2 = heatmap!(ax2, data, colormap = :blues)
     h3 = heatmap!(ax3, data, colormap = :heat)
 
-    agl1 = nest_content_into_gridlayout!(inner_gl, 1, 1)
+    agl1 = gridnest!(inner_gl, 1, 1)
     agl1[1, 2] = LColorbar(scene, h1, width = 30, label = "normal bar")
     agl1[2, 1:2] = LSlider(scene, height = 20, startvalue = 4)
     agl1[3, 1:2] = LSlider(scene, height = 20, startvalue = 5)
     agl1[4, 1:2] = LSlider(scene, height = 20, startvalue = 6)
 
-    agl2 = nest_content_into_gridlayout!(inner_gl, 1, 2)
+    agl2 = gridnest!(inner_gl, 1, 2)
     agl2[1, 2] = LColorbar(scene, h2, width = 30, height = Relative(0.66), label = "two thirds bar")
     agl2gl = agl2[2, :] = GridLayout()
     agl2gl[1, 1] = LButton(scene, label = "Run", height = Auto())
     agl2gl[1, 2] = LButton(scene, label = "Start")
 
-    agl3 = nest_content_into_gridlayout!(inner_gl, 2, 1:2)
+    agl3 = gridnest!(inner_gl, 2, 1:2)
     agl3[:, 3] = LColorbar(scene, h3, width = 30, height=200, label = "fixed height bar")
     rowsize!(agl3, 1, Auto(false, 1.0))
 

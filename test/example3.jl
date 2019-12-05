@@ -28,19 +28,19 @@ las[1, 2].attributes.aspect = nothing
 las[1, 3].attributes.aspect = nothing
 
 begin
-    subgl = nest_content_into_gridlayout!(maingl, 1, 1)
+    subgl = gridnest!(maingl, 1, 1)
     cb1 = subgl[:, 2] = LColorbar(scene, width=30, height=Relative(0.66))
     sleep(0.5)
 
-    subgl2 = nest_content_into_gridlayout!(maingl, 1:2, 1:2)
+    subgl2 = gridnest!(maingl, 1:2, 1:2)
     cb2 = subgl2[:, 3] = LColorbar(scene, width=30, height=Relative(0.66))
     sleep(0.5)
 
-    subgl3 = nest_content_into_gridlayout!(maingl, 1:3, 1:3)
+    subgl3 = gridnest!(maingl, 1:3, 1:3)
     cb3 = subgl3[:, 4] = LColorbar(scene, width=30, height=Relative(0.66))
     sleep(0.5)
 
-    subgl4 = nest_content_into_gridlayout!(maingl, 1:4, 1:4)
+    subgl4 = gridnest!(maingl, 1:4, 1:4)
     cb4 = subgl4[:, 5] = LColorbar(scene, width=30, height=Relative(0.66))
     sleep(0.5)
 

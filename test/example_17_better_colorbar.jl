@@ -18,21 +18,21 @@ begin
     ys = LinRange(0, 3, 100)
     vals = [sin(x * y) for x in xs, y in ys]
 
-    gl1 = nest_content_into_gridlayout!(innergrid, 1, 1)
+    gl1 = gridnest!(innergrid, 1, 1)
 
     hm1 = heatmap!(las[1, 1], vals, colormap=:viridis)
     cb1 = gl1[1, 2] = LColorbar(scene, hm1, width=30f0,
         height=Relative(0.66), alignment=(:center, :center), label = "amplitude",
         ticklabelspace = 60f0)
 
-    gl2 = nest_content_into_gridlayout!(innergrid, 1, 2)
+    gl2 = gridnest!(innergrid, 1, 2)
 
     hm2 = heatmap!(las[1, 2], vals, colormap=:heat)
 
     gl2[2, 1] = LSlider(scene, height = 30, range = 0:100)
 
 
-    gl3 = nest_content_into_gridlayout!(innergrid, 2, 1)
+    gl3 = gridnest!(innergrid, 2, 1)
 
     las[2, 1].titlevisible = false
     hm3 = heatmap!(las[2, 1], vals, colormap=:inferno)
@@ -40,7 +40,7 @@ begin
         flipaxisposition=true, ticklabelalign = (:center, :bottom), height=30f0,
         label = "amplitude")
 
-    gl4 = nest_content_into_gridlayout!(innergrid, 2, 2)
+    gl4 = gridnest!(innergrid, 2, 2)
 
     las[2, 2].yaxisposition = :right
     las[2, 2].yticklabelalign = (:left, :center)

@@ -49,8 +49,8 @@ begin
     gridgl = maingl[1, 1] = GridLayout(
         nrows, ncols)
 
-    la1 = gridgl[1, :] = LayoutedAxis(scene)
-    la2 = gridgl[2, 1] = LayoutedAxis(scene)
+    la1 = gridgl[1, :] = LAxis(scene)
+    la2 = gridgl[2, 1] = LAxis(scene)
 
     # linkxaxes!(la1, la2)
     # linkyaxes!(la1, la2)
@@ -67,16 +67,16 @@ begin
     # display(scene)
 
     slidergl = gridgl[3, :] = GridLayout(1, 1)
-    slidergl[1, 1] = LayoutedText(scene, text="Turbulence", halign=:left)
-    slidergl[1, 2] = LayoutedSlider(scene, height = 30, range = 0.0:0.1:100.0, buttonsize=20, textsize=20)
-    slidergl[1, 3] = LayoutedButton(scene, label="Press this")
+    slidergl[1, 1] = LText(scene, text="Turbulence", halign=:left)
+    slidergl[1, 2] = LSlider(scene, height = 30, range = 0.0:0.1:100.0, buttonsize=20, textsize=20)
+    slidergl[1, 3] = LButton(scene, label="Press this")
     slidergl.colsizes[3] = Fixed(200)
-    slidergl[2, 1] = LayoutedText(scene, text="Gamma Factor", halign=:left)
-    slidergl[2, 2] = LayoutedSlider(scene, height = 30, range = 0.0:0.1:100.0, buttonsize=20, textsize=20)
-    slidergl[2, 3] = LayoutedButton(scene, label="Press that")
-    slidergl[3, 1] = LayoutedText(scene, text="Precision", halign=:left)
-    slidergl[3, 2] = LayoutedSlider(scene, height = 30, range = 0.0:0.1:100.0, buttonsize=20, textsize=20)
-    slidergl[3, 3] = LayoutedButton(scene, label="And this too")
+    slidergl[2, 1] = LText(scene, text="Gamma Factor", halign=:left)
+    slidergl[2, 2] = LSlider(scene, height = 30, range = 0.0:0.1:100.0, buttonsize=20, textsize=20)
+    slidergl[2, 3] = LButton(scene, label="Press that")
+    slidergl[3, 1] = LText(scene, text="Precision", halign=:left)
+    slidergl[3, 2] = LSlider(scene, height = 30, range = 0.0:0.1:100.0, buttonsize=20, textsize=20)
+    slidergl[3, 3] = LButton(scene, label="And this too")
 
 
     nothing

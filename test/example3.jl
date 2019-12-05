@@ -12,10 +12,10 @@ begin
         alignmode = Outside(30, 30, 30, 30)
     )
 
-    las = Array{LayoutedAxis, 2}(undef, 4, 4)
+    las = Array{LAxis, 2}(undef, 4, 4)
 
     for i in 1:4, j in 1:4
-        las[i, j] = maingl[i, j] = LayoutedAxis(scene)
+        las[i, j] = maingl[i, j] = LAxis(scene)
     end
 end
 
@@ -29,19 +29,19 @@ las[1, 3].attributes.aspect = nothing
 
 begin
     subgl = nest_content_into_gridlayout!(maingl, 1, 1)
-    cb1 = subgl[:, 2] = LayoutedColorbar(scene, width=30, height=Relative(0.66))
+    cb1 = subgl[:, 2] = LColorbar(scene, width=30, height=Relative(0.66))
     sleep(0.5)
 
     subgl2 = nest_content_into_gridlayout!(maingl, 1:2, 1:2)
-    cb2 = subgl2[:, 3] = LayoutedColorbar(scene, width=30, height=Relative(0.66))
+    cb2 = subgl2[:, 3] = LColorbar(scene, width=30, height=Relative(0.66))
     sleep(0.5)
 
     subgl3 = nest_content_into_gridlayout!(maingl, 1:3, 1:3)
-    cb3 = subgl3[:, 4] = LayoutedColorbar(scene, width=30, height=Relative(0.66))
+    cb3 = subgl3[:, 4] = LColorbar(scene, width=30, height=Relative(0.66))
     sleep(0.5)
 
     subgl4 = nest_content_into_gridlayout!(maingl, 1:4, 1:4)
-    cb4 = subgl4[:, 5] = LayoutedColorbar(scene, width=30, height=Relative(0.66))
+    cb4 = subgl4[:, 5] = LColorbar(scene, width=30, height=Relative(0.66))
     sleep(0.5)
 
 end

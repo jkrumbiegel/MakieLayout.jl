@@ -1,4 +1,4 @@
-## Layouted Axis
+## LAxis
 
 This object represents a 2D axis that has many functions to make it more convenient
 to use with layouts. For a grid layout, the axis is a rectangle whose size is not
@@ -12,7 +12,7 @@ The axis interacts in two directions with the layout. When the size of one of it
 protrusions changes, this will notify any associated ProtrusionLayout object. This will
 then notify its parent GridLayout, and so on, until the full layout is recomputed.
 After that's done, the ProtrusionLayout will have received a new bounding box in which
-to place its content. The LayoutedAxis has a bounding box node which determines
+to place its content. The LAxis has a bounding box node which determines
 the borders of the central plot area. This is now updated and the axis' subscene
 is adjusted to its new size. All axis decorations also update their positions.
 
@@ -29,7 +29,7 @@ maingl = GridLayout(
     parent = scene,
     alignmode = Outside(30, 30, 30, 30))
 
-las = [maingl[i, j] = LayoutedAxis(scene) for i in 1:2, j in 1:2]
+las = [maingl[i, j] = LAxis(scene) for i in 1:2, j in 1:2]
 
 a_title = Animation([0, 2], [30.0, 50.0], sineio(n=2, yoyo=true, prewait=0.2))
 a_xlabel = Animation([2, 4], [20.0, 40.0], sineio(n=2, yoyo=true, prewait=0.2))
@@ -69,7 +69,7 @@ maingl = GridLayout(
     addedrowgaps = Fixed(0),
     alignmode = Outside(30, 30, 30, 30))
 
-las = [maingl[i, j] = LayoutedAxis(scene) for j in 1:2, i in 1:2]
+las = [maingl[i, j] = LAxis(scene) for j in 1:2, i in 1:2]
 
 record(scene, "example_hiding_decorations.mp4", framerate=3) do io
 
@@ -144,7 +144,7 @@ maingl = GridLayout(
     parent = scene,
     alignmode = Outside(30, 30, 30, 30))
 
-las = [maingl[i, j] = LayoutedAxis(scene,
+las = [maingl[i, j] = LAxis(scene,
     xautolimitmargin=(0, 0), yautolimitmargin=(0, 0)) for i in 1:2, j in 1:3]
 
 img = reverse(load("cow.png"), dims=1)'

@@ -25,14 +25,14 @@ begin
 
     inner_gl = outer_gl[1, 1] = GridLayout()
 
-    ax1 = inner_gl[1, 1] = LayoutedAxis(scene, xautolimitmargin=(0, 0), yautolimitmargin=(0, 0))
-    ax2 = inner_gl[1, 2] = LayoutedAxis(scene, xautolimitmargin=(0, 0), yautolimitmargin=(0, 0))
-    ax3 = inner_gl[2, 1:2] = LayoutedAxis(scene, xautolimitmargin=(0, 0), yautolimitmargin=(0, 0))
+    ax1 = inner_gl[1, 1] = LAxis(scene, xautolimitmargin=(0, 0), yautolimitmargin=(0, 0))
+    ax2 = inner_gl[1, 2] = LAxis(scene, xautolimitmargin=(0, 0), yautolimitmargin=(0, 0))
+    ax3 = inner_gl[2, 1:2] = LAxis(scene, xautolimitmargin=(0, 0), yautolimitmargin=(0, 0))
 
     guigl = inner_gl[3, 1:2] = GridLayout()
-    b1 = guigl[1, 1] = LayoutedButton(scene, label = "prev", width = Auto())
-    sl = guigl[1, 2] = LayoutedSlider(scene, startvalue = 6, height = 40)
-    b2 = guigl[1, 3] = LayoutedButton(scene, label = "next", width = Auto())
+    b1 = guigl[1, 1] = LButton(scene, label = "prev", width = Auto())
+    sl = guigl[1, 2] = LSlider(scene, startvalue = 6, height = 40)
+    b2 = guigl[1, 3] = LButton(scene, label = "next", width = Auto())
 
     data = randn(200, 200) .+ 3 .* sin.((1:200) ./ 20) .* sin.((1:200)' ./ 20)
     h1 = heatmap!(ax1, data)
@@ -40,22 +40,22 @@ begin
     h3 = heatmap!(ax3, data, colormap = :heat)
 
     agl1 = nest_content_into_gridlayout!(inner_gl, 1, 1)
-    agl1[1, 2] = LayoutedColorbar(scene, h1, width = 30, label = "normal bar")
-    agl1[2, 1:2] = LayoutedSlider(scene, height = 20, startvalue = 4)
-    agl1[3, 1:2] = LayoutedSlider(scene, height = 20, startvalue = 5)
-    agl1[4, 1:2] = LayoutedSlider(scene, height = 20, startvalue = 6)
+    agl1[1, 2] = LColorbar(scene, h1, width = 30, label = "normal bar")
+    agl1[2, 1:2] = LSlider(scene, height = 20, startvalue = 4)
+    agl1[3, 1:2] = LSlider(scene, height = 20, startvalue = 5)
+    agl1[4, 1:2] = LSlider(scene, height = 20, startvalue = 6)
 
     agl2 = nest_content_into_gridlayout!(inner_gl, 1, 2)
-    agl2[1, 2] = LayoutedColorbar(scene, h2, width = 30, height = Relative(0.66), label = "two thirds bar")
+    agl2[1, 2] = LColorbar(scene, h2, width = 30, height = Relative(0.66), label = "two thirds bar")
     agl2gl = agl2[2, :] = GridLayout()
-    agl2gl[1, 1] = LayoutedButton(scene, label = "Run", height = Auto())
-    agl2gl[1, 2] = LayoutedButton(scene, label = "Start")
+    agl2gl[1, 1] = LButton(scene, label = "Run", height = Auto())
+    agl2gl[1, 2] = LButton(scene, label = "Start")
 
     agl3 = nest_content_into_gridlayout!(inner_gl, 2, 1:2)
-    agl3[:, 3] = LayoutedColorbar(scene, h3, width = 30, height=200, label = "fixed height bar")
+    agl3[:, 3] = LColorbar(scene, h3, width = 30, height=200, label = "fixed height bar")
     rowsize!(agl3, 1, Auto(false, 1.0))
 
-    inner_gl[0, :] = LayoutedText(scene, text = "MakieLayout", textsize = 50)
+    inner_gl[0, :] = LText(scene, text = "MakieLayout", textsize = 50)
 end
 
 for ts in 0:1/30:10

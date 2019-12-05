@@ -28,7 +28,7 @@ begin
     for i in 1:3, j in 1:3
         # la =
         # al = ProtrusionLayout(gl, la.protrusions, la.bboxnode)
-        la = gl[i, j] = LayoutedAxis(scene)
+        la = gl[i, j] = LAxis(scene)
         sc = scatter!(
             la,
             rand(100, 2) .* 90 .+ 5,
@@ -41,14 +41,14 @@ begin
 
     glside = maingl[1, 2] = GridLayout(7, 1, alignmode=Outside())
 
-    but = glside[1, 1] = LayoutedButton(scene, width = 200, height = 50, label = "Toggle Titles")
+    but = glside[1, 1] = LButton(scene, width = 200, height = 50, label = "Toggle Titles")
     on(but.clicks) do c
         for la in las
             la.attributes.titlevisible[] = !la.attributes.titlevisible[]
         end
     end
 
-    but2 = glside[2, 1] = LayoutedButton(scene, width = 200, height = 50, label = "Toggle Labels")
+    but2 = glside[2, 1] = LButton(scene, width = 200, height = 50, label = "Toggle Labels")
     on(but2.clicks) do c
         for la in las
             la.attributes.xlabelvisible[] = !la.attributes.xlabelvisible[]
@@ -56,7 +56,7 @@ begin
         end
     end
 
-    but3 = glside[3, 1] = LayoutedButton(scene, width = 200, height = 50, label = "Toggle Ticklabels")
+    but3 = glside[3, 1] = LButton(scene, width = 200, height = 50, label = "Toggle Ticklabels")
     on(but3.clicks) do c
         for la in las
             la.attributes.xticklabelsvisible[] = !la.attributes.xticklabelsvisible[]
@@ -64,7 +64,7 @@ begin
         end
     end
 
-    but4 = glside[4, 1] = LayoutedButton(scene, width = 200, height = 50, label = "Toggle Ticks")
+    but4 = glside[4, 1] = LButton(scene, width = 200, height = 50, label = "Toggle Ticks")
     on(but4.clicks) do c
         t1 = time()
         with_updates_suspended(maingl) do
@@ -76,7 +76,7 @@ begin
         println(time() - t1)
     end
 
-    but5 = glside[5, 1] = LayoutedButton(scene, width = 200, height = 50, label = "Toggle Tick Align")
+    but5 = glside[5, 1] = LButton(scene, width = 200, height = 50, label = "Toggle Tick Align")
     on(but5.clicks) do c
         t1 = time()
         maingl.block_updates = true
@@ -89,7 +89,7 @@ begin
         println(time() - t1)
     end
 
-    but6 = glside[6, 1] = LayoutedButton(scene, width = 200, height = 50, label = "Toggle Grids")
+    but6 = glside[6, 1] = LButton(scene, width = 200, height = 50, label = "Toggle Grids")
     on(but6.clicks) do c
         for la in las
             la.attributes.xgridvisible[] = !la.attributes.xgridvisible[]
@@ -97,7 +97,7 @@ begin
         end
     end
 
-    but7 = glside[7, 1] = LayoutedButton(scene, width = 200, height = 50, label = "Toggle Spines")
+    but7 = glside[7, 1] = LButton(scene, width = 200, height = 50, label = "Toggle Spines")
     on(but7.clicks) do c
         for la in las
             la.attributes.topspinevisible[] = !la.attributes.topspinevisible[]

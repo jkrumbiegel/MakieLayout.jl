@@ -14,22 +14,22 @@ begin
         alignmode = Outside(30, 30, 30, 30)
     )
 
-    maingl[1, 2] = LayoutedAxis(scene)
-    maingl[1, 3] = LayoutedAxis(scene)
+    maingl[1, 2] = LAxis(scene)
+    maingl[1, 3] = LAxis(scene)
 
     guigl = maingl[1, 1] = GridLayout(1, 3)
 
-    # guigl[1, 1] = LayoutedButton(scene, 100, 30, "button")
-    guigl[1, 1] = LayoutedText(scene, text="HelloWorld", halign=:left)
-    guigl[1, 2] = LayoutedText(scene, text="Blablo", halign=:left)
-    guigl[1, 3] = LayoutedButton(scene, width = 120, height = 30, label = "Bliblu")
+    # guigl[1, 1] = LButton(scene, 100, 30, "button")
+    guigl[1, 1] = LText(scene, text="HelloWorld", halign=:left)
+    guigl[1, 2] = LText(scene, text="Blablo", halign=:left)
+    guigl[1, 3] = LButton(scene, width = 120, height = 30, label = "Bliblu")
 
-    guigl[2, 1] = LayoutedText(scene, text="Mamama", halign=:left)
-    guigl[2, 2] = LayoutedText(scene, text="Mimimi", halign=:left)
-    guigl[2, 3] = LayoutedButton(scene, width = 120, height = 30, label = "Momomo")
+    guigl[2, 1] = LText(scene, text="Mamama", halign=:left)
+    guigl[2, 2] = LText(scene, text="Mimimi", halign=:left)
+    guigl[2, 3] = LButton(scene, width = 120, height = 30, label = "Momomo")
 
-    guigl[3, 1] = LayoutedText(scene, text="VeerrryLoong", halign=:left)
-    guigl[3, 2] = LayoutedText(scene, text="Blablo", halign=:left)
-    guigl[3, 3] = LayoutedButton(scene, width = 120, height = 30, label = "Short")
+    guigl[3, 1] = LText(scene, text="VeerrryLoong", halign=:left)
+    guigl[3, 2] = LText(scene, text="Blablo", halign=:left)
+    guigl[3, 3] = LButton(scene, width = 120, height = 30, label = "Short")
 
 end

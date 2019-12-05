@@ -12,7 +12,7 @@ begin
         alignmode = Outside(30, 30, 30, 30)
     )
 
-    la = maingl[1, 1] = LayoutedAxis(scene)
+    la = maingl[1, 1] = LAxis(scene)
     la.attributes.yautolimitmargin = (0f0, 0.05f0)
 
 

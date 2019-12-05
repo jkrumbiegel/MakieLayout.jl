@@ -3,7 +3,7 @@ using Makie
 using KernelDensity
 
 
-function kdepoly!(la::LayoutedAxis, vec, reverse=false; kwargs...)
+function kdepoly!(la::LAxis, vec, reverse=false; kwargs...)
     kderesult = kde(vec; npoints=32)
 
     x = kderesult.x
@@ -21,11 +21,11 @@ begin
     screen = display(scene)
     campixel!(scene);
 
-    la1 = LayoutedAxis(scene)
-    la2 = LayoutedAxis(scene)
-    la3 = LayoutedAxis(scene)
-    la4 = LayoutedAxis(scene)
-    la5 = LayoutedAxis(scene)
+    la1 = LAxis(scene)
+    la2 = LAxis(scene)
+    la3 = LAxis(scene)
+    la4 = LAxis(scene)
+    la5 = LAxis(scene)
 
     linkxaxes!(la3, la4)
     linkyaxes!(la3, la5)
@@ -52,7 +52,7 @@ begin
 
     maingl = GridLayout(2, 1, parent=scene, alignmode=Outside(40))
 
-    slalign = maingl[2, 1] = LayoutedSlider(scene, height = 30, range = LinRange(0.0, 150.0, 200))
+    slalign = maingl[2, 1] = LSlider(scene, height = 30, range = LinRange(0.0, 150.0, 200))
 
 
     gl = maingl[1, 1] = GridLayout(
@@ -79,10 +79,10 @@ begin
     gl_colorbar = gl_slider[1, 1] = GridLayout(1, 2; colsizes=[Auto(), Relative(0.1)])
 
     gl_colorbar[1, 1] = la2
-    # gl_colorbar[1, 2] = LayoutedColorbar(scene)
+    # gl_colorbar[1, 2] = LColorbar(scene)
 
-    sl1 = gl_slider[2, 1] = LayoutedSlider(scene, height = 40, range = 1:0.01:10)
-    sl2 = gl_slider[3, 1] = LayoutedSlider(scene, height = 40, range = 0.1:0.01:1)
+    sl1 = gl_slider[2, 1] = LSlider(scene, height = 40, range = 1:0.01:10)
+    sl2 = gl_slider[3, 1] = LSlider(scene, height = 40, range = 0.1:0.01:1)
 
     xrange = LinRange(0, 2pi, 500)
     lines!(

@@ -16,7 +16,7 @@ begin
     )
 
     axes = [
-        maingl[i, j] = LayoutedAxis(
+        maingl[i, j] = LAxis(
             scene,
             aspect=DataAspect(),  # make axis the same aspect as the data (images will not be stretched)
             xautolimitmargin=(0, 0), # don't create margins so that the image aligns with the axis spines

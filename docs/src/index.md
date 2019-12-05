@@ -35,17 +35,17 @@ maingl = GridLayout(
     parent = scene,
     alignmode = Outside(30, 30, 30, 30))
 
-# create a grid of LayoutedAxis objects and at the same time place them in the
+# create a grid of LAxis objects and at the same time place them in the
 # grid layout with indexing syntax
-las = [maingl[i, j] = LayoutedAxis(scene) for i in 1:nrows, j in 1:ncols]
+las = [maingl[i, j] = LAxis(scene) for i in 1:nrows, j in 1:ncols]
 
-# link x and y axes of all LayoutedAxis objects
+# link x and y axes of all LAxis objects
 linkxaxes!(las...)
 linkyaxes!(las...)
 
 for i in 1:nrows, j in 1:ncols
 
-    # plot into the scene that is managed by the LayoutedAxis
+    # plot into the scene that is managed by the LAxis
     scatter!(las[i, j], rand(200, 2) .+ [i j])
 
     # remove unnecessary decorations in some of the facets, this will have an
@@ -62,12 +62,12 @@ end
 
 # index into the 0th row, thereby adding a new row into the layout and place
 # a text object across the full column width as a super title
-maingl[0, :] = LayoutedText(scene, text="Super Title", textsize=50)
+maingl[0, :] = LText(scene, text="Super Title", textsize=50)
 
 # place a title on the side by going from the second row to the last (because
 # in the first row, there is now the super title) and adding a column to the end
 # by indexing one column further than the last index
-maingl[2:end, end+1] = LayoutedText(scene, text="Side Title", textsize=50,
+maingl[2:end, end+1] = LText(scene, text="Side Title", textsize=50,
     rotation=-pi/2)
 
 save("example_intro.png", scene); nothing # hide

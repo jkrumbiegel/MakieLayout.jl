@@ -14,10 +14,10 @@ begin
 
     ni = 2
     nj = 2
-    las = Array{LayoutedAxis, 2}(undef, ni, nj)
+    las = Array{LAxis, 2}(undef, ni, nj)
 
     for i in 1:ni, j in 1:nj
-        las[i, j] = maingl[i, j] = LayoutedAxis(scene, titlesize=20)
+        las[i, j] = maingl[i, j] = LAxis(scene, titlesize=20)
     end
 
     lines!(las[1, 1], 0:0.1:100, sin.((0:0.1:100) ./ 5) .+ 1)

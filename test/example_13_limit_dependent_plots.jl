@@ -1,7 +1,7 @@
 using MakieLayout
 using Makie
 
-function axhline!(la::LayoutedAxis, y; kwargs...)
+function axhline!(la::LAxis, y; kwargs...)
     points = lift(la.limits) do lims
         x1 = lims.origin[1]
         x2 = lims.origin[1] + lims.widths[1]
@@ -11,7 +11,7 @@ function axhline!(la::LayoutedAxis, y; kwargs...)
     lines!(la, points; xautolimit=false, kwargs...)
 end
 
-function axvline!(la::LayoutedAxis, x; kwargs...)
+function axvline!(la::LAxis, x; kwargs...)
     points = lift(la.limits) do lims
         y1 = lims.origin[2]
         y2 = lims.origin[2] + lims.widths[2]
@@ -21,7 +21,7 @@ function axvline!(la::LayoutedAxis, x; kwargs...)
     lines!(la, points; yautolimit=false, kwargs...)
 end
 
-function abline!(la::LayoutedAxis, a, b; kwargs...)
+function abline!(la::LAxis, a, b; kwargs...)
     points = lift(la.limits) do lims
         x1 = lims.origin[1]
         x2 = lims.origin[1] + lims.widths[1]
@@ -31,7 +31,7 @@ function abline!(la::LayoutedAxis, a, b; kwargs...)
     lines!(la, points; xautolimit=false, yautolimit=false, kwargs...)
 end
 
-function dynamicfunc!(la::LayoutedAxis, func; n=nothing, kwargs...)
+function dynamicfunc!(la::LAxis, func; n=nothing, kwargs...)
 
     points = lift(la.limits, la.layoutnodes.computedbbox) do lims, bbox
 
@@ -50,7 +50,7 @@ function dynamicfunc!(la::LayoutedAxis, func; n=nothing, kwargs...)
     lines!(la, points; xautolimit=false, yautolimit=false, kwargs...)
 end
 
-function dynamicimage!(la::LayoutedAxis, func; n=300, kwargs...)
+function dynamicimage!(la::LAxis, func; n=300, kwargs...)
     pixels = lift(la.limits) do lims
         x1, y1 = lims.origin
         x2, y2 = lims.origin .+ lims.widths
@@ -79,7 +79,7 @@ begin
     gridgl = maingl[1, 1] = GridLayout(
         nrows, ncols)
 
-    la = gridgl[1, 1] = LayoutedAxis(scene)
+    la = gridgl[1, 1] = LAxis(scene)
 
     # scatter!(la, rand(100, 2) .* 50, markersize=20)
     axhline!(la, 0)

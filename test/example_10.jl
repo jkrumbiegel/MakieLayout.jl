@@ -16,7 +16,7 @@ begin
         rowsizes = Auto(false, 1),
         alignmode = Outside(30, 30, 30, 30))
 
-    las = [maingl[i, j] = LayoutedAxis(scene) for i in 1:nrows, j in 1:ncols]
+    las = [maingl[i, j] = LAxis(scene) for i in 1:nrows, j in 1:ncols]
 
     linkxaxes!(las...)
     linkyaxes!(las...)
@@ -34,20 +34,20 @@ begin
         i < nrows && (las[i, j].xlabelvisible = false)
     end
 
-    tl = maingl[0, :] = LayoutedText(scene, text="Super Title", padding=(10, 10, 20, 20), textsize=50)
-    maingl[1, :] = LayoutedRect(scene, strokevisible=false)
-    stl = maingl[2:end, end+1] = LayoutedText(scene, text="Side Title", textsize=50, rotation=-pi/2)
+    tl = maingl[0, :] = LText(scene, text="Super Title", padding=(10, 10, 20, 20), textsize=50)
+    maingl[1, :] = LRect(scene, strokevisible=false)
+    stl = maingl[2:end, end+1] = LText(scene, text="Side Title", textsize=50, rotation=-pi/2)
 
     slgl = maingl[end+1, 1:end-1] = GridLayout(1, 2)
 
-    slgl[1, 1] = LayoutedText(scene, text="Supertitle Size", halign=:left)
-    sl1 = slgl[1, 2] = LayoutedSlider(scene, height = 30, range = 1:200)
+    slgl[1, 1] = LText(scene, text="Supertitle Size", halign=:left)
+    sl1 = slgl[1, 2] = LSlider(scene, height = 30, range = 1:200)
     on(sl1.value) do val
         tl.attributes.textsize = val
     end
 
-    slgl[2, 1] = LayoutedText(scene, text="Sidetitle Size", halign=:left)
-    sl2 = slgl[2, 2] = LayoutedSlider(scene, height = 30, range = 1:200)
+    slgl[2, 1] = LText(scene, text="Sidetitle Size", halign=:left)
+    sl2 = slgl[2, 2] = LSlider(scene, height = 30, range = 1:200)
     on(sl2.value) do val
         stl.attributes.textsize = val
     end

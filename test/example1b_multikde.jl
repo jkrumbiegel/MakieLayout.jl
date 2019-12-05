@@ -3,7 +3,7 @@ using Makie
 using KernelDensity
 
 
-function kdepoly!(la::LayoutedAxis, vec, reverse=false; kwargs...)
+function kdepoly!(la::LAxis, vec, reverse=false; kwargs...)
     kderesult = kde(vec; npoints=32)
 
     x = kderesult.x
@@ -21,9 +21,9 @@ begin
     screen = display(scene)
     campixel!(scene);
 
-    la1 = LayoutedAxis(scene)
-    la2 = LayoutedAxis(scene)
-    la3 = LayoutedAxis(scene)
+    la1 = LAxis(scene)
+    la2 = LAxis(scene)
+    la3 = LAxis(scene)
 
     linkxaxes!(la1, la2)
     linkyaxes!(la1, la3)
@@ -56,7 +56,7 @@ begin
     la3.attributes.xpanlock[] = true
     la3.attributes.xzoomlock[] = true
 
-    maingl[0, 1] = LayoutedText(scene, text="Auto Limits", textsize=50)
+    maingl[0, 1] = LText(scene, text="Auto Limits", textsize=50)
 
     sleep(3)
     linkeddata = randn(200, 2) .* 15 .+ 50

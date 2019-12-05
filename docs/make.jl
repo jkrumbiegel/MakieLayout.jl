@@ -5,7 +5,7 @@ makedocs(
     pages = [
         "index.md",
         "Grids" => "grids.md",
-        "LayoutedAxis" => "layoutedaxis.md",
+        "LAxis" => "laxis.md",
     ],
     format = Documenter.HTML(
             prettyurls = get(ENV, "CI", nothing) == "true"

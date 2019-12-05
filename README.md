@@ -20,4 +20,4 @@ Most layout parameters are instantly adjustable using Observables, as in Makie.j
 Also, the layout automatically readjusts if you change visual attributes of your
 content elements.
 
-![layout demo](https://jkrumbiegel.github.io/MakieLayout.jl/additional_media/layoutdemo.gif)
+![layout demo](https://raw.githubusercontent.com/jkrumbiegel/MakieLayout.jl/gh-pages/additional_media/layoutdemo.gif)

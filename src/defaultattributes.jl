@@ -58,7 +58,10 @@ function default_attributes(::Type{LayoutedAxis})
         rightspinecolor = RGBf0(0, 0, 0),
         bottomspinecolor = RGBf0(0, 0, 0),
         aspect = nothing,
-        alignment = (0.5f0, 0.5f0),
+        valign = :center,
+        halign = :center,
+        width = nothing,
+        height = nothing,
         maxsize = (Inf32, Inf32),
         xautolimitmargin = (0.05f0, 0.05f0),
         yautolimitmargin = (0.05f0, 0.05f0),
@@ -103,12 +106,14 @@ function default_attributes(::Type{LayoutedColorbar})
         leftspinecolor = RGBf0(0, 0, 0),
         rightspinecolor = RGBf0(0, 0, 0),
         bottomspinecolor = RGBf0(0, 0, 0),
-        alignment = (:center, :center),
+        valign = :center,
+        halign = :center,
         vertical = true,
         flipaxisposition = true,
         width = nothing,
         height = nothing,
         colormap = :viridis,
+        limits = (0f0, 1f0),
     )
 end
 
@@ -123,6 +128,8 @@ function default_attributes(::Type{LayoutedText})
         halign = :center,
         rotation = 0f0,
         padding = (0f0, 0f0, 0f0, 0f0),
+        height = Auto(),
+        width = Auto(),
     )
 end
 
@@ -136,16 +143,33 @@ function default_attributes(::Type{LayoutedRect})
         strokewidth = 2f0,
         strokevisible = true,
         strokecolor = RGBf0(0, 0, 0),
+        width = nothing,
+        height = nothing,
     )
 end
 
 function default_attributes(::Type{LayoutedButton})
     Attributes(
-        valign = :center,
         halign = :center,
-        padding = (0f0, 0f0, 0f0, 0f0),
+        valign = :center,
+        padding = (10f0, 10f0, 10f0, 10f0),
         textsize = 20f0,
         label = "Button",
+        font = "Dejavu Sans",
+        width = nothing,
+        height = nothing,
+        cornerradius = 4,
+        cornersegments = 10,
+        strokewidth = 2f0,
+        strokecolor = :transparent,
+        buttoncolor = RGBf0(0.9, 0.9, 0.9),
+        autoshrink = (false, false),
+        labelcolor = :black,
+        labelcolor_hover = :black,
+        labelcolor_active = :white,
+        buttoncolor_active = RGBf0(0.2, 0.2, 0.2),
+        buttoncolor_hover = RGBf0(0.8, 0.8, 0.8),
+        clicks = 0,
     )
 end
 
@@ -179,5 +203,26 @@ function default_attributes(::Type{LineAxis})
         ticklabelspace = 30f0,
         ticklabelpad = 5f0,
         labelpadding = 10f0,
+    )
+end
+
+function default_attributes(::Type{LayoutedSlider})
+    Attributes(
+        linewidth = 3f0,
+        halign = :center,
+        valign = :center,
+        # vertical = true,
+        width = nothing,
+        height = nothing,
+        range = 0:10,
+        buttonradius_inactive = 7f0,
+        buttonradius_active = 8f0,
+        startvalue = 0,
+        value = 0,
+        color_active = RGBf0(0.2, 0.2, 0.2),
+        color_inactive = RGBf0(0.9, 0.9, 0.9),
+        buttoncolor_inactive = RGBf0(1, 1, 1),
+        horizontal = true,
+        buttonstrokewidth = 3f0,
     )
 end

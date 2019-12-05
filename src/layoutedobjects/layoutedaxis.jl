@@ -1,4 +1,4 @@
-function LayoutedAxis(parent::Scene; kwargs...)
+function LayoutedAxis(parent::Scene; bbox=nothing, kwargs...)
 
     attrs = merge!(Attributes(kwargs), default_attributes(LayoutedAxis))
 
@@ -13,22 +13,32 @@ function LayoutedAxis(parent::Scene; kwargs...)
         ytickcolor, xpanlock, ypanlock, xzoomlock, yzoomlock, spinewidth, xgridvisible, ygridvisible,
         xgridwidth, ygridwidth, xgridcolor, ygridcolor, topspinevisible, rightspinevisible, leftspinevisible,
         bottomspinevisible, topspinecolor, leftspinecolor, rightspinecolor, bottomspinecolor,
-        aspect, alignment, maxsize, xticks, yticks, panbutton, xpankey, ypankey, xzoomkey, yzoomkey,
+        aspect, halign, valign, maxsize, xticks, yticks, panbutton, xpankey, ypankey, xzoomkey, yzoomkey,
         xaxisposition, yaxisposition, xoppositespinevisible, yoppositespinevisible
     )
 
     decorations = Dict{Symbol, Any}()
 
-    bboxnode = Node(BBox(0, 100, 0, 100))
+    sizeattrs = sizenode!(attrs.width, attrs.height)
+    alignment = lift(tuple, halign, valign)
 
-    scenearea = Node(IRect(0, 0, 100, 100))
+    suggestedbbox = if isnothing(bbox)
+        Node(BBox(0, 100, 0, 100))
+    else
+        AbstractPlotting.to_node(BBox, bbox)
+    end
 
-    scene = Scene(parent, scenearea, raw = true)
+    computedsize = computedsizenode!(sizeattrs)
+
+    finalbbox = alignedbboxnode!(suggestedbbox, computedsize, alignment, sizeattrs)
+
     limits = Node(FRect(0, 0, 100, 100))
 
-    block_limit_linking = Node(false)
+    scenearea = sceneareanode!(finalbbox, limits, aspect)
 
-    connect_scenearea_and_bbox!(scenearea, bboxnode, limits, aspect, alignment, maxsize)
+    scene = Scene(parent, scenearea, raw = true)
+
+    block_limit_linking = Node(false)
 
     plots = AbstractPlot[]
 
@@ -39,7 +49,6 @@ function LayoutedAxis(parent::Scene; kwargs...)
     add_zoom!(scene, limits, xzoomlock, yzoomlock, xzoomkey, yzoomkey)
 
     campixel!(scene)
-
 
     xgridnode = Node(Point2f0[])
     xgridlines = linesegments!(
@@ -103,14 +112,14 @@ function LayoutedAxis(parent::Scene; kwargs...)
         flipped = xaxis_flipped, ticklabelalign = xticklabelalign, labelsize = xlabelsize,
         labelpadding = xlabelpadding, ticklabelpad = xticklabelpad, labelvisible = xlabelvisible,
         label = xlabel, labelcolor = xlabelcolor, tickalign = xtickalign,
-        ticklabelspace = xticklabelspace)
+        ticklabelspace = xticklabelspace, ticks = xticks)
     decorations[:xaxis] = xaxis
 
     yaxis  =  LineAxis(parent, endpoints = yaxis_endpoints, limits = lift(ylimits, limits),
         flipped = yaxis_flipped, ticklabelalign = yticklabelalign, labelsize = ylabelsize,
         labelpadding = ylabelpadding, ticklabelpad = yticklabelpad, labelvisible = ylabelvisible,
         label = ylabel, labelcolor = ylabelcolor, tickalign = ytickalign,
-        ticklabelspace = yticklabelspace)
+        ticklabelspace = yticklabelspace, ticks = yticks)
     decorations[:yaxis] = yaxis
 
     xoppositelinepoints = lift(scene.px_area, spinewidth, xaxisposition) do r, sw, xaxpos
@@ -229,8 +238,14 @@ function LayoutedAxis(parent::Scene; kwargs...)
         needs_update[] = true
     end
 
-    la = LayoutedAxis(parent, scene, plots, xaxislinks, yaxislinks, bboxnode, limits,
-        protrusions, needs_update, attrs, block_limit_linking, decorations)
+    # trigger bboxnode so the axis layouts itself even if not connected to a
+    # layout
+    suggestedbbox[] = suggestedbbox[]
+
+    layoutnodes = LayoutNodes(suggestedbbox, protrusions, computedsize, finalbbox)
+
+    la = LayoutedAxis(parent, scene, plots, xaxislinks, yaxislinks, limits,
+        layoutnodes, needs_update, attrs, block_limit_linking, decorations)
 
     add_reset_limits!(la)
 
@@ -304,17 +319,11 @@ function AbstractPlotting.plot!(
 end
 
 function align_to_bbox!(la::LayoutedAxis, bb::BBox)
-    la.bboxnode[] = bb
+    la.layoutnodes.suggestedbbox[] = bb
 end
 
-function protrusionnode(la::LayoutedAxis)
-    # work around the new optional protrusions
-    node = Node{Union{Nothing, RectSides{Float32}}}(la.protrusions[])
-    on(la.protrusions) do p
-        node[] = p
-    end
-    node
-end
+protrusionnode(la::LayoutedAxis) = la.layoutnodes.protrusions
+computedsizenode(la::LayoutedAxis) = la.layoutnodes.computedsize
 
 function bboxunion(bb1, bb2)
 
@@ -638,17 +647,11 @@ end
 
 
 function tight_yticklabel_spacing!(la::LayoutedAxis)
-    maxwidth = maximum(la.decorations[:yaxis].decorations[:ticklabels]) do yt
-        yt.visible[] ? boundingbox(yt).widths[1] : 0f0
-    end
-    la.yticklabelspace = maxwidth
+    tight_ticklabel_spacing!(la.decorations[:yaxis])
 end
 
 function tight_xticklabel_spacing!(la::LayoutedAxis)
-    maxheight = maximum(la.decorations[:xaxis].decorations[:ticklabels]) do xt
-        xt.visible[] ? boundingbox(xt).widths[2] : 0f0
-    end
-    la.xticklabelspace = maxheight
+    tight_ticklabel_spacing!(la.decorations[:xaxis])
 end
 
 function tight_ticklabel_spacing!(la::LayoutedAxis)

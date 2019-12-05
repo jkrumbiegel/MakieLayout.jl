@@ -52,7 +52,7 @@ begin
 
     maingl = GridLayout(2, 1, parent=scene, alignmode=Outside(40))
 
-    slalign = maingl[2, 1] = LayoutedSlider(scene, 30, LinRange(0.0, 150.0, 200))
+    slalign = maingl[2, 1] = LayoutedSlider(scene, height = 30, range = LinRange(0.0, 150.0, 200))
 
 
     gl = maingl[1, 1] = GridLayout(
@@ -63,7 +63,7 @@ begin
         addedcolgaps = Fixed(20),
         alignmode = Outside(0))
 
-    on(slalign.slider.value) do v
+    on(slalign.value) do v
         with_updates_suspended(maingl) do
             gl.addedrowgaps = [Fixed(v)]
             gl.addedcolgaps = [Fixed(v)]
@@ -81,14 +81,14 @@ begin
     gl_colorbar[1, 1] = la2
     # gl_colorbar[1, 2] = LayoutedColorbar(scene)
 
-    sl1 = gl_slider[2, 1] = LayoutedSlider(scene, 40, 1:0.01:10)
-    sl2 = gl_slider[3, 1] = LayoutedSlider(scene, 40, 0.1:0.01:1)
+    sl1 = gl_slider[2, 1] = LayoutedSlider(scene, height = 40, range = 1:0.01:10)
+    sl2 = gl_slider[3, 1] = LayoutedSlider(scene, height = 40, range = 0.1:0.01:1)
 
     xrange = LinRange(0, 2pi, 500)
     lines!(
         la2,
         xrange ./ 2pi .* 100,
-        lift((x, y)->sin.(xrange .* x) .* 40 .* y .+ 50, sl1.slider.value, sl2.slider.value),
+        lift((x, y)->sin.(xrange .* x) .* 40 .* y .+ 50, sl1.value, sl2.value),
         color=:blue, linewidth=2, show_axis=false)
 
     gl[2, :] = la1

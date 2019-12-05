@@ -1,29 +1,48 @@
 abstract type AbstractMouseState end
-struct MouseOut <: AbstractMouseState end
-struct MouseEnter <: AbstractMouseState end
-struct MouseOver <: AbstractMouseState end
-struct MouseLeave <: AbstractMouseState end
-struct MouseDown <: AbstractMouseState end
-struct MouseUp <: AbstractMouseState end
-struct MouseDragStart <: AbstractMouseState end
-struct MouseDrag <: AbstractMouseState end
-struct MouseDragStop <: AbstractMouseState end
-struct MouseClick <: AbstractMouseState end
-struct MouseDoubleclick <: AbstractMouseState end
 
 struct MouseState{T<:AbstractMouseState}
-    state::T
+    typ::T
     t::Float64
     pos::Point2f0
     tprev::Float64
     prev::Point2f0
 end
 
+mousestates = (:MouseOut, :MouseEnter, :MouseOver, :MouseLeave, :MouseDown,
+    :MouseUp, :MouseDragStart, :MouseDrag, :MouseDragStop,
+    :MouseClick, :MouseDoubleclick)
+    
+for statetype in mousestates
+    onfunctionname = Symbol("on" * lowercase(String(statetype)))
+    @eval begin
+        struct $statetype <: AbstractMouseState end
+
+        function $onfunctionname(f, statenode::Node{MouseState})
+            on(statenode) do state
+                if state.typ isa $statetype
+                    f(state)
+                end
+            end
+        end
+    end
+end
+# struct MouseOut <: AbstractMouseState end
+# struct MouseEnter <: AbstractMouseState end
+# struct MouseOver <: AbstractMouseState end
+# struct MouseLeave <: AbstractMouseState end
+# struct MouseDown <: AbstractMouseState end
+# struct MouseUp <: AbstractMouseState end
+# struct MouseDragStart <: AbstractMouseState end
+# struct MouseDrag <: AbstractMouseState end
+# struct MouseDragStop <: AbstractMouseState end
+# struct MouseClick <: AbstractMouseState end
+# struct MouseDoubleclick <: AbstractMouseState end
+
 function Base.show(io::IO, ms::MouseState{T}) where T
     print(io, "$T(t: $(ms.t), pos: $(ms.pos[1]), $(ms.pos[2]), tprev: $(ms.tprev), prev: $(ms.prev[1]), $(ms.prev[2]))")
 end
 
-function addmousestate!(scene, element)
+function addmousestate!(scene, elements...)
 
     Mouse = AbstractPlotting.Mouse
 
@@ -52,7 +71,7 @@ function addmousestate!(scene, element)
                 mousestate[] = MouseState(MouseUp(), t, pos, tprev[], prev[])
                 mouse_downed_inside[] = false
                 # check after drag is over if we're also outside of the element now
-                if !mouseover(scene, element)
+                if !mouseover(scene, elements...)
                     mousestate[] = MouseState(MouseLeave(), t, pos, tprev[], prev[])
                     mousestate[] = MouseState(MouseOut(), t, pos, tprev[], prev[])
                     mouse_was_inside[] = false
@@ -63,7 +82,7 @@ function addmousestate!(scene, element)
             end
         # no dragging already ongoing
         else
-            if mouseover(scene, element)
+            if mouseover(scene, elements...)
                 # guard against mouse coming in from outside when pressed
                 if !mouse_was_inside[] && dragstate != Mouse.pressed
                     mousestate[] = MouseState(MouseEnter(), t, pos, tprev[], prev[])

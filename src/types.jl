@@ -1,5 +1,7 @@
 const BBox = Rect2D{Float32}
 
+const Optional{T} = Union{Nothing, T}
+
 struct RectSides{T<:Real}
     left::T
     right::T
@@ -18,6 +20,9 @@ struct TopLeft <: Side end
 struct TopRight <: Side end
 struct BottomLeft <: Side end
 struct BottomRight <: Side end
+
+struct Inner <: Side end
+struct Outer <: Side end
 
 abstract type GridDir end
 struct Col <: GridDir end
@@ -48,6 +53,7 @@ a grid via its span.
 struct SpannedLayout{T <: AbstractLayout}
     al::T
     sp::Span
+    side::Side
 end
 
 abstract type AlignMode end
@@ -164,11 +170,6 @@ struct SolvedGridLayout <: AbstractLayout
     grid::RowCols{Vector{Float64}}
 end
 
-struct SolvedProtrusionLayout{T} <: AbstractLayout
-    bbox::BBox
-    content::T
-end
-
 struct AxisAspect
     aspect::Float32
 end
@@ -177,23 +178,13 @@ struct DataAspect end
 
 mutable struct ProtrusionLayout{T} <: AbstractLayout
     parent::Union{Nothing, GridLayout}
-    protrusions::Node{Union{Nothing, RectSides{Float32}}}
-    widthnode::Node{Union{Nothing, Float32}}
-    heightnode::Node{Union{Nothing, Float32}}
+    protrusions::Node{RectSides{Float32}}
+    computedsize::Node{NTuple{2, Optional{Float32}}}
     needs_update::Node{Bool}
     content::T
 end
 
-mutable struct ProtrusionContentLayout{T} <: AbstractLayout
-    parent::Union{Nothing, GridLayout}
-    widthnode::Node{Union{Nothing, Float32}}
-    heightnode::Node{Union{Nothing, Float32}}
-    side::Side
-    needs_update::Node{Bool}
-    content::T
-end
-
-struct SolvedProtrusionContentLayout{T} <: AbstractLayout
+struct SolvedProtrusionLayout{T} <: AbstractLayout
     bbox::BBox
     content::T
 end
@@ -224,15 +215,21 @@ mutable struct LineAxis
     ticklabels::Node{Vector{String}}
 end
 
+struct LayoutNodes
+    suggestedbbox::Node{BBox}
+    protrusions::Node{RectSides{Float32}}
+    computedsize::Node{NTuple{2, Optional{Float32}}}
+    computedbbox::Node{BBox}
+end
+
 mutable struct LayoutedAxis <: AbstractPlotting.AbstractScene
     parent::Scene
     scene::Scene
     plots::Vector{AxisContent}
     xaxislinks::Vector{LayoutedAxis}
     yaxislinks::Vector{LayoutedAxis}
-    bboxnode::Node{BBox}
     limits::Node{BBox}
-    protrusions::Node{RectSides{Float32}}
+    layoutnodes::LayoutNodes
     needs_update::Node{Bool}
     attributes::Attributes
     block_limit_linking::Node{Bool}
@@ -242,43 +239,35 @@ end
 mutable struct LayoutedColorbar
     parent::Scene
     scene::Scene
-    bboxnode::Node{BBox}
-    protrusions::Node{RectSides{Float32}}
-    needs_update::Node{Bool}
+    layoutnodes::LayoutNodes
     attributes::Attributes
     decorations::Dict{Symbol, Any}
 end
 
 mutable struct LayoutedText
     parent::Scene
-    bboxnode::Node{BBox}
-    height::Node{Float32}
-    width::Node{Float32}
+    layoutnodes::LayoutNodes
     text::AbstractPlotting.Text
     attributes::Attributes
 end
 
 mutable struct LayoutedRect
     parent::Scene
-    bboxnode::Node{BBox}
-    height::Node{Union{Nothing, Float32}}
-    width::Node{Union{Nothing, Float32}}
+    layoutnodes::LayoutNodes
     rect::AbstractPlotting.Poly
     attributes::Attributes
 end
 
 struct LayoutedSlider
     scene::Scene
-    bboxnode::Node{BBox}
-    height::Node{Union{Nothing, Float32}}
-    slider::Slider
+    layoutnodes::LayoutNodes
+    attributes::Attributes
+    decorations::Dict{Symbol, Any}
 end
 
 struct LayoutedButton
     scene::Scene
-    bboxnode::Node{BBox}
-    width::Node{Union{Nothing, Float32}}
-    height::Node{Union{Nothing, Float32}}
-    button::Button
+    layoutnodes::LayoutNodes
     attributes::Attributes
+    decorations::Dict{Symbol, Any}
 end

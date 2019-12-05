@@ -18,18 +18,18 @@ begin
     gridgl[2, 1] = LayoutedRect(scene, color=:red)
 
     gridgl[2, 2] = LayoutedAxis(scene)
-    gridgl[2, 2, :top] = LayoutedRect(scene, height=40, strokevisible=false)
-    gridgl[2, 2, :left] = LayoutedRect(scene, strokevisible=false)
-    gridgl[2, 2, :bottom] = LayoutedRect(scene, strokevisible=false)
+    gridgl[2, 2, Top()] = LayoutedRect(scene, height=40, strokevisible=false)
+    gridgl[2, 2, Left()] = LayoutedRect(scene, strokevisible=false)
+    gridgl[2, 2, Bottom()] = LayoutedRect(scene, strokevisible=false)
 
     slgl = gridgl[3, :] = GridLayout(1, 1)
-    sl = slgl[1, 1] = LayoutedSlider(scene, 40, 0:100)
-    but = slgl[1, 2] = LayoutedButton(scene, width=200, label="Hello")
+    sl = slgl[1, 1] = LayoutedSlider(scene, height = 40, range = 0:100)
+    but = slgl[1, 2] = LayoutedButton(scene, label="Hello")
 
-    sl2 = slgl[2, 1] = LayoutedSlider(scene, 40, 0:100)
-    but2 = slgl[2, 2] = LayoutedButton(scene, width=300, label="Hello Hello")
+    sl2 = slgl[2, 1] = LayoutedSlider(scene, height = 40, range = 0:100)
+    but2 = slgl[2, 2] = LayoutedButton(scene, label="Hello Hello")
 
-    on(sl.slider.value) do val
+    on(sl.value) do val
         r1.attributes.strokewidth = val
     end
     nothing

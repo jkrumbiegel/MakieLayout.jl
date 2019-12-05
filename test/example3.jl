@@ -29,31 +29,19 @@ las[1, 3].attributes.aspect = nothing
 
 begin
     subgl = nest_content_into_gridlayout!(maingl, 1, 1)
-    cb1 = subgl[:, 2] = LayoutedColorbar(scene, height=Relative(0.66))
-    subgl.colsizes[2] = Relative(0.1)
-    maingl.needs_update[] = true
-
+    cb1 = subgl[:, 2] = LayoutedColorbar(scene, width=30, height=Relative(0.66))
     sleep(0.5)
 
     subgl2 = nest_content_into_gridlayout!(maingl, 1:2, 1:2)
-    cb2 = subgl2[:, 3] = LayoutedColorbar(scene, height=Relative(0.66))
-    subgl2.colsizes[3] = Relative(0.1)
-    maingl.needs_update[] = true
-
+    cb2 = subgl2[:, 3] = LayoutedColorbar(scene, width=30, height=Relative(0.66))
     sleep(0.5)
 
     subgl3 = nest_content_into_gridlayout!(maingl, 1:3, 1:3)
-    cb3 = subgl3[:, 4] = LayoutedColorbar(scene, height=Relative(0.66))
-    subgl3.colsizes[4] = Relative(0.1)
-    maingl.needs_update[] = true
-
+    cb3 = subgl3[:, 4] = LayoutedColorbar(scene, width=30, height=Relative(0.66))
     sleep(0.5)
 
     subgl4 = nest_content_into_gridlayout!(maingl, 1:4, 1:4)
-    cb4 = subgl4[:, 5] = LayoutedColorbar(scene, height=Relative(0.66))
-    subgl4.colsizes[5] = Relative(0.1)
-    maingl.needs_update[] = true
-
+    cb4 = subgl4[:, 5] = LayoutedColorbar(scene, width=30, height=Relative(0.66))
     sleep(0.5)
 
 end

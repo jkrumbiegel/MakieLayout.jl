@@ -33,7 +33,7 @@ end
 
 function dynamicfunc!(la::LayoutedAxis, func; n=nothing, kwargs...)
 
-    points = lift(la.limits, la.bboxnode) do lims, bbox
+    points = lift(la.limits, la.layoutnodes.computedbbox) do lims, bbox
 
         if isnothing(n)
             xwidth = width(bbox)

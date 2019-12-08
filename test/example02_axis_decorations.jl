@@ -44,142 +44,138 @@ begin
     but = glside[1, 1] = LButton(scene, width = 200, height = 50, label = "Toggle Titles")
     on(but.clicks) do c
         for la in las
-            la.attributes.titlevisible[] = !la.attributes.titlevisible[]
+            la.titlevisible[] = !la.titlevisible[]
         end
     end
 
     but2 = glside[2, 1] = LButton(scene, width = 200, height = 50, label = "Toggle Labels")
     on(but2.clicks) do c
         for la in las
-            la.attributes.xlabelvisible[] = !la.attributes.xlabelvisible[]
-            la.attributes.ylabelvisible[] = !la.attributes.ylabelvisible[]
+            la.xlabelvisible[] = !la.xlabelvisible[]
+            la.ylabelvisible[] = !la.ylabelvisible[]
         end
     end
 
     but3 = glside[3, 1] = LButton(scene, width = 200, height = 50, label = "Toggle Ticklabels")
     on(but3.clicks) do c
         for la in las
-            la.attributes.xticklabelsvisible[] = !la.attributes.xticklabelsvisible[]
-            la.attributes.yticklabelsvisible[] = !la.attributes.yticklabelsvisible[]
+            la.xticklabelsvisible[] = !la.xticklabelsvisible[]
+            la.yticklabelsvisible[] = !la.yticklabelsvisible[]
         end
     end
 
     but4 = glside[4, 1] = LButton(scene, width = 200, height = 50, label = "Toggle Ticks")
     on(but4.clicks) do c
-        t1 = time()
         with_updates_suspended(maingl) do
             for la in las
-                la.attributes.xticksvisible[] = !la.attributes.xticksvisible[]
-                la.attributes.yticksvisible[] = !la.attributes.yticksvisible[]
+                la.xticksvisible[] = !la.xticksvisible[]
+                la.yticksvisible[] = !la.yticksvisible[]
             end
         end
-        println(time() - t1)
     end
 
     but5 = glside[5, 1] = LButton(scene, width = 200, height = 50, label = "Toggle Tick Align")
     on(but5.clicks) do c
-        t1 = time()
         maingl.block_updates = true
         for la in las
-            la.attributes.xtickalign[] = la.attributes.xtickalign[] == 1 ? 0 : 1
-            la.attributes.ytickalign[] = la.attributes.ytickalign[] == 1 ? 0 : 1
+            la.xtickalign[] = la.xtickalign[] == 1 ? 0 : 1
+            la.ytickalign[] = la.ytickalign[] == 1 ? 0 : 1
         end
         maingl.block_updates = true
         maingl.needs_update[] = true
-        println(time() - t1)
     end
 
     but6 = glside[6, 1] = LButton(scene, width = 200, height = 50, label = "Toggle Grids")
     on(but6.clicks) do c
         for la in las
-            la.attributes.xgridvisible[] = !la.attributes.xgridvisible[]
-            la.attributes.ygridvisible[] = !la.attributes.ygridvisible[]
+            la.xgridvisible[] = !la.xgridvisible[]
+            la.ygridvisible[] = !la.ygridvisible[]
         end
     end
 
     but7 = glside[7, 1] = LButton(scene, width = 200, height = 50, label = "Toggle Spines")
     on(but7.clicks) do c
         for la in las
-            la.attributes.topspinevisible[] = !la.attributes.topspinevisible[]
-            la.attributes.leftspinevisible[] = !la.attributes.leftspinevisible[]
-            la.attributes.bottomspinevisible[] = !la.attributes.bottomspinevisible[]
-            la.attributes.rightspinevisible[] = !la.attributes.rightspinevisible[]
+            la.xspinevisible[] = !la.xspinevisible[]
+            la.yspinevisible[] = !la.yspinevisible[]
+            la.xoppositespinevisible[] = !la.xoppositespinevisible[]
+            la.yoppositespinevisible[] = !la.yoppositespinevisible[]
         end
     end
 end
 
-map(la -> la.attributes.xticklabelpad = 5, las)
-map(la -> la.attributes.xlabelpadding = 0, las)
-map(la -> la.attributes.spinewidth = 1, las)
-map(la -> la.attributes.xticklabelrotation = pi/2, las)
-map(la -> la.attributes.xticklabelalign = (:right, :center), las)
-map(la -> la.attributes.xticklabelspace = 50, las)
+map(la -> la.xticklabelpad = 5, las)
+map(la -> la.xlabelpadding = 0, las)
+map(la -> la.spinewidth = 1, las)
+map(la -> la.xticklabelrotation = pi/2, las)
+map(la -> la.xticklabelalign = (:right, :center), las)
+map(la -> la.xticklabelspace = 50, las)
 
 
 begin
     begin
         for i in 1:9
-            las[i].attributes.ylabelvisible[] = false
-            las[i].attributes.xlabelvisible[] = false
+            las[i].ylabelvisible[] = false
+            las[i].xlabelvisible[] = false
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].attributes.yticklabelsvisible[] = false
-            las[i].attributes.xticklabelsvisible[] = false
+            las[i].yticklabelsvisible[] = false
+            las[i].xticklabelsvisible[] = false
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].attributes.titlevisible[] = false
+            las[i].titlevisible[] = false
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].attributes.ylabelvisible[] = true
-            las[i].attributes.xlabelvisible[] = true
+            las[i].ylabelvisible[] = true
+            las[i].xlabelvisible[] = true
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].attributes.yticklabelsvisible[] = true
-            las[i].attributes.xticklabelsvisible[] = true
+            las[i].yticklabelsvisible[] = true
+            las[i].xticklabelsvisible[] = true
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].attributes.titlevisible[] = true
+            las[i].titlevisible[] = true
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].attributes.title[] = "Big\nTitle"
-            las[i].attributes.ylabel[] = "Big\ny label"
-            las[i].attributes.xlabel[] = "Big\nx label"
+            las[i].title[] = "Big\nTitle"
+            las[i].ylabel[] = "Big\ny label"
+            las[i].xlabel[] = "Big\nx label"
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].attributes.title[] = "Title"
-            las[i].attributes.ylabel[] = "y label"
-            las[i].attributes.xlabel[] = "x label"
+            las[i].title[] = "Title"
+            las[i].ylabel[] = "y label"
+            las[i].xlabel[] = "x label"
             sleep(0.05)
         end
     end
     begin
         for i in 1:9
-            las[i].attributes.ylabelsize[] = 30
-            las[i].attributes.xlabelsize[] = 30
-            las[i].attributes.yticklabelsize[] = 30
-            las[i].attributes.xticklabelsize[] = 30
+            las[i].ylabelsize[] = 30
+            las[i].xlabelsize[] = 30
+            las[i].yticklabelsize[] = 30
+            las[i].xticklabelsize[] = 30
             sleep(0.05)
         end
 
         for i in 1:9
-            las[i].attributes.ylabelsize[] = 20
-            las[i].attributes.xlabelsize[] = 20
-            las[i].attributes.yticklabelsize[] = 20
-            las[i].attributes.xticklabelsize[] = 20
+            las[i].ylabelsize[] = 20
+            las[i].xlabelsize[] = 20
+            las[i].yticklabelsize[] = 20
+            las[i].xticklabelsize[] = 20
             sleep(0.05)
         end
     end

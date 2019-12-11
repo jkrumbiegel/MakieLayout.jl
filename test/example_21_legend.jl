@@ -14,15 +14,15 @@ begin
 
     nlines = 10
     xs = 1:0.1:10
-    linearr = [lines!(ax, xs, sin.(xs .+ i/3) .* 5, color = col)
+    linearr = [lines!(ax, xs, sin.(xs .+ i/3) .* 5, color = col, linestyle = :dash)
         for (i, col) in enumerate(LCHuv.(50, 80, LinRange(0, 360, nlines + 1)[1:end-1]))]
 
     xs2 = 1:0.5:10
-    scatarr = [scatter!(ax, xs2, sin.(xs2 .+ i/3) .* 5, color = col, marker = rand(('◀', '■', :circle, :cross, :x)))
+    scatarr = [scatter!(ax, xs2, sin.(xs2 .+ i/3) .* 5, color = col, strokewidth=5, marker = rand(('◀', '■', :circle, :cross, :x)))
         for (i, col) in enumerate(LCHuv.(50, 80, LinRange(0, 360, nlines + 1)[1:end-1]))]
 
 
-    ll = g[1, 2] = LLegend(scene)
+    ll = g[1, 1] = LLegend(scene)
 
     sg = g[2, :] = GridLayout()
 
@@ -58,8 +58,34 @@ begin
     nothing
 end
 
-ll.titlesize = 30
-ll.entries[][1].labelsize = 30
+g[1, 2] = ll
+lg = gridnest!(g, 1, 2)
+ll2 = lg[2, 1] = LLegend(scene)
+ll2.valign = :top
+
+rowsize!(lg, 1, Auto(true))
+
+ll2.entries[] = LegendEntry.(["Size $i" for i in 1:5:30], [MarkerElement(color = :black, markersize = i, marker = '⚫', strokecolor = :transparent) for i in 1:5:30])
+
+
+ll.entries[] = [ll.entries[];
+    MakieLayout.LegendEntry(
+        MakieLayout.LegendElement[
+            MakieLayout.LineElement(; color = :green, linestyle = :dot)], Attributes(label = "Blibli"))]
+
+ll.title = "Long\ntitle"
+ll.entries[] = LegendEntry.(["Line $i" for i in 1:length(linearr)], linearr, scatarr)
+
+linearr[1].color = :black
+ll.bgcolor = :gray
+ll.halign = :left
+ll.valign = :top
+ll.margin = (10, 10, 10, 10)
+
+ll.strokecolor = :transparent
+ll.patchcolor = :white
+ll.titlesize = 24
+ll.entries[][1].labelsize = 20
 ll.entries[][1].labelcolor = :red
 ll.labelcolor = :black
 ll.entries[][1].label = "whoopdeedoo"
@@ -70,8 +96,6 @@ ll.labelvalign = :center
 ll.patchlabelgap = 5
 ll.rowgap = 5
 ll.colgap = 10
-ll.valign = :center
-ll.margin = (10, 10, 10, 10)
 ll.markerpoints = Point2f0.([0.2, 0.5, 0.8], [0.2, 0.5, 0.8])
 ll.linepoints = [Point2f0(0, 0), Point2f0(1, 1)]
 ll.entries[][1].linepoints = Point2f0.(LinRange(0, 1, 40), sin.(LinRange(0, 2pi, 40)) .* 0.5 .+ 0.5)

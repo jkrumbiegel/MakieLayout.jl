@@ -48,7 +48,7 @@ begin
         i_randline = rand(1:length(linearr))
         ll.entries[] = [
             ll.entries[];
-            LegendEntry("Line $i_randline", AbstractPlot[linearr[i_randline], scatarr[i_randline]])
+            LegendEntry("Line $i_randline", linearr[i_randline], scatarr[i_randline])
         ]
     end
     on(delbutton.clicks) do c
@@ -58,14 +58,23 @@ begin
     nothing
 end
 
-ll.entries[][1].attributes.labelsize = 30
-ll.labelsize = 40
+ll.titlesize = 30
+ll.entries[][1].labelsize = 30
+ll.entries[][1].labelcolor = :red
+ll.labelcolor = :black
+ll.entries[][1].label = "whoopdeedoo"
+ll.labelsize = 18
+ll.patchsize = (40, 40)
 ll.labelhalign = :left
 ll.labelvalign = :center
 ll.patchlabelgap = 5
-ll.rowgap = 10
+ll.rowgap = 5
+ll.colgap = 10
 ll.valign = :center
 ll.margin = (10, 10, 10, 10)
+ll.markerpoints = Point2f0.([0.2, 0.5, 0.8], [0.2, 0.5, 0.8])
+ll.linepoints = [Point2f0(0, 0), Point2f0(1, 1)]
+ll.entries[][1].linepoints = Point2f0.(LinRange(0, 1, 40), sin.(LinRange(0, 2pi, 40)) .* 0.5 .+ 0.5)
 
 ll.entries[] = reverse(ll.entries[])
 using Random
@@ -82,3 +91,5 @@ translate!(ll.scene, 0, 0, 10)
 linearr[2].color = :red
 scatarr[2].color = :red
 scatarr[2].marker = 'm'
+
+@macroexpand @lift($nodes[1])

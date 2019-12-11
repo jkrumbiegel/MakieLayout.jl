@@ -1,5 +1,6 @@
 using MakieLayout
 using Makie
+using Colors
 
 begin
     scene = Scene(camera = campixel!)
@@ -9,7 +10,17 @@ begin
 
     rowsize!(g, 1, Auto(false))
     colsize!(g, 1, Auto(false))
-    g[1, 1] = LAxis(scene)
+    ax = g[1, 1] = LAxis(scene)
+
+    nlines = 10
+    xs = 1:0.1:10
+    linearr = [lines!(ax, xs, sin.(xs .+ i/3), color = col)
+        for (i, col) in enumerate(LCHuv.(50, 80, LinRange(0, 360, nlines + 1)[1:end-1]))]
+
+    xs2 = 1:0.5:10
+    scatarr = [scatter!(ax, xs2, sin.(xs2 .+ i/3), color = col, marker = rand(('◀', '■', :circle, :cross, :x)))
+        for (i, col) in enumerate(LCHuv.(50, 80, LinRange(0, 360, nlines + 1)[1:end-1]))]
+
 
     ll = g[1, 2] = LLegend(scene, halign=:left, valign=:top)
 
@@ -27,24 +38,34 @@ begin
     patchslider_v = sg[3, 2] = LSlider(scene, range=10:80, height=30)
     on(patchslider_v.value) do v; ll.patchsize = Base.setindex(ll.patchsize[], v, 2); end;
 
-    addbutton = sg[4, :] = LButton(scene, label = "Add legend entry",
+    bg = sg[4, :] = GridLayout()
+    addbutton = bg[1, 1] = LButton(scene, label = "Add legend entry",
+        height = Auto())
+    delbutton = bg[1, 2] = LButton(scene, label = "Remove legend entry",
         height = Auto())
 
     on(addbutton.clicks) do c
+        i_randline = rand(1:length(linearr))
         ll.entries[] = [
             ll.entries[];
-            LegendEntry("entry $(length(ll.entries[]) + 1)", [])
+            LegendEntry("Line $i_randline", AbstractPlot[linearr[i_randline], scatarr[i_randline]])
         ]
+    end
+    on(delbutton.clicks) do c
+        ll.entries[] = ll.entries[][1:end-1];
     end
 
     nothing
 end
 
-
-ll.labelsize = 20
+ll.entries[][1].attributes.labelsize = 30
+ll.labelsize = 40
 ll.labelhalign = :left
+ll.labelvalign = :center
 ll.patchlabelgap = 5
 ll.rowgap = 10
+ll.valign = :center
+ll.margin = (10, 10, 10, 10)
 
 ll.entries[] = reverse(ll.entries[])
 using Random

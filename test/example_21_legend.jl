@@ -14,15 +14,15 @@ begin
 
     nlines = 10
     xs = 1:0.1:10
-    linearr = [lines!(ax, xs, sin.(xs .+ i/3), color = col)
+    linearr = [lines!(ax, xs, sin.(xs .+ i/3) .* 5, color = col)
         for (i, col) in enumerate(LCHuv.(50, 80, LinRange(0, 360, nlines + 1)[1:end-1]))]
 
     xs2 = 1:0.5:10
-    scatarr = [scatter!(ax, xs2, sin.(xs2 .+ i/3), color = col, marker = rand(('◀', '■', :circle, :cross, :x)))
+    scatarr = [scatter!(ax, xs2, sin.(xs2 .+ i/3) .* 5, color = col, marker = rand(('◀', '■', :circle, :cross, :x)))
         for (i, col) in enumerate(LCHuv.(50, 80, LinRange(0, 360, nlines + 1)[1:end-1]))]
 
 
-    ll = g[1, 2] = LLegend(scene, halign=:left, valign=:top)
+    ll = g[1, 2] = LLegend(scene)
 
     sg = g[2, :] = GridLayout()
 
@@ -75,6 +75,10 @@ scene
 ll.patchsize = 60
 ll.halign = rand(setdiff([:left, :center, :right], [ll.halign[]]))
 ll.valign = rand(setdiff([:bottom, :center, :top], [ll.valign[]]))
-ll.margin = rand(4) .* 40
+ll.margin = rand(4) .* 0
 
 translate!(ll.scene, 0, 0, 10)
+
+linearr[2].color = :red
+scatarr[2].color = :red
+scatarr[2].marker = 'm'

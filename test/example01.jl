@@ -17,7 +17,7 @@ function kdepoly!(la::LAxis, vec, reverse=false; kwargs...)
 end
 
 begin
-    scene = Scene(resolution = (1000, 1000), font="SF Hello");
+    scene = Scene(resolution = (1000, 1000));
     screen = display(scene)
     campixel!(scene);
 

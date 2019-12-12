@@ -108,7 +108,8 @@ function LColorbar(parent::Scene; bbox = nothing, kwargs...)
         ticklabelsize = ticklabelsize, ticklabelsvisible = ticklabelsvisible, ticksize = ticksize,
         ticksvisible = ticksvisible, ticklabelpad = ticklabelpad, tickalign = tickalign,
         tickwidth = tickwidth, tickcolor = tickcolor, spinewidth = spinewidth,
-        idealtickdistance = idealtickdistance, ticklabelspace = ticklabelspace)
+        idealtickdistance = idealtickdistance, ticklabelspace = ticklabelspace,
+        spinecolor = :transparent, spinevisible = :false)
     decorations[:axis] = axis
 
     protrusions = lift(axis.protrusion, vertical, flipaxisposition) do axprotrusion,
@@ -140,15 +141,6 @@ function LColorbar(parent::Scene; bbox = nothing, kwargs...)
     suggestedbbox[] = suggestedbbox[]
 
     LColorbar(parent, scene, layoutnodes, attrs, decorations)
-end
-
-defaultlayout(lc::LColorbar) = ProtrusionLayout(lc)
-
-computedsizenode(lc::LColorbar) = lc.layoutnodes.computedsize
-protrusionnode(lc::LColorbar) = lc.layoutnodes.protrusions
-
-function align_to_bbox!(lc::LColorbar, bbox)
-    lc.layoutnodes.suggestedbbox[] = bbox
 end
 
 function tight_ticklabel_spacing!(lc::LColorbar)

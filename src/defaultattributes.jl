@@ -243,3 +243,61 @@ function default_attributes(::Type{LToggle})
         rimfraction = 0.25,
     )
 end
+
+
+function default_attributes(::Type{LLegend})
+    Attributes(
+        halign = :center,
+        valign = :center,
+        width = Auto(),
+        height = Auto(),
+        title = "Legend",
+        titlefont = "Dejavu Sans",
+        titlesize = 20f0,
+        titlealign = :center,
+        labelsize = 20f0,
+        labelfont = "Dejavu Sans",
+        labelcolor = :black,
+        labelhalign = :left,
+        labelvalign = :center,
+        padding = (10f0, 10f0, 10f0, 10f0),
+        margin = (0f0, 0f0, 0f0, 0f0),
+        bgcolor = :white,
+        strokecolor = :black,
+        strokewidth = 1f0,
+        patchsize = (40f0, 40f0),
+        patchstrokecolor = :transparent,
+        patchstrokewidth = 1f0,
+        patchcolor = RGBf0(0.97, 0.97, 0.97),
+        label = "undefined",
+        ncols = 1,
+        colgap = 20,
+        rowgap = 4,
+        patchlabelgap = 5,
+        linepoints = [Point2f0(0, 0.5), Point2f0(1, 0.5)],
+        linewidth = 3,
+        markerpoints = [Point2f0(0.5, 0.5)],
+        markersize = 16,
+        markerstrokewidth = 2,
+        polypoints = [Point2f0(0.2, 0.2), Point2f0(0.8, 0.2), Point2f0(0.8, 0.8), Point2f0(0.2, 0.8)],
+        polystrokewidth = 2,
+    )
+end
+
+
+function attributenames(::Type{LegendEntry})
+    (:label, :labelsize, :labelfont, :labelcolor, :labelhalign, :labelvalign,
+        :patchsize, :patchstrokecolor, :patchstrokewidth, :patchcolor,
+        :linepoints, :markerpoints, :markersize, :markerstrokewidth, :linewidth,
+        :polypoints, :polystrokewidth)
+end
+
+function extractattributes(attributes::Attributes, typ::Type)
+    extracted = Attributes()
+    for name in attributenames(typ)
+        if haskey(attributes, name)
+            extracted[name] = attributes[name]
+        end
+    end
+    extracted
+end

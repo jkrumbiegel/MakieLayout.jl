@@ -7,8 +7,7 @@ begin
     campixel!(scene);
 
     maingl = GridLayout(
-        1, 1;
-        parent = scene,
+        scene;
         alignmode = Outside(30, 30, 30, 30)
     )
 

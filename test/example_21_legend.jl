@@ -22,7 +22,7 @@ begin
         for (i, col) in enumerate(LCHuv.(50, 80, LinRange(0, 360, nlines + 1)[1:end-1]))]
 
 
-    ll = g[1, 1] = LLegend(scene)
+    ll = g[1, 2] = LLegend(scene)
 
     sg = g[2, :] = GridLayout()
 

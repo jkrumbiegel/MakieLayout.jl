@@ -10,11 +10,10 @@ begin
     ncols = 1
 
     maingl = GridLayout(
-        nrows, ncols,
-        parent = scene,
+        scene, nrows, ncols,
         colsizes = Auto(false, 1),
         rowsizes = Auto(false, 1),
-        alignmode = Outside(30, 30, 30, 30))
+        alignmode = Outside(30))
 
     las = [maingl[i, j] = LAxis(scene) for i in 1:nrows, j in 1:ncols]
 

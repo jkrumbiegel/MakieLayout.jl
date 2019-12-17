@@ -28,7 +28,7 @@ begin
     linkxaxes!(la1, la2)
     linkyaxes!(la1, la3)
 
-    maingl = GridLayout(1, 1, parent=scene, alignmode=Outside(40), colsizes=Relative(1))
+    maingl = GridLayout(scene, 1, 1, alignmode=Outside(40), colsizes=Relative(1))
 
     gl2 = maingl[1, 1] = GridLayout(
         2, 2,

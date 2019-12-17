@@ -6,10 +6,7 @@ begin
     screen = display(scene)
     campixel!(scene);
 
-    maingl = GridLayout(
-        scene;
-        alignmode = Outside(30, 30, 30, 30)
-    )
+    maingl = GridLayout(scene, alignmode = Outside(30))
 
     las = Array{LAxis, 2}(undef, 4, 4)
 

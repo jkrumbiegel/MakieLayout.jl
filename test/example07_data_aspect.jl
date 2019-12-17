@@ -9,11 +9,8 @@ begin
     nrows = 2
     ncols = 2
 
-    maingl = GridLayout(
-        nrows, ncols;
-        parent = scene,
-        alignmode = Outside(30, 30, 30, 30)
-    )
+    maingl = GridLayout(scene, nrows, ncols, alignmode = Outside(30))
+
 
     axes = [
         maingl[i, j] = LAxis(

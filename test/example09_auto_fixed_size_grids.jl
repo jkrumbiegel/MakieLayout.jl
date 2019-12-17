@@ -6,18 +6,15 @@ begin
     screen = display(scene)
     campixel!(scene);
 
-    maingl = GridLayout(
-        1, 3;
+    maingl = GridLayout(scene, 1, 3;
         addedcolgaps = Fixed(0),
-        rowsizes = Relative(1),
-        parent = scene,
-        alignmode = Outside(30, 30, 30, 30)
+        alignmode = Outside(30)
     )
 
     maingl[1, 2] = LAxis(scene)
     maingl[1, 3] = LAxis(scene)
 
-    guigl = maingl[1, 1] = GridLayout(1, 3)
+    guigl = maingl[1, 1] = GridLayout(1, 3; height=Auto(false))
 
     # guigl[1, 1] = LButton(scene, 100, 30, "button")
     guigl[1, 1] = LText(scene, text="HelloWorld", halign=:left)

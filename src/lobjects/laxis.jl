@@ -29,9 +29,11 @@ function LAxis(parent::Scene; bbox = nothing, kwargs...)
 
     suggestedbbox = create_suggested_bboxnode(bbox)
 
-    computedsize = computedsizenode!(sizeattrs)
+    autosizenode = Node{NTuple{2, Optional{Float32}}}((nothing, nothing))
 
-    finalbbox = alignedbboxnode!(suggestedbbox, computedsize, alignment, sizeattrs)
+    computedsize = computedsizenode!(sizeattrs, autosizenode)
+
+    finalbbox = alignedbboxnode!(suggestedbbox, computedsize, alignment, sizeattrs, autosizenode)
 
     limits = Node(FRect(0, 0, 100, 100))
 
@@ -115,7 +117,7 @@ function LAxis(parent::Scene; bbox = nothing, kwargs...)
         labelpadding = xlabelpadding, ticklabelpad = xticklabelpad, labelvisible = xlabelvisible,
         label = xlabel, labelcolor = xlabelcolor, tickalign = xtickalign,
         ticklabelspace = xticklabelspace, ticks = xticks, ticklabelsvisible = xticklabelsvisible,
-        ticksvisible = yticksvisible, spinevisible = xspinevisible, spinecolor = xspinecolor)
+        ticksvisible = xticksvisible, spinevisible = xspinevisible, spinecolor = xspinecolor)
     decorations[:xaxis] = xaxis
 
     yaxis  =  LineAxis(parent, endpoints = yaxis_endpoints, limits = lift(ylimits, limits),
@@ -249,7 +251,7 @@ function LAxis(parent::Scene; bbox = nothing, kwargs...)
     # layout
     suggestedbbox[] = suggestedbbox[]
 
-    layoutnodes = LayoutNodes(suggestedbbox, protrusions, computedsize, finalbbox)
+    layoutnodes = LayoutNodes{LAxis, GridLayout}(suggestedbbox, protrusions, computedsize, autosizenode, finalbbox, nothing)
 
     la = LAxis(parent, scene, plots, xaxislinks, yaxislinks, limits,
         layoutnodes, needs_update, attrs, block_limit_linking, decorations)

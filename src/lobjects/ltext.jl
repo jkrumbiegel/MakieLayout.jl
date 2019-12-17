@@ -12,7 +12,7 @@ function LText(parent::Scene; bbox = nothing, kwargs...)
 
     alignment = lift(tuple, halign, valign)
 
-    autosizenode = Node((0f0, 0f0))
+    autosizenode = Node{NTuple{2, Optional{Float32}}}((nothing, nothing))
 
     computedsize = computedsizenode!(sizeattrs, autosizenode)
 
@@ -24,7 +24,7 @@ function LText(parent::Scene; bbox = nothing, kwargs...)
     textpos = Node(Point3f0(0, 0, 0))
 
     t = text!(parent, text, position = textpos, textsize = textsize, font = font, color = color,
-        visible = visible, align = (:center, :center), rotation = rotation)[end]
+        visible = visible, align = (:center, :center), rotation = rotation, raw = true)[end]
 
     textbb = BBox(0, 1, 0, 1)
 
@@ -75,7 +75,7 @@ function LText(parent::Scene; bbox = nothing, kwargs...)
     # text has no protrusions
     protrusions = Node(RectSides(0f0, 0f0, 0f0, 0f0))
 
-    layoutnodes = LayoutNodes(suggestedbbox, protrusions, computedsize, finalbbox)
+    layoutnodes = LayoutNodes{LText, GridLayout}(suggestedbbox, protrusions, computedsize, autosizenode, finalbbox, nothing)
 
     # trigger first update, otherwise bounds are wrong somehow
     text[] = text[]
@@ -118,10 +118,15 @@ function Base.propertynames(lt::LText)
 end
 
 function Base.delete!(lt::LText)
+
+    disconnect_layoutnodes!(lt.layoutnodes.gridcontent)
+    remove_from_gridlayout!(lt.layoutnodes.gridcontent)
+    empty!(lt.layoutnodes.suggestedbbox.listeners)
+    empty!(lt.layoutnodes.computedbbox.listeners)
+    empty!(lt.layoutnodes.computedsize.listeners)
+    empty!(lt.layoutnodes.autosize.listeners)
+    empty!(lt.layoutnodes.protrusions.listeners)
+
     # remove the plot object from the scene
     delete!(lt.parent, lt.text)
-    # remove all layout node callbacks
-    for f in fieldnames(LayoutNodes)
-        empty!(getfield(lt.layoutnodes, f).listeners)
-    end
 end

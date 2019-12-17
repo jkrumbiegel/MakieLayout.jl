@@ -6,11 +6,7 @@ begin
     screen = display(scene)
     campixel!(scene);
 
-    maingl = GridLayout(
-        1, 1;
-        parent = scene,
-        alignmode = Outside(30, 30, 30, 30)
-    )
+    maingl = GridLayout(scene, alignmode = Outside(30))
 
     la = maingl[1, 1] = LAxis(scene)
     la.attributes.yautolimitmargin = (0f0, 0.05f0)

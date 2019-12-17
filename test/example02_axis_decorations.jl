@@ -7,8 +7,7 @@ begin
     campixel!(scene);
 
     maingl = GridLayout(
-        1, 2;
-        parent = scene,
+        scene, 1, 2;
         rowsizes = Relative(1),
         colsizes = [Auto(), Fixed(200)],
         addedcolgaps = Fixed(30),

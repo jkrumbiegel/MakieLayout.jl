@@ -19,7 +19,7 @@ function LLegend(parent::Scene; bbox = nothing, kwargs...)
 
     suggestedbbox = create_suggested_bboxnode(bbox)
 
-    autosizenode = Node((500f0, 500f0))
+    autosizenode = Node{NTuple{2, Optional{Float32}}}((nothing, nothing))
 
     computedsize = computedsizenode!(sizeattrs, autosizenode)
 
@@ -43,7 +43,7 @@ function LLegend(parent::Scene; bbox = nothing, kwargs...)
     entries = Node(LegendEntry[])
 
 
-    maingrid = GridLayout(legendrect, alignmode = Outside(20))
+    maingrid = GridLayout(bbox = legendrect, alignmode = Outside(20))
     manipulating_grid = Ref(false)
 
     onany(maingrid.needs_update, margin) do _, margin
@@ -118,15 +118,9 @@ function LLegend(parent::Scene; bbox = nothing, kwargs...)
 
         # first delete all existing labels and patches
 
-        # delete from grid layout
-        detachfromgridlayout!.(entrytexts, Ref(labelgrid))
-        # and from scene
         delete!.(entrytexts)
         empty!(entrytexts)
 
-        # delete from grid layout
-        detachfromgridlayout!.(entryrects, Ref(labelgrid))
-        # and from scene
         delete!.(entryrects)
         empty!(entryrects)
 
@@ -179,7 +173,7 @@ function LLegend(parent::Scene; bbox = nothing, kwargs...)
     # trigger suggestedbbox
     suggestedbbox[] = suggestedbbox[]
 
-    layoutnodes = LayoutNodes(suggestedbbox, protrusions, computedsize, finalbbox)
+    layoutnodes = LayoutNodes{LLegend, GridLayout}(suggestedbbox, protrusions, computedsize, autosizenode, finalbbox, nothing)
 
     LLegend(scene, entries, layoutnodes, attrs, decorations, entrytexts, entryplots)
 end

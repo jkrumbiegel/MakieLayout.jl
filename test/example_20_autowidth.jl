@@ -6,7 +6,7 @@ begin
     scene = Scene(camera=campixel!)
     display(scene)
 
-    topgl = GridLayout(parent=scene, alignmode=Outside(30))
+    topgl = GridLayout(scene, alignmode=Outside(30))
     gl = topgl[1, 1] = GridLayout()
     la = gl[1, 1] = LAxis(scene)
     lc2 = gl[1, 2] = LColorbar(scene, width=50)

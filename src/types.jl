@@ -50,10 +50,14 @@ end
 An object that can be aligned that also specifies how much space it occupies in
 a grid via its span.
 """
-struct SpannedLayout{T <: AbstractLayout}
+mutable struct GridContent{G, T} # G should be GridLayout but can't be used before definition
+    parent::Optional{G}
     al::T
     sp::Span
     side::Side
+    needs_update::Node{Bool}
+    protrusions_handle::Optional{Function}
+    computedsize_handle::Optional{Function}
 end
 
 abstract type AlignMode end
@@ -88,9 +92,17 @@ struct Aspect <: ContentSize
     ratio::Float64
 end
 
+mutable struct LayoutNodes{T, G} # G again GridLayout
+    suggestedbbox::Node{BBox}
+    protrusions::Node{RectSides{Float32}}
+    computedsize::Node{NTuple{2, Optional{Float32}}}
+    autosize::Node{NTuple{2, Optional{Float32}}}
+    computedbbox::Node{BBox}
+    gridcontent::Optional{GridContent{G, T}} # the connecting link to the gridlayout
+end
+
 mutable struct GridLayout <: AbstractLayout
-    parent::Union{Nothing, Scene, GridLayout, Node{<:Rect2D}}
-    content::Vector{SpannedLayout}
+    content::Vector{GridContent}
     nrows::Int
     ncols::Int
     rowsizes::Vector{ContentSize}
@@ -103,37 +115,39 @@ mutable struct GridLayout <: AbstractLayout
     block_updates::Bool
     valign::Node{Symbol}
     halign::Node{Symbol}
+    layoutnodes::LayoutNodes
+    attributes::Attributes
     _update_func_handle::Optional{Function} # stores a reference to the result of on(obs)
 
     function GridLayout(
-        parent, content, nrows, ncols, rowsizes, colsizes,
+        content, nrows, ncols, rowsizes, colsizes,
         addedrowgaps, addedcolgaps, alignmode, equalprotrusiongaps, needs_update,
-        valign, halign)
+        valign, halign, layoutnodes, attributes)
 
-        gl = new(nothing, content, nrows, ncols, rowsizes, colsizes,
+        gl = new(content, nrows, ncols, rowsizes, colsizes,
             addedrowgaps, addedcolgaps, alignmode, equalprotrusiongaps,
-            needs_update, false, valign, halign, nothing)
+            needs_update, false, valign, halign, layoutnodes, attributes, nothing)
 
         validategridlayout(gl)
 
-        attach_parent!(gl, parent)
+        # attach_parent!(gl, parent)
 
-        on(needs_update) do update
-            request_update(gl)
-        end
+        # on(needs_update) do update
+        #     request_update(gl)
+        # end
 
         gl
     end
 end
 
 
-struct SolvedGridLayout <: AbstractLayout
-    bbox::BBox
-    content::Vector{SpannedLayout}
-    nrows::Int
-    ncols::Int
-    grid::RowCols{Vector{Float64}}
-end
+# struct SolvedGridLayout <: AbstractLayout
+#     bbox::BBox
+#     content::Vector{GridContent}
+#     nrows::Int
+#     ncols::Int
+#     grid::RowCols{Vector{Float64}}
+# end
 
 struct AxisAspect
     aspect::Float32
@@ -178,13 +192,6 @@ mutable struct LineAxis
     tickpositions::Node{Vector{Point2f0}}
     tickvalues::Node{Vector{Float32}}
     ticklabels::Node{Vector{String}}
-end
-
-struct LayoutNodes
-    suggestedbbox::Node{BBox}
-    protrusions::Node{RectSides{Float32}}
-    computedsize::Node{NTuple{2, Optional{Float32}}}
-    computedbbox::Node{BBox}
 end
 
 abstract type LObject end

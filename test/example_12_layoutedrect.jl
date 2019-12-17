@@ -8,7 +8,7 @@ begin
     nrows = 2
     ncols = 2
 
-    maingl = GridLayout(1, 1, parent=scene, alignmode=Outside(30))
+    maingl = GridLayout(scene, 1, 1, alignmode=Outside(30))
 
     gridgl = maingl[1, 1] = GridLayout(
         nrows, ncols)

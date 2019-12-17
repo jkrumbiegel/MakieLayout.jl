@@ -1,6 +1,8 @@
 using MakieLayout
 using Makie
 
+using AbstractPlotting: px
+
 begin
     scene = Scene(resolution = (1000, 1000));
     screen = display(scene)
@@ -9,7 +11,7 @@ begin
     nrows = 4
     ncols = 4
 
-    maingl = GridLayout(1, 1, parent=scene, alignmode=Outside(30))
+    maingl = GridLayout(scene, 1, 1, alignmode=Outside(30))
 
     gridgl = maingl[1, 1] = GridLayout(
         nrows, ncols)
@@ -21,7 +23,7 @@ begin
 
     for i in 1:nrows, j in 1:ncols
 
-        scatter!(las[i, j], rand(200, 2) .+ [i j], markersize=20, color=(:black, 0.3))
+        scatter!(las[i, j], rand(200, 2) .+ [i j], markersize=20px, color=(:black, 0.3))
 
         i > 1 && (las[i, j].titlevisible = false)
         j > 1 && (las[i, j].ylabelvisible = false)
@@ -33,7 +35,7 @@ begin
     end
 
     gridgl[:, end, Right()] = LText(scene, text="Side Protrusion", rotation=-pi/2, padding=(20, 0, 0, 0), halign=:right)
-    gridgl[end, :, Bottom()] = LText(scene, text="x label", padding=(0, 0, 50, 0), valign=:bottom)
+    gridgl[end, :, Bottom()] = LText(scene, text="x label", padding=(0, 0, 0, 50), valign=:bottom)
 
     maingl[2, 1] = LAxis(scene)
     maingl[:, 2] = LAxis(scene)
@@ -61,5 +63,3 @@ begin
 
     nothing
 end
-
-# save("layout.png", scene)

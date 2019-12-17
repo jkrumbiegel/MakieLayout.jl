@@ -6,19 +6,12 @@ begin
     screen = display(scene)
     campixel!(scene);
 
-    maingl = GridLayout(
-        1, 1;
-        parent = scene,
-        alignmode = Outside(30, 30, 30, 30)
-    )
+    maingl = GridLayout(scene, alignmode = Outside(30))
 
     ni = 2
     nj = 2
-    las = Array{LAxis, 2}(undef, ni, nj)
 
-    for i in 1:ni, j in 1:nj
-        las[i, j] = maingl[i, j] = LAxis(scene, titlesize=20)
-    end
+    las = maingl[1:ni, 1:nj] = [LAxis(scene, titlesize=20) for i in 1:ni, j in 1:nj]
 
     lines!(las[1, 1], 0:0.1:100, sin.((0:0.1:100) ./ 5) .+ 1)
     lines!(las[1, 2], (0:0.1:100) .+ 50, -sin.((0:0.1:100) ./ 5), color=:blue)

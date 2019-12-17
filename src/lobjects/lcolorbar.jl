@@ -25,11 +25,13 @@ function LColorbar(parent::Scene; bbox = nothing, kwargs...)
     sizeattrs = sizenode!(attrs.width, attrs.height)
     alignment = lift(tuple, halign, valign)
 
+    autosizenode = Node{NTuple{2, Optional{Float32}}}((nothing, nothing))
+
     suggestedbbox = create_suggested_bboxnode(bbox)
 
-    computedsize = computedsizenode!(sizeattrs)
+    computedsize = computedsizenode!(sizeattrs, autosizenode)
 
-    finalbbox = alignedbboxnode!(suggestedbbox, computedsize, alignment, sizeattrs)
+    finalbbox = alignedbboxnode!(suggestedbbox, computedsize, alignment, sizeattrs, autosizenode)
 
     scenearea = lift(IRect2D, finalbbox)
 
@@ -135,7 +137,7 @@ function LColorbar(parent::Scene; bbox = nothing, kwargs...)
         RectSides{Float32}(left, right, bottom, top)
     end
 
-    layoutnodes = LayoutNodes(suggestedbbox, protrusions, computedsize, finalbbox)
+    layoutnodes = LayoutNodes{LColorbar, GridLayout}(suggestedbbox, protrusions, computedsize, autosizenode, finalbbox, nothing)
 
     # trigger bbox
     suggestedbbox[] = suggestedbbox[]

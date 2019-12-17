@@ -154,8 +154,8 @@ function default_attributes(::Type{LButton})
         textsize = 20f0,
         label = "Button",
         font = "Dejavu Sans",
-        width = nothing,
-        height = nothing,
+        width = Auto(true),
+        height = Auto(true),
         cornerradius = 4,
         cornersegments = 10,
         strokewidth = 2f0,
@@ -211,7 +211,7 @@ function default_attributes(::Type{LSlider})
         valign = :center,
         # vertical = true,
         width = nothing,
-        height = nothing,
+        height = Auto(true),
         range = 0:10,
         buttonradius_inactive = 7f0,
         buttonradius_active = 7f0,
@@ -300,4 +300,13 @@ function extractattributes(attributes::Attributes, typ::Type)
         end
     end
     extracted
+end
+
+function default_attributes(::Type{GridLayout})
+    Attributes(
+        halign = :center,
+        valign = :center,
+        width = Auto(),
+        height = Auto(),
+    )
 end

@@ -9,9 +9,11 @@ function LRect(parent::Scene; bbox = nothing, kwargs...)
 
     suggestedbbox = create_suggested_bboxnode(bbox)
 
-    computedsize = computedsizenode!(sizeattrs)
+    autosizenode = Node{NTuple{2, Optional{Float32}}}((nothing, nothing))
 
-    finalbbox = alignedbboxnode!(suggestedbbox, computedsize, alignment, sizeattrs)
+    computedsize = computedsizenode!(sizeattrs, autosizenode)
+
+    finalbbox = alignedbboxnode!(suggestedbbox, computedsize, alignment, sizeattrs, autosizenode)
 
     strokecolor_with_visibility = lift(strokecolor, strokevisible) do col, vis
         vis ? col : RGBAf0(0, 0, 0, 0)
@@ -23,7 +25,7 @@ function LRect(parent::Scene; bbox = nothing, kwargs...)
     # no protrusions
     protrusions = Node(RectSides(0f0, 0f0, 0f0, 0f0))
 
-    layoutnodes = LayoutNodes(suggestedbbox, protrusions, computedsize, finalbbox)
+    layoutnodes = LayoutNodes{LRect, GridLayout}(suggestedbbox, protrusions, computedsize, autosizenode, finalbbox, nothing)
 
     # trigger bbox
     suggestedbbox[] = suggestedbbox[]
@@ -33,10 +35,14 @@ end
 
 
 function Base.delete!(lr::LRect)
+    disconnect_layoutnodes!(lr.layoutnodes.gridcontent)
+    remove_from_gridlayout!(lr.layoutnodes.gridcontent)
+    empty!(lr.layoutnodes.suggestedbbox.listeners)
+    empty!(lr.layoutnodes.computedbbox.listeners)
+    empty!(lr.layoutnodes.computedsize.listeners)
+    empty!(lr.layoutnodes.autosize.listeners)
+    empty!(lr.layoutnodes.protrusions.listeners)
+
     # remove the plot object from the scene
     delete!(lr.parent, lr.rect)
-    # remove all layout node callbacks
-    for f in fieldnames(LayoutNodes)
-        empty!(getfield(lr.layoutnodes, f).listeners)
-    end
 end

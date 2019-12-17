@@ -6,7 +6,7 @@ begin
     scene = Scene(camera=campixel!)
     display(scene)
 
-    outergrid = GridLayout(scene; alignmode=Outside(30))
+    outergrid = GridLayout(scene, alignmode=Outside(30))
 
     innergrid = outergrid[1, 1] = GridLayout(3, 3)
 

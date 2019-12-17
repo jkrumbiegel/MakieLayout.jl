@@ -1,6 +1,6 @@
 # MakieLayout.jl
 
-Check out the [documentation here](https://jkrumbiegel.github.io/MakieLayout.jl/dev/)!
+Check out the [!!currently outdated!! documentation here](https://jkrumbiegel.github.io/MakieLayout.jl/dev/)!
 
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://jkrumbiegel.github.io/MakieLayout.jl/dev/)
 

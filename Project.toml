@@ -1,7 +1,7 @@
 name = "MakieLayout"
 uuid = "5a521ce4-ebb9-4793-b5b7-b334dfe8393c"
 authors = ["Simon Danisch", "Julius Krumbiegel"]
-version = "0.1.7"
+version = "0.2.0"
 
 [deps]
 AbstractPlotting = "537997a7-5e4e-5d89-9595-2241ea00577e"
@@ -11,7 +11,7 @@ Match = "7eb4fadd-790c-5f42-8a69-bfa0b872bfbf"
 Observables = "510215fc-4207-5dde-b226-833fc4488ee2"
 
 [compat]
-AbstractPlotting = "^0.9"
+AbstractPlotting = "^0.9.14"
 Animations = "^0.3"
 Formatting = "^0.4"
 Observables = "^0.2"

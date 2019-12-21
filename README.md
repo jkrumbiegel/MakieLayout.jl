@@ -1,6 +1,7 @@
 # MakieLayout.jl
 
-Check out the **currently outdated** [documentation here](https://jkrumbiegel.github.io/MakieLayout.jl/dev/)!
+The package is quite new and therefore still in constant flux.
+Check out the current [documentation here](https://jkrumbiegel.github.io/MakieLayout.jl/dev/)!
 
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://jkrumbiegel.github.io/MakieLayout.jl/dev/)
 

@@ -1,11 +1,15 @@
 using Documenter, MakieLayout, Makie, Animations
 
+# don't open windows while generating animations
+Makie.AbstractPlotting.inline!(true)
+
 makedocs(
     sitename="MakieLayout.jl",
     pages = [
         "index.md",
-        "Grids" => "grids.md",
+        "GridLayout" => "grids.md",
         "LAxis" => "laxis.md",
+        "How layouting works" => "layouting.md"
     ],
     format = Documenter.HTML(
             prettyurls = get(ENV, "CI", nothing) == "true"

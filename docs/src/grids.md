@@ -1,4 +1,4 @@
-## Nesting grids
+## Nesting
 
 Grids can be nested inside other grids, and so on, to arbitrary depths. The top
 grid's parent should be the scene in which the layout is placed. When you place
@@ -11,31 +11,23 @@ plots in nested grids are nicely aligned along their spines.
 using MakieLayout
 using Makie
 
-scene = Scene(resolution = (1200, 900), camera=campixel!)
+scene, layout = layoutscene(30, resolution = (1200, 900))
 
-maingl = GridLayout(
-    1, 2,
-    parent = scene,
-    alignmode = Outside(30, 30, 30, 30))
+subgl_left = GridLayout()
+subgl_left[1:2, 1:2] = [LAxis(scene) for i in 1:2, j in 1:2]
 
-subgl_left = maingl[1, 1] = GridLayout(2, 2)
+subgl_right = GridLayout()
+subgl_right[1:3, 1] = [LAxis(scene) for i in 1:3]
 
-for i in 1:2, j in 1:2
-    subgl_left[i, j] = LAxis(scene)
-end
-
-subgl_right = maingl[1, 2] = GridLayout(3, 1)
-
-for i in 1:3
-    subgl_right[i, 1] = LAxis(scene)
-end
+layout[1, 1] = subgl_left
+layout[1, 2] = subgl_right
 
 save("example_nested_grids.png", scene); nothing # hide
 ```
 
 ![example nested grids](example_nested_grids.png)
 
-## Grid alignment
+## Alignment
 
 Here you can see the difference between the align modes Outside with and without
 margins and the Inside alignmode. Only the standard Inside mode aligns the axis
@@ -48,31 +40,28 @@ grid with Inside alignment, and they are both effectively aligned exactly the sa
 using MakieLayout
 using Makie
 
-scene = Scene(resolution = (1200, 1200), camera=campixel!)
+scene, layout = layoutscene(30, resolution = (1200, 1200))
 
-maingl = GridLayout(
-    3, 2,
-    parent = scene,
-    alignmode = Outside(30, 30, 30, 30))
+layout[1, 1] = LAxis(scene, title="No grid layout")
+layout[2, 1] = LAxis(scene, title="No grid layout")
+layout[3, 1] = LAxis(scene, title="No grid layout")
 
-maingl[1, 1] = LAxis(scene, title="No grid layout")
-maingl[2, 1] = LAxis(scene, title="No grid layout")
-maingl[3, 1] = LAxis(scene, title="No grid layout")
-
-subgl_1 = maingl[1, 2] = GridLayout(1, 1, alignmode=Inside())
-subgl_2 = maingl[2, 2] = GridLayout(1, 1, alignmode=Outside())
-subgl_3 = maingl[3, 2] = GridLayout(1, 1, alignmode=Outside(50))
+subgl_1 = layout[1, 2] = GridLayout(alignmode=Inside())
+subgl_2 = layout[2, 2] = GridLayout(alignmode=Outside())
+subgl_3 = layout[3, 2] = GridLayout(alignmode=Outside(50))
 
 subgl_1[1, 1] = LAxis(scene, title="Inside")
 subgl_2[1, 1] = LAxis(scene, title="Outside")
 subgl_3[1, 1] = LAxis(scene, title="Outside(50)")
+
+layout[1:3, 2] = [LRect(scene, color = :transparent, strokecolor = :red) for i in 1:3]
 
 save("example_grid_alignment.png", scene); nothing # hide
 ```
 
 ![example grid alignment](example_grid_alignment.png)
 
-## Spanned Grid Content
+## Spanned Placement
 
 Elements in a grid layout can span multiple rows and columns. You can specify
 them with the range syntax and colons for the full width or height. You can
@@ -82,25 +71,20 @@ also use end to specify the last row or column.
 using MakieLayout
 using Makie
 
-scene = Scene(resolution = (1200, 1200), camera=campixel!)
+scene, layout = layoutscene(4, 4, 30, resolution = (1200, 1200))
 
-maingl = GridLayout(
-    4, 4,
-    parent = scene,
-    alignmode = Outside(30, 30, 30, 30))
-
-maingl[1, 1:2] = LAxis(scene, title="[1, 1:2]")
-maingl[2:4, 1:2] = LAxis(scene, title="[2:4, 1:2]")
-maingl[:, 3] = LAxis(scene, title="[:, 3]")
-maingl[1:3, end] = LAxis(scene, title="[1:3, end]")
-maingl[end, end] = LAxis(scene, title="[end, end]")
+layout[1, 1:2] = LAxis(scene, title="[1, 1:2]")
+layout[2:4, 1:2] = LAxis(scene, title="[2:4, 1:2]")
+layout[:, 3] = LAxis(scene, title="[:, 3]")
+layout[1:3, end] = LAxis(scene, title="[1:3, end]")
+layout[end, end] = LAxis(scene, title="[end, end]")
 
 save("example_spanned_grid_content.png", scene); nothing # hide
 ```
 
 ![spanned grid content](example_spanned_grid_content.png)
 
-## Indexing outside of a grid layout
+## Auto-resizing
 
 If you index outside of the current range of a grid layout, you do not get an
 error. Instead, the layout automatically resizes to contain the new indices.
@@ -111,25 +95,19 @@ side titles.
 using MakieLayout
 using Makie
 
-scene = Scene(resolution = (1200, 1200), camera=campixel!)
+scene, layout = layoutscene(30, resolution = (1200, 1200))
 
-maingl = GridLayout(
-    1, 1,
-    parent = scene,
-    alignmode = Outside(30, 30, 30, 30))
-
-
-maingl[1, 1] = LAxis(scene)
+layout[1, 1] = LAxis(scene)
 for i in 1:3
-    maingl[:, end+1] = LAxis(scene)
-    maingl[end+1, :] = LAxis(scene)
+    layout[:, end+1] = LAxis(scene)
+    layout[end+1, :] = LAxis(scene)
 end
 
-maingl[0, :] = LText(scene, text="Super Title", textsize=50)
-maingl[end+1, :] = LText(scene, text="Sub Title", textsize=50)
-maingl[2:end-1, 0] = LText(scene, text="Left Text", textsize=50,
+layout[0, :] = LText(scene, text="Super Title", textsize=50)
+layout[end+1, :] = LText(scene, text="Sub Title", textsize=50)
+layout[2:end-1, 0] = LText(scene, text="Left Text", textsize=50,
     rotation=pi/2)
-maingl[2:end-1, end+1] = LText(scene, text="Right Text", textsize=50,
+layout[2:end-1, end+1] = LText(scene, text="Right Text", textsize=50,
     rotation=-pi/2)
 
 save("example_indexing_outside_grid.png", scene); nothing # hide
@@ -158,9 +136,8 @@ using Makie
 
 scene = Scene(resolution = (1200, 900), camera=campixel!)
 
-maingl = GridLayout(
-    5, 5,
-    parent = scene,
+layout = GridLayout(
+    scene, 5, 5,
     colsizes = [Fixed(200), Relative(0.25), Auto(), Auto(), Auto(2)],
     rowsizes = [Fixed(100), Relative(0.25), Aspect(2, 1), Auto(), Auto()],
     alignmode = Outside(30, 30, 30, 30))
@@ -168,9 +145,9 @@ maingl = GridLayout(
 
 for i in 1:5, j in 1:5
     if i == 5 && j == 3
-        maingl[i, j] = LText(scene, text="My Size is Inferred")
+        layout[i, j] = LText(scene, text="My Size is Inferred")
     else
-        maingl[i, j] = LAxis(scene, titlevisible=false,
+        layout[i, j] = LAxis(scene, titlevisible=false,
             xlabelvisible=false, ylabelvisible=false, xticklabelsvisible=false,
             yticklabelsvisible=false)
     end

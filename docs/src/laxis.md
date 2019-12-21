@@ -22,24 +22,20 @@ using MakieLayout
 using Makie
 using Animations
 
-scene = Scene(resolution = (600, 600), camera=campixel!)
+scene, layout = layoutscene(resolution = (600, 600))
 
-maingl = GridLayout(
-    2, 2,
-    parent = scene,
-    alignmode = Outside(30, 30, 30, 30))
-
-las = [maingl[i, j] = LAxis(scene) for i in 1:2, j in 1:2]
+axes = [LAxis(scene) for i in 1:2, j in 1:2]
+layout[1:2, 1:2] = axes
 
 a_title = Animation([0, 2], [30.0, 50.0], sineio(n=2, yoyo=true, prewait=0.2))
 a_xlabel = Animation([2, 4], [20.0, 40.0], sineio(n=2, yoyo=true, prewait=0.2))
 a_ylabel = Animation([4, 6], [20.0, 40.0], sineio(n=2, yoyo=true, prewait=0.2))
 
-record(scene, "example_protrusion_changes.mp4", 0:1/25:6) do t
+record(scene, "example_protrusion_changes.mp4", 0:1/60:6, framerate = 60) do t
 
-    las[1, 1].titlesize = a_title(t)
-    las[1, 1].xlabelsize = a_xlabel(t)
-    las[1, 1].ylabelsize = a_ylabel(t)
+    axes[1, 1].titlesize = a_title(t)
+    axes[1, 1].xlabelsize = a_xlabel(t)
+    axes[1, 1].ylabelsize = a_ylabel(t)
 
 end
 
@@ -62,51 +58,51 @@ using Makie
 
 scene = Scene(resolution = (600, 600), camera=campixel!)
 
-maingl = GridLayout(
-    2, 2,
-    parent = scene,
+layout = GridLayout(
+    scene, 2, 2, # we need to specify rows and columns so the gap sizes don't get lost
     addedcolgaps = Fixed(0),
     addedrowgaps = Fixed(0),
-    alignmode = Outside(30, 30, 30, 30))
+    alignmode = Outside(30))
 
-las = [maingl[i, j] = LAxis(scene) for j in 1:2, i in 1:2]
+axes = [LAxis(scene) for j in 1:2, i in 1:2]
+layout[1:2, 1:2] = axes
 
 record(scene, "example_hiding_decorations.mp4", framerate=3) do io
 
     recordframe!(io)
-    for la in las
-        la.titlevisible = false
+    for ax in axes
+        ax.titlevisible = false
         recordframe!(io)
     end
-    for la in las
-        la.xlabelvisible = false
+    for ax in axes
+        ax.xlabelvisible = false
         recordframe!(io)
     end
-    for la in las
-        la.ylabelvisible = false
+    for ax in axes
+        ax.ylabelvisible = false
         recordframe!(io)
     end
-    for la in las
-        la.xticklabelsvisible = false
+    for ax in axes
+        ax.xticklabelsvisible = false
         recordframe!(io)
     end
-    for la in las
-        la.yticklabelsvisible = false
+    for ax in axes
+        ax.yticklabelsvisible = false
         recordframe!(io)
     end
-    for la in las
-        la.xticksvisible = false
+    for ax in axes
+        ax.xticksvisible = false
         recordframe!(io)
     end
-    for la in las
-        la.yticksvisible = false
+    for ax in axes
+        ax.yticksvisible = false
         recordframe!(io)
     end
-    for la in las
-        la.rightspinevisible = false
-        la.leftspinevisible = false
-        la.bottomspinevisible = false
-        la.topspinevisible = false
+    for ax in axes
+        ax.xspinevisible = false
+        ax.yspinevisible = false
+        ax.xoppositespinevisible = false
+        ax.yoppositespinevisible = false
         recordframe!(io)
     end
 end
@@ -137,38 +133,34 @@ using FileIO
 using Random # hide
 Random.seed!(1) # hide
 
-scene = Scene(resolution = (1200, 900), camera=campixel!)
+scene, layout = layoutscene(30, resolution = (1200, 900))
 
-maingl = GridLayout(
-    2, 3,
-    parent = scene,
-    alignmode = Outside(30, 30, 30, 30))
+axes = [LAxis(scene) for i in 1:2, j in 1:3]
+tightlimits!.(axes)
+layout[1:2, 1:3] = axes
 
-las = [maingl[i, j] = LAxis(scene,
-    xautolimitmargin=(0, 0), yautolimitmargin=(0, 0)) for i in 1:2, j in 1:3]
+img = rotr90(load("cow.png"))
 
-img = reverse(load("cow.png"), dims=1)'
-
-for la in las
-    image!(la, img)
+for ax in axes
+    image!(ax, img)
 end
 
-las[1, 1].title = "Default"
+axes[1, 1].title = "Default"
 
-las[1, 2].title = "DataAspect"
-las[1, 2].aspect = DataAspect()
+axes[1, 2].title = "DataAspect"
+axes[1, 2].aspect = DataAspect()
 
-las[1, 3].title = "AxisAspect(418/348)"
-las[1, 3].aspect = AxisAspect(418/348)
+axes[1, 3].title = "AxisAspect(418/348)"
+axes[1, 3].aspect = AxisAspect(418/348)
 
-las[2, 1].title = "AxisAspect(1)"
-las[2, 1].aspect = AxisAspect(1)
+axes[2, 1].title = "AxisAspect(1)"
+axes[2, 1].aspect = AxisAspect(1)
 
-las[2, 2].title = "AxisAspect(2)"
-las[2, 2].aspect = AxisAspect(2)
+axes[2, 2].title = "AxisAspect(2)"
+axes[2, 2].aspect = AxisAspect(2)
 
-las[2, 3].title = "AxisAspect(0.5)"
-las[2, 3].aspect = AxisAspect(0.5)
+axes[2, 3].title = "AxisAspect(0.5)"
+axes[2, 3].aspect = AxisAspect(0.5)
 
 save("example_axis_aspects.png", scene) # hide
 nothing # hide

@@ -1,74 +1,64 @@
 # MakieLayout.jl
 
-## Intro
-
-MakieLayout.jl brings a new 2D Axis object and grid layouting to Makie.jl. You
+MakieLayout.jl brings a new 2D Axis `LAxis` and grid layouting with `GridLayout` to Makie.jl. You
 can build your layouts as grids that are nested within other grids. For grid layouts,
 you can specify many visual parameters like row and column widths, the gap sizes
 between the rows and columns, or paddings. 2D axes have many more parameters like
 titles, labels, ticks, their sizes and colors and alignments, etc. All of these
 parameters are Observables and the layout updates itself automatically when you
-change them.
+change relevant ones.
 
 As a starting point, here's one example that creates a fairly standard faceting layout
-like you might know from ggplot :
+like you might know from ggplot:
 
 ```@example
+
 using MakieLayout
 using Makie
 using Random # hide
-Random.seed!(1) # hide
+Random.seed!(2) # hide
 
-scene = Scene(resolution = (1200, 900), camera=campixel!)
+# layoutscene is a convenience function that creates a Scene and a GridLayout
+# that are already connected correctly and with Outside alignment
+scene, layout = layoutscene(30, resolution = (1200, 1200))
 
+ncols = 4
 nrows = 4
-ncols = 5
 
-# Create the main GridLayout that is the parent of all other layout objects.
-# We set its own parent to the scene it belongs to, this way it will recompute
-# itself when the scene size changes, e.g., when you resize the window.
-# We also specify the `alignmode` as Outside, which means that everything
-# including the decorations of the grid content will fit into the window, with a
-# margin of 30px to each side
-maingl = GridLayout(
-    nrows, ncols,
-    parent = scene,
-    alignmode = Outside(30, 30, 30, 30))
-
-# create a grid of LAxis objects and at the same time place them in the
-# grid layout with indexing syntax
-las = [maingl[i, j] = LAxis(scene) for i in 1:nrows, j in 1:ncols]
+# create a grid of LAxis objects
+axes = [LAxis(scene) for i in 1:nrows, j in 1:ncols]
+# and place them into the layout
+layout[1:nrows, 1:ncols] = axes
 
 # link x and y axes of all LAxis objects
-linkxaxes!(las...)
-linkyaxes!(las...)
+linkxaxes!(axes...)
+linkyaxes!(axes...)
+
+lineplots = [lines!(axes[i, j], 1:0.1:8pi, sin.(1:0.1:8pi) .* i .+ j,
+        color = rand(RGBf0), linewidth = 4)
+    for i in 1:nrows, j in 1:ncols]
 
 for i in 1:nrows, j in 1:ncols
-
-    # plot into the scene that is managed by the LAxis
-    scatter!(las[i, j], rand(200, 2) .+ [i j])
-
     # remove unnecessary decorations in some of the facets, this will have an
     # effect on the layout as the freed up space will be used to make the axes
     # bigger
-    i > 1 && (las[i, j].titlevisible = false)
-    j > 1 && (las[i, j].ylabelvisible = false)
-    j > 1 && (las[i, j].yticklabelsvisible = false)
-    j > 1 && (las[i, j].yticksvisible = false)
-    i < nrows && (las[i, j].xticklabelsvisible = false)
-    i < nrows && (las[i, j].xticksvisible = false)
-    i < nrows && (las[i, j].xlabelvisible = false)
+    i > 1 && (axes[i, j].titlevisible = false)
+    j > 1 && (axes[i, j].ylabelvisible = false)
+    j > 1 && (axes[i, j].yticklabelsvisible = false)
+    j > 1 && (axes[i, j].yticksvisible = false)
+    i < nrows && (axes[i, j].xticklabelsvisible = false)
+    i < nrows && (axes[i, j].xticksvisible = false)
+    i < nrows && (axes[i, j].xlabelvisible = false)
 end
 
-# index into the 0th row, thereby adding a new row into the layout and place
-# a text object across the full column width as a super title
-maingl[0, :] = LText(scene, text="Super Title", textsize=50)
+legend = LLegend(scene, lineplots, ["Line $i" for i in 1:length(lineplots)],
+    ncols = 2)
+# place a legend on the side by indexing into one column after the current last
+layout[:, end+1] = legend
 
-# place a title on the side by going from the second row to the last (because
-# in the first row, there is now the super title) and adding a column to the end
-# by indexing one column further than the last index
-maingl[2:end, end+1] = LText(scene, text="Side Title", textsize=50,
-    rotation=-pi/2)
+# index into the 0th row, thereby adding a new row into the layout and place
+# a text object across the first four columns as a super title
+layout[0, 1:4] = LText(scene, text="MakieLayout Facets", textsize=50)
 
 save("example_intro.png", scene); nothing # hide
 ```

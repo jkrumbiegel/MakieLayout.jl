@@ -59,18 +59,24 @@ using Makie
 scene = Scene(resolution = (1200, 900), camera=campixel!)
 
 layout = GridLayout(
-    scene, 5, 5,
-    colsizes = [Fixed(200), Relative(0.25), Auto(), Auto(), Auto(2)],
-    rowsizes = [Fixed(100), Relative(0.25), Aspect(2, 1), Auto(), Auto()],
+    scene, 6, 6,
+    colsizes = [Fixed(200), Relative(0.25), Auto(), Auto(), Auto(2), Auto()],
+    rowsizes = [Auto(), Fixed(100), Relative(0.25), Aspect(2, 1), Auto(), Auto()],
     alignmode = Outside(30, 30, 30, 30))
 
 
-for i in 1:5, j in 1:5
-    if i == 5 &amp;&amp; j == 3
+for i in 2:6, j in 1:5
+    if i == 6 &amp;&amp; j == 3
         layout[i, j] = LText(scene, text=&quot;My Size is Inferred&quot;)
     else
-        layout[i, j] = LAxis(scene, titlevisible=false,
-            xlabelvisible=false, ylabelvisible=false, xticklabelsvisible=false,
-            yticklabelsvisible=false)
+        layout[i, j] = LRect(scene)
     end
-end</code></pre><p><img src="example_row_col_sizes.png" alt="row col sizes"/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="index.html">« MakieLayout.jl</a><a class="docs-footer-nextpage" href="laxis.html">LAxis »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 22 December 2019 18:02">Sunday 22 December 2019</span>. Using Julia version 1.3.0-rc5.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+end
+
+for (j, label) in enumerate([&quot;Fixed(200)&quot;, &quot;Relative(0.25)&quot;, &quot;Auto()&quot;, &quot;Auto()&quot;, &quot;Auto(2)&quot;])
+    layout[1, j] = LText(scene, width = Auto(false), text = label)
+end
+
+for (i, label) in enumerate([&quot;Fixed(100)&quot;, &quot;Relative(0.25)&quot;, &quot;Aspect(2, 1)&quot;, &quot;Auto()&quot;, &quot;Auto()&quot;])
+    layout[i + 1, 6] = LText(scene, height = Auto(false), text = label)
+end</code></pre><p><img src="example_row_col_sizes.png" alt="row col sizes"/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="index.html">« MakieLayout.jl</a><a class="docs-footer-nextpage" href="laxis.html">LAxis »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 22 December 2019 18:35">Sunday 22 December 2019</span>. Using Julia version 1.3.0-rc5.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

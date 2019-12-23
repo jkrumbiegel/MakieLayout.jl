@@ -18,6 +18,8 @@ computations.
 - Auto-determined width and height
 - Computed width and height
 - Protrusions
+- Size attributes
+- Alignment attributes
 
 ### Suggested bounding box
 
@@ -52,3 +54,22 @@ These are four values that tell the `GridLayout` how much gap space is needed by
 the element outside of the main element area. With an `LAxis` that would be the
 title at the top, y axis at the left side and x axis at the bottom in standard
 configuration.
+
+### Size attributes
+
+The user can specify height and width of an element in different ways, which interact with the
+suggested bounding box and the auto-determined size to compute the final size of the object and
+also control how the layout responds to the element's size (used here for either width or height, respectively).
+
+- `Fixed` or `Real`: The size is always fixed, no matter what the layout suggests. A `GridLayout` can auto-adjust column sizes to this size.
+- `Relative`: The size is a fraction of the suggested size. A `GridLayout` can not auto-adjust column sizes to this size.
+- `Auto(true)`: The size is equal to the auto-determined size if that is not `nothing`, otherwise it's equal to the suggested size. A `GridLayout` can auto-adjust to this size if it's not `nothing`.
+- `Auto(false)`: The size is equal to the auto-determined size if that is not `nothing`, otherwise it's equal to the suggested size. A `GridLayout` can *not* auto-adjust to this size (useful for single-spanned elements that should not affect the row or column they are in, but use their auto-size themselves).
+- `nothing`: The size is equal to the suggested size. A `GridLayout` can not auto-adjust column sizes to this size.
+
+### Alignment attributes
+
+The user can specify how an element should be aligned relative to its suggested
+bounding box if it's not of the same size (in which case the alignment just has no effect on placement).
+Currently, these values can be `:left`, `:right` or `:center` for horizontal alignment
+and `:top`, `:bottom` and `:center` for vertical alignment.

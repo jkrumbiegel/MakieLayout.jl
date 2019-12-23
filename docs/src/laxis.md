@@ -9,8 +9,8 @@ the layout is resized. Therefore, the main axis area will always be determined
 by the remaining space after the protrusions are subtracted.
 
 The axis interacts in two directions with the layout. When the size of one of its
-protrusions changes, this will notify any associated ProtrusionLayout object. This will
-then notify its parent GridLayout, and so on, until the full layout is recomputed.
+protrusions changes, this will notify its GridContent. This will
+then notify its parent GridLayout and so on, until the full layout is recomputed.
 After that's done, the ProtrusionLayout will have received a new bounding box in which
 to place its content. The LAxis has a bounding box node which determines
 the borders of the central plot area. This is now updated and the axis' subscene

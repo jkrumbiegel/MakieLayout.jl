@@ -137,20 +137,26 @@ using Makie
 scene = Scene(resolution = (1200, 900), camera=campixel!)
 
 layout = GridLayout(
-    scene, 5, 5,
-    colsizes = [Fixed(200), Relative(0.25), Auto(), Auto(), Auto(2)],
-    rowsizes = [Fixed(100), Relative(0.25), Aspect(2, 1), Auto(), Auto()],
+    scene, 6, 6,
+    colsizes = [Fixed(200), Relative(0.25), Auto(), Auto(), Auto(2), Auto()],
+    rowsizes = [Auto(), Fixed(100), Relative(0.25), Aspect(2, 1), Auto(), Auto()],
     alignmode = Outside(30, 30, 30, 30))
 
 
-for i in 1:5, j in 1:5
-    if i == 5 && j == 3
+for i in 2:6, j in 1:5
+    if i == 6 && j == 3
         layout[i, j] = LText(scene, text="My Size is Inferred")
     else
-        layout[i, j] = LAxis(scene, titlevisible=false,
-            xlabelvisible=false, ylabelvisible=false, xticklabelsvisible=false,
-            yticklabelsvisible=false)
+        layout[i, j] = LRect(scene)
     end
+end
+
+for (j, label) in enumerate(["Fixed(200)", "Relative(0.25)", "Auto()", "Auto()", "Auto(2)"])
+    layout[1, j] = LText(scene, width = Auto(false), text = label)
+end
+
+for (i, label) in enumerate(["Fixed(100)", "Relative(0.25)", "Aspect(2, 1)", "Auto()", "Auto()"])
+    layout[i + 1, 6] = LText(scene, height = Auto(false), text = label)
 end
 
 save("example_row_col_sizes.png", scene); nothing # hide

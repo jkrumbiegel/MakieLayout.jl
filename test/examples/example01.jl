@@ -65,8 +65,8 @@ begin
 
     on(slalign.value) do v
         with_updates_suspended(maingl) do
-            gl.addedrowgaps = [Fixed(v)]
-            gl.addedcolgaps = [Fixed(v)]
+            gl.addedrowgaps = MakieLayout.GapSize[Fixed(v)]
+            gl.addedcolgaps = MakieLayout.GapSize[Fixed(v)]
         end
     end
 
@@ -101,21 +101,21 @@ begin
         addedcolgaps = [Fixed(10)])
 
     gl2[2, 1] = la3
-    la3.attributes.titlevisible[] = false
+    la3.titlevisible[] = false
 
     gl2[1, 1] = la4
-    la4.attributes.xlabelvisible[] = false
-    la4.attributes.xticklabelsvisible[] = false
-    la4.attributes.xticksvisible[] = false
-    la4.attributes.titlevisible[] = false
-    la4.attributes.ypanlock[] = true
-    la4.attributes.yzoomlock[] = true
+    la4.xlabelvisible[] = false
+    la4.xticklabelsvisible[] = false
+    la4.xticksvisible[] = false
+    la4.titlevisible[] = false
+    la4.ypanlock[] = true
+    la4.yzoomlock[] = true
 
     gl2[2, 2] = la5
-    la5.attributes.ylabelvisible[] = false
-    la5.attributes.yticklabelsvisible[] = false
-    la5.attributes.yticksvisible[] = false
-    la5.attributes.titlevisible[] = false
-    la5.attributes.xpanlock[] = true
-    la5.attributes.xzoomlock[] = true
+    la5.ylabelvisible[] = false
+    la5.yticklabelsvisible[] = false
+    la5.yticksvisible[] = false
+    la5.titlevisible[] = false
+    la5.xpanlock[] = true
+    la5.xzoomlock[] = true
 end

@@ -52,7 +52,7 @@ begin
 
     maingl = GridLayout(scene, 2, 1, alignmode=Outside(40))
 
-    slalign = maingl[2, 1] = LSlider(scene, height = 30, range = LinRange(0.0, 150.0, 200))
+    slalign = maingl[2, 1] = LSlider(scene, range = LinRange(0.0, 150.0, 200))
 
 
     gl = maingl[1, 1] = GridLayout(
@@ -81,8 +81,8 @@ begin
     gl_colorbar[1, 1] = la2
     # gl_colorbar[1, 2] = LColorbar(scene)
 
-    sl1 = gl_slider[2, 1] = LSlider(scene, height = 40, range = 1:0.01:10)
-    sl2 = gl_slider[3, 1] = LSlider(scene, height = 40, range = 0.1:0.01:1)
+    sl1 = gl_slider[2, 1] = LSlider(scene, range = 1:0.01:10)
+    sl2 = gl_slider[3, 1] = LSlider(scene, range = 0.1:0.01:1)
 
     xrange = LinRange(0, 2pi, 500)
     lines!(

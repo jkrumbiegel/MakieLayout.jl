@@ -42,13 +42,13 @@ begin
     slgl[1, 1] = LText(scene, text="Supertitle Size", halign=:left)
     sl1 = slgl[1, 2] = LSlider(scene, height = 30, range = 1:200)
     on(sl1.value) do val
-        tl.attributes.textsize = val
+        @async tl.attributes.textsize = val
     end
 
     slgl[2, 1] = LText(scene, text="Sidetitle Size", halign=:left)
     sl2 = slgl[2, 2] = LSlider(scene, height = 30, range = 1:200)
     on(sl2.value) do val
-        stl.attributes.textsize = val
+        @async stl.attributes.textsize = val
     end
 
     nothing

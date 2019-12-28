@@ -22,7 +22,7 @@ begin
 
     for i in 1:nrows, j in 1:ncols
 
-        scatter!(las[i, j], rand(200, 2) .+ [i j], markersize=20, color=(:black, 0.3))
+        scatter!(las[i, j], rand(200, 2) .+ [i j], markersize=0.1, color=(:black, 0.3))
 
         i > 1 && (las[i, j].titlevisible = false)
         j > 1 && (las[i, j].ylabelvisible = false)

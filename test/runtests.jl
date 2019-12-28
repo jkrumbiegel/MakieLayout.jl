@@ -25,5 +25,5 @@ include("debugrect.jl")
     @test layout.nrows == 1 && layout.ncols == 2
     colgap!(layout, 1, Fixed(0))
 
-    @test dr.layoutnodes.computedbbox[].widths == dr2.layoutnodes.computedbbox[].widths
+    @test dr.layoutnodes.computedbbox[].widths == dr2.layoutnodes.computedbbox[].widths == Float32[400.0, 800.0]
 end

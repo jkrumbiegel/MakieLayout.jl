@@ -6,7 +6,7 @@ variables:
 
 stages:
   - test
-  - pages
+  - deploy
 
 test:
   stage: test

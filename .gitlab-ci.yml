@@ -1,20 +1,26 @@
-include:
-  - 'https://raw.githubusercontent.com/JuliaGPU/gitlab-ci/master/templates/v6.yml'
+variables:
+  CI_IMAGE_TAG: "opengl"
+  MODERNGL_DEBUGGING: "true"
+  JULIA_DEPOT_PATH: "$CI_PROJECT_DIR/.julia/"
+  CI_DEV_PKGS: "Makie#master AbstractPlotting#master GLMakie#master"
 
-test:1.3:
-  extends:
-    - .julia:1.3
-    - .test
+stages:
+  - test
+
+test:
+  stage: test
   tags:
-    - nvidia
-  image: nvidia/cuda:latest
+      - xorg
+  image: "juliagpu/julia:v1.2-${CI_IMAGE_TAG}"
+  before_script:
+      - apt-get -qq update
+      # glfw
+      - apt-get install -y cmake xorg-dev mesa-utils p7zip-full
 
-pages:
-  stage: deploy
   script:
-    - mv docs/build public
-  artifacts:
-    paths:
-    - public
-  only:
-    - master
+    - mkdir $JULIA_DEPOT_PATH # Pkg.jl#325
+    - glxinfo | grep 'version'
+    - julia -e 'using InteractiveUtils; versioninfo()'
+    - julia --project -e "using Pkg;
+                          pkg\"add $CI_DEV_PKGS\""
+    - julia --project -e 'using Pkg; pkg"test"'

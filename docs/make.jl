@@ -26,6 +26,8 @@ end
 
 Documenter.authentication_method(::Gitlab) = Documenter.SSH
 
+println("ENV[DOCUMENTER_KEY] working?", typeof(Documenter.documenter_key(Gitlab())), length(Documenter.documenter_key(Gitlab())))
+
 deploydocs(
     repo = "github.com/jkrumbiegel/MakieLayout.jl.git",
     deploy_config = Gitlab(),

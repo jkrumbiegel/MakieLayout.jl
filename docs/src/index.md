@@ -15,12 +15,13 @@ like you might know from ggplot:
 
 using MakieLayout
 using Makie
+using ColorSchemes
 using Random # hide
 Random.seed!(2) # hide
 
 # layoutscene is a convenience function that creates a Scene and a GridLayout
 # that are already connected correctly and with Outside alignment
-scene, layout = layoutscene(30, resolution = (1200, 1200))
+scene, layout = layoutscene(30, resolution = (1200, 900))
 
 ncols = 4
 nrows = 4
@@ -34,8 +35,8 @@ layout[1:nrows, 1:ncols] = axes
 linkxaxes!(axes...)
 linkyaxes!(axes...)
 
-lineplots = [lines!(axes[i, j], 1:0.1:8pi, sin.(1:0.1:8pi) .* i .+ j,
-        color = rand(RGBf0), linewidth = 4)
+lineplots = [lines!(axes[i, j], (1:0.1:8pi) .+ i, sin.(1:0.1:8pi) .+ j,
+        color = get(ColorSchemes.rainbow, ((i - 1) * nrows + j) / (nrows * ncols)), linewidth = 4)
     for i in 1:nrows, j in 1:ncols]
 
 for i in 1:nrows, j in 1:ncols
@@ -51,7 +52,9 @@ for i in 1:nrows, j in 1:ncols
     i < nrows && (axes[i, j].xlabelvisible = false)
 end
 
-legend = LLegend(scene, lineplots, ["Line $i" for i in 1:length(lineplots)],
+autolimits!(axes[1]) # hide
+
+legend = LLegend(scene, permutedims(lineplots, (2, 1)), ["Line $i" for i in 1:length(lineplots)],
     ncols = 2)
 # place a legend on the side by indexing into one column after the current last
 layout[:, end+1] = legend

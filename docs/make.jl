@@ -1,4 +1,4 @@
-using Documenter, MakieLayout, Makie, Animations
+using Documenter, MakieLayout, Makie, Animations, ColorSchemes, Colors
 
 # don't open windows while generating animations
 Makie.AbstractPlotting.inline!(true)
@@ -9,26 +9,34 @@ makedocs(
         "index.md",
         "GridLayout" => "grids.md",
         "LAxis" => "laxis.md",
-        "How layouting works" => "layouting.md"
+        "How layouting works" => "layouting.md",
+        "Frequently Asked Questions" => "faq.md",
     ],
     format = Documenter.HTML(
             prettyurls = get(ENV, "CI", nothing) == "true"
         )
     )
 
-struct Gitlab <: Documenter.DeployConfig end
+struct Local <: Documenter.DeployConfig end
 
-function Documenter.deploy_folder(cfg::Gitlab;
+function Documenter.deploy_folder(cfg::Local;
         repo, devbranch, push_preview, devurl, kwargs...)
 
-    folder = devurl
+    folder = if ENV["PUSH_LOCAL_BUILD"] == "true"
+        devurl
+    else
+        @warn("Set ENV[\"PUSH_LOCAL_BUILD\"] = \"true\" if you want your local build to be pushed to Github Pages.")
+        nothing
+    end
 end
 
-Documenter.authentication_method(::Gitlab) = Documenter.SSH
+Documenter.authentication_method(::Local) = Documenter.SSH
 
-println("ENV[DOCUMENTER_KEY] working?", typeof(Documenter.documenter_key(Gitlab())), length(Documenter.documenter_key(Gitlab())))
+function Documenter.documenter_key(::Local)
+    open(readline, expanduser("~/.ssh/documenter_makielayout"))
+end
 
 deploydocs(
     repo = "github.com/jkrumbiegel/MakieLayout.jl.git",
-    deploy_config = Gitlab(),
+    deploy_config = Local(),
 )

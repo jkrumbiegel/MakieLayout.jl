@@ -163,3 +163,41 @@ save("example_row_col_sizes.png", scene); nothing # hide
 ```
 
 ![row col sizes](example_row_col_sizes.png)
+
+
+## Trimming empty rows and columns
+
+If you change a layout interactively and end up with unused rows or columns, `trim!`
+will remove those for you:
+
+```@example
+using MakieLayout
+using Makie
+
+scene, layout = layoutscene(resolution = (600, 600))
+
+record(scene, "example_trimming.mp4", framerate=1) do io
+
+    ax1 = layout[1, 1] = LAxis(scene, title = "Axis 1")
+    recordframe!(io)
+
+    ax2 = layout[1, 2] = LAxis(scene, title = "Axis 2")
+    recordframe!(io)
+
+    layout[2, 1] = ax2
+    recordframe!(io)
+
+    trim!(layout)
+    recordframe!(io)
+
+    layout[2, 3:4] = ax1
+    recordframe!(io)
+
+    trim!(layout)
+    recordframe!(io)
+end
+
+nothing # hide
+```
+
+![hiding decorations](example_trimming.mp4)

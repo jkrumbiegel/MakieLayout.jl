@@ -23,6 +23,8 @@ function Documenter.deploy_folder(cfg::Local;
         repo, devbranch, push_preview, devurl, kwargs...)
 
     folder = if ENV["PUSH_LOCAL_BUILD"] == "true"
+        @warn("Setting ENV[\"PUSH_LOCAL_BUILD\"] = \"false\", remember to set it to true for the next push.")
+        ENV["PUSH_LOCAL_BUILD"] = "false"
         devurl
     else
         @warn("Set ENV[\"PUSH_LOCAL_BUILD\"] = \"true\" if you want your local build to be pushed to Github Pages.")

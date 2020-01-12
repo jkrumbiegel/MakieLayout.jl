@@ -11,10 +11,9 @@ by the remaining space after the protrusions are subtracted.
 The axis interacts in two directions with the layout. When the size of one of its
 protrusions changes, this will notify its GridContent. This will
 then notify its parent GridLayout and so on, until the full layout is recomputed.
-After that's done, the ProtrusionLayout will have received a new bounding box in which
-to place its content. The LAxis has a bounding box node which determines
-the borders of the central plot area. This is now updated and the axis' subscene
-is adjusted to its new size. All axis decorations also update their positions.
+When that's done, the LAxis object will have received a new bounding box with which
+it should align given its size and alignment attributes. This is now updated and the axis' subscene
+is adjusted to its new size. All axis decorations then also update their positions.
 
 
 ```@example
@@ -167,3 +166,40 @@ nothing # hide
 ```
 
 ![axis aspects](example_axis_aspects.png)
+
+
+## Linking axes
+
+You can link axes to each other. Every axis simply keeps track of a list of other
+axes which it updates when it is changed itself. You can link x and y dimensions
+separately.
+
+```@example
+using Makie
+using MakieLayout
+
+scene, layout = layoutscene()
+
+layout[1, 1:3] = axs = [LAxis(scene) for i in 1:3]
+linkxaxes!(axs[1:2]...)
+linkyaxes!(axs[2:3]...)
+
+axs[1].title = "x linked"
+axs[2].title = "x & y linked"
+axs[3].title = "y linked"
+
+for i in 1:3
+    lines!(axs[i], 1:10, 1:10, color = "green")
+    if i != 1
+        lines!(axs[i], 1:10, 11:20, color = "blue")
+    end
+    if i != 3
+        lines!(axs[i], 11:20, 1:10, color = "red")
+    end
+end
+
+save("example_linked_axes.png", scene) # hide
+nothing # hide
+```
+
+![linked axes](example_linked_axes.png)

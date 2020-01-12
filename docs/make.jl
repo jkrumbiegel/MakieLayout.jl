@@ -16,6 +16,17 @@ makedocs(
         )
     )
 
+struct Gitlab <: Documenter.DeployConfig end
+
+function Documenter.deploy_folder(cfg::Gitlab;
+        repo, devbranch, push_preview, devurl, kwargs...)
+
+    folder = devurl
+end
+
+Documenter.authentication_method(::Gitlab) = Documenter.SSH
+
 deploydocs(
     repo = "github.com/jkrumbiegel/MakieLayout.jl.git",
+    deploy_config = Gitlab(),
 )

@@ -16,6 +16,6 @@ makedocs(
         )
     )
 
-# deploydocs(
-#     repo = "github.com/jkrumbiegel/Animations.jl.git",
-# )
+deploydocs(
+    repo = "github.com/jkrumbiegel/MakieLayout.jl.git",
+)

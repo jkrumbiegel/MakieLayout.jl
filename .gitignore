@@ -10,3 +10,5 @@ test/Manifest.toml
 docs/build/
 
 *.pptx
+
+docs/Manifest.toml

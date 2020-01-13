@@ -10,6 +10,7 @@ makedocs(
         "GridLayout" => "grids.md",
         "LAxis" => "laxis.md",
         "How layouting works" => "layouting.md",
+        "Ticks" => "ticks.md"
         "Frequently Asked Questions" => "faq.md",
     ],
     format = Documenter.HTML(

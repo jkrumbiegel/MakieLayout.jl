@@ -300,7 +300,7 @@ function compute_tick_values(ticks::AutoLinearTicks, vmin, vmax, pxwidth)
     locateticks(vmin, vmax, pxwidth, ticks.idealtickdistance)
 end
 
-function compute_tick_values(ticks::AutoOptimizedTicks, vmin, vmax, pxwidth)
+function compute_tick_values(ticks::WilkinsonTicks, vmin, vmax, pxwidth)
     return AbstractPlotting.PlotUtils.optimize_ticks(
         vmin, vmax;
         extend_ticks = ticks.extend_ticks,
@@ -355,7 +355,7 @@ function get_tick_labels(ticks::AutoLinearTicks, tickvalues)
     end
 end
 
-function get_tick_labels(ticks::AutoOptimizedTicks, tickvalues)
+function get_tick_labels(ticks::WilkinsonTicks, tickvalues)
 
     # take difference of first two values (they are equally spaced anyway)
     dif = diff(view(tickvalues, 1:2))[1]

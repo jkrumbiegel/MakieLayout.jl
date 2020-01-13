@@ -163,7 +163,7 @@ AutoLinearTicks(num::Real) = AutoLinearTicks(Float32(num))
 
 
 """
-    AutoOptimizedTicks(; kwargs...)
+    WilkinsonTicks(; kwargs...)
 
 This is basically Wilkinson's ad-hoc scoring method that tries to balance
 tight fit around the data, optimal number of ticks, and simple numbers.
@@ -196,7 +196,7 @@ and the variables here are:
 *  `v`: 1 if label range includes 0, 0 otherwise.
 
 """
-Base.@kwdef struct AutoOptimizedTicks <: Ticks
+Base.@kwdef struct WilkinsonTicks <: Ticks
 
     "Determines whether to extend tick computation.  Defaults to `false`."
     extend_ticks::Bool = false

@@ -23,6 +23,6 @@ Currently, there are three defined types of ticks in MakieLayout:
 
 ```@docs
 AutoLinearTicks
-AutoOptimizedTicks
+WilkinsonTicks
 ManualTicks
 ```

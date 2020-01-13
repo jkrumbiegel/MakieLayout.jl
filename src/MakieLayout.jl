@@ -5,8 +5,8 @@ using AbstractPlotting: Rect2D, IRect2D, ispressed, is_mouseinside
 using AbstractPlotting.Keyboard
 using AbstractPlotting.Mouse
 using Observables: onany
-using Match
-import Animations, Formatting, Observables, DocStringExtensions
+using Match, DocStringExtensions
+import Animations, Formatting, Observables
 
 include("types.jl")
 include("gridlayout.jl")

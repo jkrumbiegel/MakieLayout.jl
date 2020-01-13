@@ -15,6 +15,7 @@ struct Left <: Side end
 struct Right <: Side end
 struct Top <: Side end
 struct Bottom <: Side end
+
 # for protrusion content:
 struct TopLeft <: Side end
 struct TopRight <: Side end
@@ -145,12 +146,108 @@ end
 
 struct DataAspect end
 
+"An abstract type representing ticks."
 abstract type Ticks end
 
+"""
+    AutoLinearTicks(idealtickdistance::Float32)
+
+This is a simple tick finding function which takes in an ideal tick distance
+**in pixels**.
+"""
 struct AutoLinearTicks <: Ticks
     idealtickdistance::Float32
 end
 
+AutoLinearTicks(num::Real) = AutoLinearTicks(Float32(num))
+
+
+"""
+    AutoOptimizedTicks(; kwargs...)
+
+This is basically Wilkinson's ad-hoc scoring method that tries to balance
+tight fit around the data, optimal number of ticks, and simple numbers.
+
+This is the function which Plots.jl and Makie.jl use by default.
+
+## Keyword Arguments
+
+$(FIELDS)
+
+## Mathematical details
+
+Wilkinson’s optimization function is defined as the sum of three
+components. If the user requests m labels and a possible labeling has
+k labels, then the components are `simplicity`, `coverage` and `granularity`.
+
+These components are defined as follows:
+```math
+\\begin{aligned}
+  &\\text{simplicity} = 1 - \\frac{i}{|Q|} + \\frac{v}{|Q|}\\\\
+  &\\text{coverage}   = \\frac{x_{max} - x_{min}}{\\mathrm{label}_{max} - \\mathrm{label}_{min}}\\\\
+  &\\text{granularity}= 1 - \\frac{\\left|k - m\\right|}{m}
+\\end{aligned}
+```
+
+and the variables here are:
+
+*  `q`: element of `Q`.
+*  `i`: index of `q` in `Q`.
+*  `v`: 1 if label range includes 0, 0 otherwise.
+
+"""
+Base.@kwdef struct AutoOptimizedTicks <: Ticks
+
+    "Determines whether to extend tick computation.  Defaults to `false`."
+    extend_ticks::Bool = false
+    "True if no ticks should be outside `[x_min, x_max]`.  Defaults to `true`."
+    strict_span::Bool = true
+
+    """
+    A distribution of nice numbers from which labellings are sampled.
+    Stored in the form `(number, score)`.
+    """
+    Q = [(1.0,1.0), (5.0, 0.9), (2.0, 0.7), (2.5, 0.5), (3.0, 0.2)]
+
+    "The minimum number of ticks."
+    k_min::Int   = 2
+    "The maximum number of ticks."
+    k_max::Int   = 10
+    "The ideal number of ticks."
+    k_ideal::Int = 5
+
+    """
+    Encourages returning roughly the number of labels requested.
+    """
+    granularity_weight::Float64 = 1/4
+
+    """
+    Encourages nicer labeling sequences by preferring step sizes that
+    appear earlier in Q.
+
+    Also rewards labelings that include 0 as a way to ground the sequence.
+    """
+    simplicity_weight::Float64 = 1/6
+
+    """
+    Encourages labelings that do not extend far beyond
+    the range of the data, penalizing unnecessary whitespace.
+    """
+    coverage_weight::Float64 = 1/3
+
+    """
+    Encourages labellings to produce nice ranges.
+    """
+    niceness_weight::Float64 = 1/4
+
+end
+
+"""
+    ManualTicks(values::Vector{Float32}, labels::Vector{String})
+
+This is used to define manual ticks.
+Tick values must be within the axis limits.
+"""
 struct ManualTicks <: Ticks
     values::Vector{Float32}
     labels::Vector{String}

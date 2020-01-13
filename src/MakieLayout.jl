@@ -1,16 +1,12 @@
 module MakieLayout
 
 using AbstractPlotting
-using AbstractPlotting: Rect2D
-import AbstractPlotting: IRect2D
+using AbstractPlotting: Rect2D, IRect2D, ispressed, is_mouseinside
 using AbstractPlotting.Keyboard
 using AbstractPlotting.Mouse
-using AbstractPlotting: ispressed, is_mouseinside
 using Observables: onany
-import Observables
-import Formatting
 using Match
-import Animations
+import Animations, Formatting, Observables, DocStringExtensions
 
 include("types.jl")
 include("gridlayout.jl")
@@ -20,6 +16,7 @@ include("geometry_integration.jl")
 include("layout_engine.jl")
 include("makie_integration.jl")
 include("ticklocators/linear.jl")
+include("ticklocators/optimized.jl")
 include("defaultattributes.jl")
 include("lineaxis.jl")
 include("lobjects/laxis.jl")

@@ -301,6 +301,7 @@ function compute_tick_values(ticks::AutoLinearTicks, vmin, vmax, pxwidth)
 end
 
 function compute_tick_values(ticks::WilkinsonTicks, vmin, vmax, pxwidth)
+    # Main.@infiltrate
     return AbstractPlotting.PlotUtils.optimize_ticks(
         vmin, vmax;
         extend_ticks = ticks.extend_ticks,
@@ -312,8 +313,7 @@ function compute_tick_values(ticks::WilkinsonTicks, vmin, vmax, pxwidth)
         simplicity_weight = ticks.simplicity_weight,
         coverage_weight = ticks.coverage_weight,
         niceness_weight = ticks.niceness_weight,
-        strict_span = ticks.strict_span,
-        span_buffer = ticks.span_buffer
+        strict_span = ticks.strict_span
     )[1]
 end
 

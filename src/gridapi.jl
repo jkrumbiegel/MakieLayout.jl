@@ -93,3 +93,10 @@ function layoutscene(nrows::Int, ncols::Int, padding = 30; kwargs...)
     gl = GridLayout(scene, nrows, ncols, alignmode = Outside(padding))
     scene, gl
 end
+
+function axisgrid(nrows, ncols; alignmode = Outside(30), scenekw = NamedTuple(), layoutkw = NamedTuple(), axiskw = NamedTuple())
+    scene = Scene(; camera = campixel!, scenekw...)
+    layout = GridLayout(scene, nrows, ncols; alignmode = alignmode, layoutkw...)
+    axes = layout[1:nrows, 1:ncols] = [LAxis(scene; axiskw...) for i in 1:nrows, j in 1:ncols]
+    scene, axes, layout
+end

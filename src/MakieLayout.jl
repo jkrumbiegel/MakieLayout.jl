@@ -65,7 +65,7 @@ export colsize!, rowsize!, colgap!, rowgap!
 export Left, Right, Top, Bottom, TopLeft, BottomLeft, TopRight, BottomRight
 export LegendEntry, LineElement, MarkerElement, PolyElement
 export grid!, hbox!, vbox!
-export layoutscene
+export layoutscene, axisgrid
 
 const FPS = Node(30)
 const COLOR_ACCENT = Ref(RGBf0(((79, 122, 214) ./ 255)...))

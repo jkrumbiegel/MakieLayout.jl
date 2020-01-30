@@ -4,6 +4,8 @@ The package is quite new and therefore still in constant flux.
 Check out the current [documentation here](https://jkrumbiegel.github.io/MakieLayout.jl/dev/)!
 
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://jkrumbiegel.github.io/MakieLayout.jl/dev/)
+[![Build Status](https://travis-ci.com/jkrumbiegel/MakieLayout.jl.svg?branch=master)](https://travis-ci.com/jkrumbiegel/MakieLayout.jl)
+[![Codecov](https://codecov.io/gh/jkrumbiegel/Animations.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/jkrumbiegel/MakieLayout.jl)
 
 ## Purpose
 

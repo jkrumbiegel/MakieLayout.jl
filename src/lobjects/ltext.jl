@@ -1,4 +1,6 @@
-function LText(parent::Scene, text::String; kwargs...)
+ ObsOrTyp = Union{T, Observable{T}} where T
+
+function LText(parent::Scene, text::ObsOrTyp{String}; kwargs...)
     LText(parent; text = text, kwargs...)
 end
 

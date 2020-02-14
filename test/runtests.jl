@@ -106,4 +106,5 @@ end
     le = gl2[1, 3] = LLegend(scene, [scat], ["scatter"])
 
     to = gl2[1, 4] = LToggle(scene)
+    te = layout[0, :] = LText(scene, "A super title")
 end

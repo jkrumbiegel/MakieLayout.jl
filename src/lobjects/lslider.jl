@@ -74,6 +74,10 @@ function LSlider(parent::Scene; bbox = nothing, kwargs...)
         value[] = sliderrange[][i]
     end
 
+    on(attrs.value) do i
+        @info "Received new value", i
+    displayed_sliderfraction[] = (i - 1) / (length(sliderrange[]) - 1)
+        end
     # initialize slider value with closest from range
     selected_index[] = closest_index(sliderrange[], startvalue[])
 

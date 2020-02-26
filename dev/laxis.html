@@ -5,7 +5,8 @@ using Animations
 
 scene, layout = layoutscene(resolution = (600, 600))
 
-axes = [LAxis(scene) for i in 1:2, j in 1:2]
+axes = [LAxis(scene, xlabel = &quot;x label&quot;, ylabel = &quot;y label&quot;, title = &quot;title&quot;)
+    for i in 1:2, j in 1:2]
 layout[1:2, 1:2] = axes
 
 a_title = Animation([0, 2], [30.0, 50.0], sineio(n=2, yoyo=true, prewait=0.2))
@@ -29,7 +30,8 @@ layout = GridLayout(
     addedrowgaps = Fixed(0),
     alignmode = Outside(30))
 
-axes = [LAxis(scene) for j in 1:2, i in 1:2]
+axes = [LAxis(scene, xlabel = &quot;x label&quot;, ylabel = &quot;y label&quot;, title = &quot;title&quot;)
+    for j in 1:2, i in 1:2]
 layout[1:2, 1:2] = axes
 
 record(scene, &quot;example_hiding_decorations.mp4&quot;, framerate=3) do io
@@ -122,4 +124,4 @@ for i in 1:3
     if i != 3
         lines!(axs[i], 11:20, 1:10, color = &quot;red&quot;)
     end
-end</code></pre><p><img src="example_linked_axes.png" alt="linked axes"/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="grids.html">« GridLayout</a><a class="docs-footer-nextpage" href="layouting.html">How layouting works »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 26 February 2020 23:13">Wednesday 26 February 2020</span>. Using Julia version 1.3.0-rc5.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+end</code></pre><p><img src="example_linked_axes.png" alt="linked axes"/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="grids.html">« GridLayout</a><a class="docs-footer-nextpage" href="layouting.html">How layouting works »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 26 February 2020 23:35">Wednesday 26 February 2020</span>. Using Julia version 1.3.0-rc5.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

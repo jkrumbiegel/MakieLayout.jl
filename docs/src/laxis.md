@@ -23,7 +23,8 @@ using Animations
 
 scene, layout = layoutscene(resolution = (600, 600))
 
-axes = [LAxis(scene) for i in 1:2, j in 1:2]
+axes = [LAxis(scene, xlabel = "x label", ylabel = "y label", title = "title")
+    for i in 1:2, j in 1:2]
 layout[1:2, 1:2] = axes
 
 a_title = Animation([0, 2], [30.0, 50.0], sineio(n=2, yoyo=true, prewait=0.2))
@@ -63,7 +64,8 @@ layout = GridLayout(
     addedrowgaps = Fixed(0),
     alignmode = Outside(30))
 
-axes = [LAxis(scene) for j in 1:2, i in 1:2]
+axes = [LAxis(scene, xlabel = "x label", ylabel = "y label", title = "title")
+    for j in 1:2, i in 1:2]
 layout[1:2, 1:2] = axes
 
 record(scene, "example_hiding_decorations.mp4", framerate=3) do io

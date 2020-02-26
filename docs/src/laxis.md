@@ -98,10 +98,10 @@ record(scene, "example_hiding_decorations.mp4", framerate=3) do io
         recordframe!(io)
     end
     for ax in axes
-        ax.xspinevisible = false
-        ax.yspinevisible = false
-        ax.xoppositespinevisible = false
-        ax.yoppositespinevisible = false
+        ax.bottomspinevisible = false
+        ax.leftspinevisible = false
+        ax.topspinevisible = false
+        ax.rightspinevisible = false
         recordframe!(io)
     end
 end

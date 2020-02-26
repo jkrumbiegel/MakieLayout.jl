@@ -11,6 +11,7 @@ makedocs(
         "LAxis" => "laxis.md",
         "How layouting works" => "layouting.md",
         "Frequently Asked Questions" => "faq.md",
+        "LLegend" => "llegend.md",
     ],
     format = Documenter.HTML(
             prettyurls = get(ENV, "CI", nothing) == "true"

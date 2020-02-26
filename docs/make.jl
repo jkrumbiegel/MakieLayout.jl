@@ -22,7 +22,7 @@ struct Local <: Documenter.DeployConfig end
 function Documenter.deploy_folder(cfg::Local;
         repo, devbranch, push_preview, devurl, kwargs...)
 
-    folder = if ENV["PUSH_LOCAL_BUILD"] == "true"
+    folder = if get(ENV, "PUSH_LOCAL_BUILD", false) == "true"
         @warn("Setting ENV[\"PUSH_LOCAL_BUILD\"] = \"false\", remember to set it to true for the next push.")
         ENV["PUSH_LOCAL_BUILD"] = "false"
         devurl

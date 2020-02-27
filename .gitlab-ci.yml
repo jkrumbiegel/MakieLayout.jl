@@ -40,6 +40,7 @@ documentation:
   script:
     - mkdir $JULIA_DEPOT_PATH # Pkg.jl#325
     - glxinfo | grep 'version'
+    - git --version`
     - julia -e 'using InteractiveUtils; versioninfo()'
     - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
     - julia --project=docs --color=yes docs/make.jl

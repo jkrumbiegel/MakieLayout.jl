@@ -35,13 +35,12 @@ documentation:
   before_script:
       - apt-get -qq update
       # glfw
-      - apt-get install -y cmake xorg-dev mesa-utils p7zip-full which ssh
+      - apt-get install -y cmake xorg-dev mesa-utils p7zip-full ssh
 
   script:
     - mkdir $JULIA_DEPOT_PATH # Pkg.jl#325
     - glxinfo | grep 'version'
     - git --version
-    - which ssh
     - ssh -V
     - julia -e 'using InteractiveUtils; versioninfo()'
     - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'

@@ -5,29 +5,11 @@ variables:
   CI_DEV_PKGS: "Makie#master AbstractPlotting#master GLMakie#master"
 
 stages:
-  - test
-  # - deploy
+  # - test
+  - deploy
 
-test:
-  stage: test
-  tags:
-      - xorg
-  image: "juliagpu/julia:v1.3-${CI_IMAGE_TAG}"
-  before_script:
-      - apt-get -qq update
-      # glfw
-      - apt-get install -y cmake xorg-dev mesa-utils p7zip-full
-
-  script:
-    - mkdir $JULIA_DEPOT_PATH # Pkg.jl#325
-    - glxinfo | grep 'version'
-    - julia -e 'using InteractiveUtils; versioninfo()'
-    - julia --project -e "using Pkg;
-                          pkg\"add $CI_DEV_PKGS\""
-    - julia --project -e 'using Pkg; pkg"test"'
-
-# pages:
-#   stage: deploy
+# test:
+#   stage: test
 #   tags:
 #       - xorg
 #   image: "juliagpu/julia:v1.2-${CI_IMAGE_TAG}"
@@ -40,11 +22,29 @@ test:
 #     - mkdir $JULIA_DEPOT_PATH # Pkg.jl#325
 #     - glxinfo | grep 'version'
 #     - julia -e 'using InteractiveUtils; versioninfo()'
-#     - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
-#     - julia --project=docs --color=yes docs/make.jl
-#     # - mv docs/build public # move to the directory picked up by Gitlab pages
-#   # artifacts:
-#   #   paths:
-#   #     - public
-#   only:
-#   - master
+#     - julia --project -e "using Pkg;
+#                           pkg\"add $CI_DEV_PKGS\""
+#     - julia --project -e 'using Pkg; pkg"test"'
+
+documentation:
+  stage: deploy
+  tags:
+      - xorg
+  image: "juliagpu/julia:v1.2-${CI_IMAGE_TAG}"
+  before_script:
+      - apt-get -qq update
+      # glfw
+      - apt-get install -y cmake xorg-dev mesa-utils p7zip-full
+
+  script:
+    - mkdir $JULIA_DEPOT_PATH # Pkg.jl#325
+    - glxinfo | grep 'version'
+    - julia -e 'using InteractiveUtils; versioninfo()'
+    - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
+    - julia --project=docs --color=yes docs/make.jl
+    # - mv docs/build public # move to the directory picked up by Gitlab pages
+  # artifacts:
+  #   paths:
+  #     - public
+  only:
+  - master

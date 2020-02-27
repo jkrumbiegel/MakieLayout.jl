@@ -26,6 +26,33 @@ save("example_legend.png", scene); nothing # hide
 ![example legend](example_legend.png)
 
 
+## Multi-column legend
+
+You can control the number of columns with the `ncols` attribute.
+
+```@example
+using MakieLayout
+using Makie
+using AbstractPlotting: px
+
+scene, layout = layoutscene()
+
+ax = layout[1, 1] = LAxis(scene)
+
+xs = 0:0.5:10
+lins = [lines!(ax, xs, sin.(xs .+ v), color = RGBf0(v, 0, 1-v)) for v in 0:0.1:1]
+
+leg = LLegend(scene, lins, string.(1:length(lins)), ncols = 3)
+layout[1, 2] = leg
+
+
+save("example_legend_ncols.png", scene); nothing # hide
+```
+
+![example legend ncols](example_legend_ncols.png)
+
+
+
 ## Legend inside an axis
 
 To place a legend inside an axis you can simply add it to the same layout slot

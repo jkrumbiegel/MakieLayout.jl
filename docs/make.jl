@@ -51,7 +51,7 @@ end
 function Gitlab()
     commit_branch = get(ENV, "CI_COMMIT_BRANCH", "")
     pull_request_iid = get(ENV, "CI_EXTERNAL_PULL_REQUEST_IID", "")
-    repo_slug = get(ENV, "CI_PROJECT_PATH_SLUG")
+    repo_slug = get(ENV, "CI_PROJECT_PATH_SLUG", "")
     commit_tag = get(ENV, "CI_COMMIT_TAG", "")
     pipeline_source = get(ENV, "CI_PIPELINE_SOURCE", "")
     Gitlab(

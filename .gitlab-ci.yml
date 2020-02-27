@@ -8,6 +8,7 @@ stages:
   # - test
   - deploy
 
+
 # test:
 #   stage: test
 #   tags:
@@ -30,7 +31,7 @@ documentation:
   stage: deploy
   tags:
       - xorg
-  image: "juliagpu/julia:v1.2-${CI_IMAGE_TAG}"
+  image: "juliagpu/julia:v1.3-${CI_IMAGE_TAG}"
   before_script:
       - apt-get -qq update
       # glfw

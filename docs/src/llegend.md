@@ -136,3 +136,41 @@ save("example_legend_entries.png", scene); nothing # hide
 ```
 
 ![example legend entries](example_legend_entries.png)
+
+
+## Horizontal legend
+
+In case you want the legend entries to be listed horizontally, set the `orientation`
+attribute to `:horizontal`. In this case the `ncols` attribute refers to the
+number of rows instead. To keep an adjacent axis from potentially shrinking to
+the width of the horizontal legend, set `width = Auto(false)` and `height = Auto(true)`
+if you place the legend below or above the axis.
+
+
+
+```@example
+using MakieLayout
+using Makie
+using AbstractPlotting: px
+
+scene, layout = layoutscene()
+
+ax = layout[1, 1] = LAxis(scene)
+
+xs = 0:0.5:10
+ys = sin.(xs)
+lin = lines!(ax, xs, ys, color = :blue)
+sca = scatter!(ax, xs, ys, color = :red, markersize = 15px)
+
+leg = LLegend(scene, [lin, sca, lin], ["a line", "some dots", "line again"])
+layout[1, 2] = leg
+
+leg_horizontal = LLegend(scene, [lin, sca, lin], ["a line", "some dots", "line again"],
+    orientation = :horizontal, width = Auto(false), height = Auto(true))
+layout[2, 1] = leg_horizontal
+
+
+save("example_legend_horizontal.png", scene); nothing # hide
+```
+
+![example legend](example_legend_horizontal.png)

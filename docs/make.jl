@@ -90,6 +90,12 @@ function Documenter.deploy_folder(cfg::Gitlab; repo, devbranch, push_preview, de
     return all_ok ? subfolder : nothing
 end
 
+Documenter.authentication_method(::Gitlab) = Documenter.SSH
+
+function Documenter.documenter_key(::Gitlab)
+    return ENV["DOCUMENTER_KEY"]
+end
+
 
 deploydocs(
     repo = "github.com/jkrumbiegel/MakieLayout.jl.git",

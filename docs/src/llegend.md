@@ -5,7 +5,7 @@ using MakieLayout
 using Makie
 using AbstractPlotting: px
 
-scene, layout = layoutscene()
+scene, layout = layoutscene(resolution = (1400, 900))
 
 ax = layout[1, 1] = LAxis(scene)
 
@@ -35,12 +35,12 @@ using MakieLayout
 using Makie
 using AbstractPlotting: px
 
-scene, layout = layoutscene()
+scene, layout = layoutscene(resolution = (1400, 900))
 
 ax = layout[1, 1] = LAxis(scene)
 
-xs = 0:0.5:10
-lins = [lines!(ax, xs, sin.(xs .+ v), color = RGBf0(v, 0, 1-v)) for v in 0:0.1:1]
+xs = 0:0.1:10
+lins = [lines!(ax, xs, sin.(xs .+ 3v), color = RGBf0(v, 0, 1-v)) for v in 0:0.1:1]
 
 leg = LLegend(scene, lins, string.(1:length(lins)), ncols = 3)
 layout[1, 2] = leg
@@ -65,7 +65,7 @@ spines.
 using MakieLayout
 using Makie
 
-scene, layout = layoutscene()
+scene, layout = layoutscene(resolution = (1400, 900))
 
 ax = layout[1, 1] = LAxis(scene)
 
@@ -116,7 +116,7 @@ using MakieLayout
 using Makie
 using AbstractPlotting: px
 
-scene, layout = layoutscene()
+scene, layout = layoutscene(resolution = (1400, 900))
 
 ax = layout[1, 1] = LAxis(scene)
 
@@ -180,7 +180,7 @@ using MakieLayout
 using Makie
 using AbstractPlotting: px
 
-scene, layout = layoutscene()
+scene, layout = layoutscene(resolution = (1400, 900))
 
 ax = layout[1, 1] = LAxis(scene)
 

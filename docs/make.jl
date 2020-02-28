@@ -9,9 +9,10 @@ makedocs(
         "index.md",
         "GridLayout" => "grids.md",
         "LAxis" => "laxis.md",
+        "LLegend" => "llegend.md",
+        "Other Layoutables" => "layoutables.md",
         "How layouting works" => "layouting.md",
         "Frequently Asked Questions" => "faq.md",
-        "LLegend" => "llegend.md",
     ],
     format = Documenter.HTML(
             prettyurls = get(ENV, "CI", nothing) == "true"

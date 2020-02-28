@@ -51,4 +51,5 @@ documentation:
   #   paths:
   #     - public
   only:
-  - master
+    - master
+    - tags

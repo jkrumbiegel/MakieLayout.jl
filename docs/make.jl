@@ -75,7 +75,7 @@ function Documenter.deploy_folder(cfg::Gitlab; repo, devbranch, push_preview, de
         println("tag_ok: ", tag_ok)
         all_ok &= tag_ok
 
-        cfg.travis_tag
+        cfg.commit_tag
     else
         devurl
     end

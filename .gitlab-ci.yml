@@ -5,27 +5,28 @@ variables:
   CI_DEV_PKGS: "Makie#master AbstractPlotting#master GLMakie#master"
 
 stages:
-  # - test
+  - test
   - deploy
 
 
-# test:
-#   stage: test
-#   tags:
-#       - xorg
-#   image: "juliagpu/julia:v1.2-${CI_IMAGE_TAG}"
-#   before_script:
-#       - apt-get -qq update
-#       # glfw
-#       - apt-get install -y cmake xorg-dev mesa-utils p7zip-full
-#
-#   script:
-#     - mkdir $JULIA_DEPOT_PATH # Pkg.jl#325
-#     - glxinfo | grep 'version'
-#     - julia -e 'using InteractiveUtils; versioninfo()'
-#     - julia --project -e "using Pkg;
-#                           pkg\"add $CI_DEV_PKGS\""
-#     - julia --project -e 'using Pkg; pkg"test"'
+test:
+  stage: test
+  tags:
+      - xorg
+  image: "juliagpu/julia:v1.3-${CI_IMAGE_TAG}"
+  before_script:
+      - apt-get -qq update
+      # glfw
+      - apt-get install -y cmake xorg-dev mesa-utils p7zip-full
+
+  script:
+    - mkdir $JULIA_DEPOT_PATH # Pkg.jl#325
+    - glxinfo | grep 'version'
+    - julia -e 'using InteractiveUtils; versioninfo()'
+    - julia --project -e "using Pkg;
+                          pkg\"add $CI_DEV_PKGS\""
+    - julia --project -e 'using Pkg; pkg"test"'
+
 
 documentation:
   stage: deploy

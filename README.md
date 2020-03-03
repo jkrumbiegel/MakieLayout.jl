@@ -1,11 +1,11 @@
 # MakieLayout.jl
 
-The package is quite new and therefore still in constant flux.
-Check out the current [documentation here](https://jkrumbiegel.github.io/MakieLayout.jl/dev/)!
-
-[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://jkrumbiegel.github.io/MakieLayout.jl/dev/)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://jkrumbiegel.github.io/MakieLayout.jl/stable)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://jkrumbiegel.github.io/MakieLayout.jl/dev/)
 [![Build Status](https://travis-ci.com/jkrumbiegel/MakieLayout.jl.svg?branch=master)](https://travis-ci.com/jkrumbiegel/MakieLayout.jl)
 [![Codecov](https://codecov.io/gh/jkrumbiegel/Animations.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/jkrumbiegel/MakieLayout.jl)
+
+![layout demo](https://raw.githubusercontent.com/jkrumbiegel/MakieLayout.jl/gh-pages/additional_media/layoutdemo.gif)
 
 ## Purpose
 
@@ -22,5 +22,3 @@ the flexible combination of these features:
 Most layout parameters are instantly adjustable using Observables, as in Makie.jl.
 Also, the layout automatically readjusts if you change visual attributes of your
 content elements.
-
-![layout demo](https://raw.githubusercontent.com/jkrumbiegel/MakieLayout.jl/gh-pages/additional_media/layoutdemo.gif)

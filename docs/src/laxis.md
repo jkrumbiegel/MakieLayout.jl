@@ -205,3 +205,26 @@ nothing # hide
 ```
 
 ![linked axes](example_linked_axes.png)
+
+
+## Axis interaction
+
+You can zoom in an axis by scrolling and pan by right-clicking and dragging. The
+limits can be reset using `ctrl + click`. Alternatively, you can just call
+`autolimits!` on the axis.
+
+For some axes you might want to limit
+zooming and panning to one dimension or disable it completely. This can be
+achieved using the attributes `xpanlock`, `ypanlock`, `xzoomlock` and `yzoomlock`.
+
+```julia
+# an LAxis that can only be zoomed and panned horizontally, for example for
+# temporal signals like audio
+ax = LAxis(scene, ypanlock = true, yzoomlock = true)
+```
+
+You can also interactively limit zoom and pan directions by pressing and holding
+a button during zooming or panning. By default those buttons are `x` and `y`,
+respectively, but you can change them with the attributes `xpankey`, `ypankey`,
+`xzoomkey` and `yzoomkey`. Buttons can be found in `AbstractPlotting.Keyboard`,
+for example the `x` button is accessed as `AbstractPlotting.Keyboard.x`.

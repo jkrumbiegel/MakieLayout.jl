@@ -170,6 +170,75 @@ nothing # hide
 ![axis aspects](example_axis_aspects.png)
 
 
+## Controlling data aspect ratios
+
+If you want the content of an axis to adhere to a certain data aspect ratio, there is
+another way than forcing the aspect ratio of the whole axis to be the same, and
+possibly breaking the layout. This works via the axis attribute `autolimitaspect`.
+It can either be set to `nothing` which means the data limits can have any arbitrary
+aspect ratio. Or it can be set to a number, in which case the targeted limits of the
+axis (that are computed by `autolimits!`) are enlarged to have the correct aspect ratio.
+
+You can see the different ways to get a plot with an unstretched circle, using
+different ways of setting aspect ratios, in the following example.
+
+```@example
+using MakieLayout
+using Makie
+using Animations
+
+# scene setup for animation
+
+container_scene = Scene(camera = campixel!, resolution = (1200, 1200))
+
+t = Node(0.0)
+
+a_width = Animation([1, 7], [1200.0, 800], sineio(n=2, yoyo=true, postwait=0.5))
+a_height = Animation([2.5, 8.5], [1200.0, 800], sineio(n=2, yoyo=true, postwait=0.5))
+
+scene_area = lift(t) do t
+    IRect(0, 0, round(Int, a_width(t)), round(Int, a_height(t)))
+end
+
+scene = Scene(container_scene, scene_area, camera = campixel!)
+
+rect = poly!(scene, scene_area,
+    raw=true, color=RGBf0(0.97, 0.97, 0.97), strokecolor=:transparent, strokewidth=0)[end]
+
+outer_layout = GridLayout(scene, alignmode = Outside(30))
+
+
+
+# example begins here
+
+layout = outer_layout[1, 1] = GridLayout()
+
+titles = ["aspect via layout", "axis aspect", "data aspect", "no aspect"]
+axs = layout[1:2, 1:2] = [LAxis(scene, title = t) for t in titles]
+
+for a in axs
+    lines!(a, Circle(Point2f0(0, 0), 100f0))
+end
+
+rowsize!(layout, 1, Relative(0.4))
+# force the layout cell [1, 1] to be square
+colsize!(layout, 1, Aspect(1, 1))
+
+axs[2].aspect = 1
+axs[3].autolimitaspect = 1
+
+rects = layout[1:2, 1:2] = [LRect(scene, color = (:black, 0.05),
+    strokecolor = :transparent) for _ in 1:4]
+
+record(container_scene, "example_circle_aspect_ratios.mp4", 0:1/60:9; framerate=60) do ti
+    t[] = ti
+end
+nothing # hide
+```
+
+![example circle aspect ratios](example_circle_aspect_ratios.mp4)
+
+
 ## Linking axes
 
 You can link axes to each other. Every axis simply keeps track of a list of other

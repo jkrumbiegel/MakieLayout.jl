@@ -213,19 +213,19 @@ outer_layout = GridLayout(scene, alignmode = Outside(30))
 
 layout = outer_layout[1, 1] = GridLayout()
 
-titles = ["aspect via layout", "axis aspect", "data aspect", "no aspect"]
+titles = ["aspect via layout", "axis aspect", "no aspect", "data aspect"]
 axs = layout[1:2, 1:2] = [LAxis(scene, title = t) for t in titles]
 
 for a in axs
     lines!(a, Circle(Point2f0(0, 0), 100f0))
 end
 
-rowsize!(layout, 1, Relative(0.4))
+rowsize!(layout, 1, Fixed(400))
 # force the layout cell [1, 1] to be square
 colsize!(layout, 1, Aspect(1, 1))
 
 axs[2].aspect = 1
-axs[3].autolimitaspect = 1
+axs[4].autolimitaspect = 1
 
 rects = layout[1:2, 1:2] = [LRect(scene, color = (:black, 0.05),
     strokecolor = :transparent) for _ in 1:4]

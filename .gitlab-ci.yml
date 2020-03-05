@@ -26,6 +26,9 @@ test:
     - julia --project -e "using Pkg;
                           pkg\"add $CI_DEV_PKGS\""
     - julia --project -e 'using Pkg; pkg"test"'
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /^DOCS.*/ # skip testing for pure docs builds
 
 
 documentation:

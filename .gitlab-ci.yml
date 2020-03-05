@@ -29,6 +29,7 @@ test:
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^DOCS.*/ # skip testing for pure docs builds
+      - $CI_COMMIT_MESSAGE =~ /^bump version.*/ # skip testing for simple version bumps
 
 
 documentation:
@@ -56,3 +57,6 @@ documentation:
   only:
     - master
     - tags
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /^bump version.*/ # skip docs for simple version bumps (tag will trigger)

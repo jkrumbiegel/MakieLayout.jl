@@ -196,6 +196,25 @@ struct AutoLinearTicks{T<:Union{Int, Float32}} <: Ticks
     target::T
 end
 
+"""
+    WilkinsonTicks(; kwargs...)
+This is basically Wilkinson's ad-hoc scoring method that tries to balance
+tight fit around the data, optimal number of ticks, and simple numbers.
+This is the function which Plots.jl and Makie.jl use by default.
+
+## Keyword Arguments
+
+* `Q`: A distribution of nice numbers from which labellings are sampled. Stored in the form (number, score).
+* `k_min`: The minimum number of ticks.
+* `k_max`: The maximum number of ticks.
+* `k_ideal`:  The ideal number of ticks.
+* `granularity_weight`: Encourages returning roughly the number of labels requested.
+* `simplicity_weight`: Encourages nicer labeling sequences by preferring step sizes that appear earlier in Q.
+    Also rewards labelings that include 0 as a way to ground the sequence.
+* `coverage_weight`: Encourages labelings that do not extend far beyond the range of the data, penalizing unnecessary whitespace.
+* `niceness_weight`: Encourages labellings to produce nice ranges.
+
+"""
 struct WilkinsonTicks <: Ticks
     k_ideal::Int
     k_min::Int
@@ -208,6 +227,12 @@ struct WilkinsonTicks <: Ticks
     min_px_dist::Float64
 end
 
+"""
+    struct ManualTicks <: Ticks
+
+These allow you to encode arbitrary, manual ticks.  The constructor has the form
+`ManualTicks(values::Vector{Float32), labels::Vector{String})`.
+"""
 struct ManualTicks <: Ticks
     values::Vector{Float32}
     labels::Vector{String}

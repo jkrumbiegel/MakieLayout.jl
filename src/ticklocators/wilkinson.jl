@@ -1,4 +1,4 @@
-function WilkinsonTicks(k_ideal::Int; k_min = 2, k_max = 10,
+function WilkinsonTicks(k_ideal::Int = 5; k_min = 4, k_max = 10,
         Q = [(1.0,1.0), (5.0, 0.9), (2.0, 0.7), (2.5, 0.5), (3.0, 0.2)],
         granularity_weight = 1/4,
         simplicity_weight = 1/6,
@@ -23,7 +23,7 @@ function compute_tick_values(ticks::WilkinsonTicks, vmin, vmax, pxwidth)
     n_max_allowed_ticks = max(ticks.k_min, round(Int, pxwidth / min_px_dist))
 
     tickvalues, _ = PlotUtils.optimize_ticks(vmin, vmax;
-        extend_ticks = false, strict_span=true, span_buffer = nothing,
+        extend_ticks = false, strict_span=false, span_buffer = nothing,
         k_min = ticks.k_min,
         k_max = min(ticks.k_max, n_max_allowed_ticks),
         k_ideal = min(ticks.k_ideal, n_max_allowed_ticks),

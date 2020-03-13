@@ -706,6 +706,8 @@ function add_pan!(scene::SceneLike, limits, xpanlock, ypanlock, panbutton, xpank
 end
 
 function add_zoom!(scene::SceneLike, limits, xzoomlock, yzoomlock, xzoomkey, yzoomkey)
+    zoomlock = (xzoomlock, yzoomlock)
+    zoomkey = (xzoomkey, yzoomkey)
 
     e = events(scene)
     cam = camera(scene)
@@ -719,30 +721,25 @@ function add_zoom!(scene::SceneLike, limits, xzoomlock, yzoomlock, xzoomkey, yzo
 
             # don't let z go negative
             z = max(0.1f0, 1f0 + (zoom * zoomspeed))
-
             # limits[] = FRect(limits[].origin..., (limits[].widths .* 0.99)...)
             mp_fraction = (Vec2f0(e.mouseposition[]) - minimum(pa)) ./ widths(pa)
 
             mp_data = limits[].origin .+ mp_fraction .* limits[].widths
+            origin = limits[].origin
+            _widths = limits[].widths
 
-            xorigin = limits[].origin[1]
-            yorigin = limits[].origin[2]
-
-            xwidth = limits[].widths[1]
-            ywidth = limits[].widths[2]
-
-            newxwidth = xzoomlock[] ? xwidth : xwidth * z
-            newywidth = yzoomlock[] ? ywidth : ywidth * z
-
-            newxorigin = xzoomlock[] ? xorigin : xorigin + mp_fraction[1] * (xwidth - newxwidth)
-            newyorigin = yzoomlock[] ? yorigin : yorigin + mp_fraction[2] * (ywidth - newywidth)
+            newwidth = ifelse.(getindex.(zoomlock), _widths, _widths .* z)
+            neworigin = ifelse.(getindex.(zoomlock), origin, origin .+ mp_fraction .* (_widths .- newwidth))
 
             if AbstractPlotting.ispressed(scene, xzoomkey[])
-                limits[] = FRect(newxorigin, yorigin, newxwidth, ywidth)
+                limits[] = FRect(neworigin[1], origin[2], newwidth[1], _widths[2])
             elseif AbstractPlotting.ispressed(scene, yzoomkey[])
-                limits[] = FRect(xorigin, newyorigin, xwidth, newywidth)
+                limits[] = FRect(origin[1], neworigin[2], _widths[1], newwidth[2])
             else
-                limits[] = FRect(newxorigin, newyorigin, newxwidth, newywidth)
+                # splatting is not yet fast for StaticArrays: https://github.com/JuliaArrays/StaticArrays.jl/issues/361
+                _neworigin = Tuple(neworigin)
+                _newwidths = Tuple(newwidth)
+                limits[] = FRect(_neworigin..., _newwidths...)
             end
         end
         return

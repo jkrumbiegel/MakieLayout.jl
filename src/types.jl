@@ -197,7 +197,7 @@ struct AutoLinearTicks{T<:Union{Int, Float32}} <: Ticks
 end
 
 """
-    WilkinsonTicks(; kwargs...)
+    WilkinsonTicks([k_ideal::Int = 5]; kwargs...)
 This is basically Wilkinson's ad-hoc scoring method that tries to balance
 tight fit around the data, optimal number of ticks, and simple numbers.
 This is the function which Plots.jl and Makie.jl use by default.

@@ -739,6 +739,12 @@ function add_zoom!(scene::SceneLike, limits, xzoomlock, yzoomlock, xzoomkey, yzo
             newwidth = ifelse.(this_zoomlock, _widths, _widths .* z)
             neworigin = ifelse.(this_zoomlock, origin, origin .+ mp_fraction .* (_widths .- newwidth))
 
+            fclamp(x) = clamp(x, floatmin(typeof(x)), floatmax(typeof(x)))
+            posfclamp(x) = clamp(x, eps(typeof(x))^2 #=some tiny=# , floatmax(typeof(x)))
+
+            newwidth = fclamp.(newwidth)
+            neworigin = fclamp.(neworigin)
+
             # splatting is not yet fast for StaticArrays: https://github.com/JuliaArrays/StaticArrays.jl/issues/361
             limits[] = FRect(Tuple(neworigin)..., Tuple(newwidth)...)
         end

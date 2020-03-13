@@ -717,6 +717,14 @@ function add_zoom!(scene::SceneLike, limits, xzoomlock, yzoomlock, xzoomkey, yzo
         zoombutton = nothing
         zoom = Float32(x[2])
         if zoom != 0 && ispressed(scene, zoombutton) && AbstractPlotting.is_mouseinside(scene)
+            zoomkeypressed = AbstractPlotting.ispressed.(Ref(scene), getindex.(zoomkey))
+            zoomkeylock = if any(zoomkeypressed)
+                .!(zoomkeypressed)
+            else
+                zoomkeypressed # falses
+            end
+            this_zoomlock = getindex.(zoomlock) .| zoomkeylock
+
             pa = pixelarea(scene)[]
 
             # don't let z go negative
@@ -728,19 +736,11 @@ function add_zoom!(scene::SceneLike, limits, xzoomlock, yzoomlock, xzoomkey, yzo
             origin = limits[].origin
             _widths = limits[].widths
 
-            newwidth = ifelse.(getindex.(zoomlock), _widths, _widths .* z)
-            neworigin = ifelse.(getindex.(zoomlock), origin, origin .+ mp_fraction .* (_widths .- newwidth))
+            newwidth = ifelse.(this_zoomlock, _widths, _widths .* z)
+            neworigin = ifelse.(this_zoomlock, origin, origin .+ mp_fraction .* (_widths .- newwidth))
 
-            if AbstractPlotting.ispressed(scene, xzoomkey[])
-                limits[] = FRect(neworigin[1], origin[2], newwidth[1], _widths[2])
-            elseif AbstractPlotting.ispressed(scene, yzoomkey[])
-                limits[] = FRect(origin[1], neworigin[2], _widths[1], newwidth[2])
-            else
-                # splatting is not yet fast for StaticArrays: https://github.com/JuliaArrays/StaticArrays.jl/issues/361
-                _neworigin = Tuple(neworigin)
-                _newwidths = Tuple(newwidth)
-                limits[] = FRect(_neworigin..., _newwidths...)
-            end
+            # splatting is not yet fast for StaticArrays: https://github.com/JuliaArrays/StaticArrays.jl/issues/361
+            limits[] = FRect(Tuple(neworigin)..., Tuple(newwidth)...)
         end
         return
     end

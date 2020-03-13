@@ -706,6 +706,8 @@ function add_pan!(scene::SceneLike, limits, xpanlock, ypanlock, panbutton, xpank
 end
 
 function add_zoom!(scene::SceneLike, limits, xzoomlock, yzoomlock, xzoomkey, yzoomkey)
+    zoomlock = (xzoomlock, yzoomlock)
+    zoomkey = (xzoomkey, yzoomkey)
 
     e = events(scene)
     cam = camera(scene)
@@ -715,35 +717,36 @@ function add_zoom!(scene::SceneLike, limits, xzoomlock, yzoomlock, xzoomkey, yzo
         zoombutton = nothing
         zoom = Float32(x[2])
         if zoom != 0 && ispressed(scene, zoombutton) && AbstractPlotting.is_mouseinside(scene)
+            zoomkeypressed = AbstractPlotting.ispressed.(Ref(scene), getindex.(zoomkey))
+            zoomkeylock = if any(zoomkeypressed)
+                .!(zoomkeypressed)
+            else
+                zoomkeypressed # falses
+            end
+            this_zoomlock = getindex.(zoomlock) .| zoomkeylock
+
             pa = pixelarea(scene)[]
 
             # don't let z go negative
             z = max(0.1f0, 1f0 + (zoom * zoomspeed))
-
             # limits[] = FRect(limits[].origin..., (limits[].widths .* 0.99)...)
             mp_fraction = (Vec2f0(e.mouseposition[]) - minimum(pa)) ./ widths(pa)
 
             mp_data = limits[].origin .+ mp_fraction .* limits[].widths
+            origin = limits[].origin
+            _widths = limits[].widths
 
-            xorigin = limits[].origin[1]
-            yorigin = limits[].origin[2]
+            newwidth = ifelse.(this_zoomlock, _widths, _widths .* z)
+            neworigin = ifelse.(this_zoomlock, origin, origin .+ mp_fraction .* (_widths .- newwidth))
 
-            xwidth = limits[].widths[1]
-            ywidth = limits[].widths[2]
+            fclamp(x) = clamp(x, floatmin(typeof(x)), floatmax(typeof(x)))
+            posfclamp(x) = clamp(x, eps(typeof(x))^2 #=some tiny=# , floatmax(typeof(x)))
 
-            newxwidth = xzoomlock[] ? xwidth : xwidth * z
-            newywidth = yzoomlock[] ? ywidth : ywidth * z
+            newwidth = fclamp.(newwidth)
+            neworigin = fclamp.(neworigin)
 
-            newxorigin = xzoomlock[] ? xorigin : xorigin + mp_fraction[1] * (xwidth - newxwidth)
-            newyorigin = yzoomlock[] ? yorigin : yorigin + mp_fraction[2] * (ywidth - newywidth)
-
-            if AbstractPlotting.ispressed(scene, xzoomkey[])
-                limits[] = FRect(newxorigin, yorigin, newxwidth, ywidth)
-            elseif AbstractPlotting.ispressed(scene, yzoomkey[])
-                limits[] = FRect(xorigin, newyorigin, xwidth, newywidth)
-            else
-                limits[] = FRect(newxorigin, newyorigin, newxwidth, newywidth)
-            end
+            # splatting is not yet fast for StaticArrays: https://github.com/JuliaArrays/StaticArrays.jl/issues/361
+            limits[] = FRect(Tuple(neworigin)..., Tuple(newwidth)...)
         end
         return
     end

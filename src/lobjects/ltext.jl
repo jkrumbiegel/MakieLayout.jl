@@ -50,13 +50,6 @@ end
 
 defaultlayout(lt::LText) = ProtrusionLayout(lt)
 
-function align_to_bbox!(lt::LText, bbox)
-    lt.layoutnodes.suggestedbbox[] = bbox
-end
-
-computedsizenode(lt::LText) = lt.layoutnodes.computedsize
-protrusionnode(lt::LText) = lt.layoutnodes.protrusions
-
 
 function Base.getproperty(lt::LText, s::Symbol)
     if s in fieldnames(LText)

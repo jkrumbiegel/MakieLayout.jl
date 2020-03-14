@@ -199,3 +199,5 @@ computedsizenode(x) = layoutnodes(x).computedsize
 autosizenode(x) = layoutnodes(x).autosize
 computedbboxnode(x) = layoutnodes(x).computedbbox
 gridcontent(x) = layoutnodes(x).gridcontent
+
+align_to_bbox!(x, bbox) = suggestedbboxnode(x)[] = bbox

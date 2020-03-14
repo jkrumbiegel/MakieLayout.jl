@@ -102,12 +102,6 @@ end
 
 defaultlayout(lt::LToggle) = ProtrusionLayout(lt)
 
-computedsizenode(lt::LToggle) = lt.layoutnodes.computedsize
-protrusionnode(lt::LToggle) = lt.layoutnodes.protrusions
-
-function align_to_bbox!(lt::LToggle, bbox)
-    lt.layoutnodes.suggestedbbox[] = bbox
-end
 
 function Base.getproperty(lt::LToggle, s::Symbol)
     if s in fieldnames(LToggle)

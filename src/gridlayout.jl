@@ -53,36 +53,19 @@ function GridLayout(nrows::Int, ncols::Int;
 
     attrs = merge!(Attributes(kwargs), default_attributes(GridLayout))
 
-    sizeattrs = sizenode!(attrs.width, attrs.height)
 
-    alignment = lift(tuple, attrs.halign, attrs.valign)
-
-    autosizenode = Node{NTuple{2, Optional{Float32}}}((nothing, nothing))
-
-    computedsize = computedsizenode!(sizeattrs, autosizenode)
-
-    suggestedbbox = create_suggested_bboxnode(bbox)
-
-    finalbbox = alignedbboxnode!(suggestedbbox, computedsize, alignment,
-        sizeattrs, autosizenode)
-
-    protrusions = Node(RectSides(0f0, 0f0, 0f0, 0f0))
-
-    layoutnodes = LayoutNodes{GridLayout, GridLayout}(suggestedbbox, protrusions, computedsize, autosizenode, finalbbox, nothing)
-
+    layoutnodes = LayoutNodes(GridLayout, attrs.width, attrs.height, attrs.halign, attrs.valign;
+        suggestedbbox = bbox)
 
     gl = GridLayout(
         content, nrows, ncols, rowsizes, colsizes, addedrowgaps,
         addedcolgaps, alignmode, equalprotrusiongaps, needs_update, layoutnodes, attrs, parentscene)
 
-    on(finalbbox) do bb
-        align_to_bbox!(gl, bb)
+    on(computedbboxnode(gl)) do cbb
+        align_to_bbox!(gl, cbb)
     end
 
     on(needs_update) do u
-        # TODO: is this correct? or should the bbox change somehow when a member
-        # size changes
-
         w = determinedirsize(gl, Col())
         h = determinedirsize(gl, Row())
 
@@ -94,20 +77,20 @@ function GridLayout(nrows::Int, ncols::Int;
             protrusion(gl, Top()),
         )
 
-        if autosizenode[] == new_autosize &&
-                gl.layoutnodes.protrusions[] == new_protrusions
+        if autosizenode(gl)[] == new_autosize &&
+                protrusionnode(gl)[] == new_protrusions
 
-            gl.layoutnodes.suggestedbbox[] = gl.layoutnodes.suggestedbbox[]
+            suggestedbboxnode(gl)[] = suggestedbboxnode(gl)[]
         else
             # otherwise these values will not already be up to date when adding the
             # gridlayout into the next one
 
             # TODO: this is a double update?
-            gl.layoutnodes.protrusions[] = new_protrusions
-            autosizenode[] = new_autosize
+            protrusionnode(gl)[] = new_protrusions
+            autosizenode(gl)[] = new_autosize
 
-            if isnothing(gl.layoutnodes.gridcontent)
-                gl.layoutnodes.suggestedbbox[] = gl.layoutnodes.suggestedbbox[]
+            if isnothing(gridcontent(gl))
+                suggestedbboxnode(gl)[] = suggestedbboxnode(gl)[]
             end
         end
 
@@ -116,10 +99,6 @@ function GridLayout(nrows::Int, ncols::Int;
 
     gl
 end
-
-
-computedsizenode(gridlayout::GridLayout) = gridlayout.layoutnodes.computedsize
-protrusionnode(gridlayout::GridLayout) = gridlayout.layoutnodes.protrusions
 
 
 function validategridlayout(gl::GridLayout)

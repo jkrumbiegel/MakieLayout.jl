@@ -8,23 +8,14 @@ function LText(parent::Scene; bbox = nothing, kwargs...)
     @extract attrs (text, textsize, font, color, visible, halign, valign,
         rotation, padding)
 
-    sizeattrs = sizenode!(attrs.width, attrs.height)
-
-    alignment = lift(tuple, halign, valign)
-
-    autosizenode = Node{NTuple{2, Optional{Float32}}}((nothing, nothing))
-
-    computedsize = computedsizenode!(sizeattrs, autosizenode)
-
-    suggestedbbox = create_suggested_bboxnode(bbox)
-
-    finalbbox = alignedbboxnode!(suggestedbbox, computedsize, alignment,
-        sizeattrs, autosizenode)
+    layoutnodes = LayoutNodes(LText, attrs.width, attrs.height, halign, valign; suggestedbbox = bbox)
 
     textpos = Node(Point3f0(0, 0, 0))
 
     t = text!(parent, text, position = textpos, textsize = textsize, font = font, color = color,
         visible = visible, align = (:center, :center), rotation = rotation, raw = true)[end]
+
+    ltext = LText(parent, layoutnodes, t, attrs)
 
     textbb = BBox(0, 1, 0, 1)
 
@@ -32,10 +23,10 @@ function LText(parent::Scene; bbox = nothing, kwargs...)
         textbb = FRect2D(boundingbox(t))
         autowidth = width(textbb) + padding[1] + padding[2]
         autoheight = height(textbb) + padding[3] + padding[4]
-        autosizenode[] = (autowidth, autoheight)
+        autosizenode(ltext)[] = (autowidth, autoheight)
     end
 
-    onany(finalbbox, padding) do bbox, padding
+    onany(computedbboxnode(ltext), padding) do bbox, padding
 
         tw = width(textbb)
         th = height(textbb)
@@ -49,20 +40,12 @@ function LText(parent::Scene; bbox = nothing, kwargs...)
         textpos[] = Point3f0(tx, ty, 0)
     end
 
-
-    # text has no protrusions
-    protrusions = Node(RectSides(0f0, 0f0, 0f0, 0f0))
-
-    layoutnodes = LayoutNodes{LText, GridLayout}(suggestedbbox, protrusions, computedsize, autosizenode, finalbbox, nothing)
-
     # trigger first update, otherwise bounds are wrong somehow
     text[] = text[]
     # trigger bbox
-    suggestedbbox[] = suggestedbbox[]
+    suggestedbboxnode(ltext)[] = suggestedbboxnode(ltext)[]
 
-    lt = LText(parent, layoutnodes, t, attrs)
-
-    lt
+    ltext
 end
 
 defaultlayout(lt::LText) = ProtrusionLayout(lt)

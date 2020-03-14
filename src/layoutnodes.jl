@@ -12,8 +12,8 @@ function LayoutNodes(T::Type, width::Node, height::Node, halign::Node, valign::N
     suggestedbbox_node = create_suggested_bboxnode(suggestedbbox)
     protrusions = create_protrusions(protrusions)
     autosizenode = Node{NTuple{2, Optional{Float32}}}((nothing, nothing))
-    computedsize = computedsizenode!(sizeattrs, autosizenode)
-    finalbbox = alignedbboxnode!(suggestedbbox_node, computedsize, alignment, sizeattrs, autosizenode)
+    computedsize = computedsizenode!(sizenode, autosizenode)
+    finalbbox = alignedbboxnode!(suggestedbbox_node, computedsize, alignment, sizenode, autosizenode)
 
     LayoutNodes{T, GridLayout}(suggestedbbox_node, protrusions, computedsize, autosizenode, finalbbox, nothing)
 end
@@ -176,3 +176,26 @@ function alignedbboxnode!(
 
     finalbbox
 end
+
+"""
+    layoutnodes(x::T) where T
+
+Access `x`'s field `:layoutnodes` containing a `LayoutNodes` instance. This should
+be overloaded for any type that is layoutable but stores its `LayoutNodes` in
+a differently named field.
+"""
+function layoutnodes(x::T) where T
+    if hasfield(T, :layoutnodes) && fieldtype(T, :layoutnodes) <: LayoutNodes
+        x.layoutnodes
+    else
+        error("It's not defined how to get LayoutNodes for type $T, overload this method for layoutable types.")
+    end
+end
+
+# These are the default API functions to retrieve the layout parts from an object
+protrusionnode(x) = layoutnodes(x).protrusionnode
+suggestedbboxnode(x) = layoutnodes(x).suggestedbbox
+computedsizenode(x) = layoutnodes(x).computedsize
+autosizenode(x) = layoutnodes(x).autosize
+computedbboxnode(x) = layoutnodes(x).computedbbox
+gridcontent(x) = layoutnodes(x).gridcontent

@@ -193,7 +193,7 @@ function layoutnodes(x::T) where T
 end
 
 # These are the default API functions to retrieve the layout parts from an object
-protrusionnode(x) = layoutnodes(x).protrusionnode
+protrusionnode(x) = layoutnodes(x).protrusions
 suggestedbboxnode(x) = layoutnodes(x).suggestedbbox
 computedsizenode(x) = layoutnodes(x).computedsize
 autosizenode(x) = layoutnodes(x).autosize

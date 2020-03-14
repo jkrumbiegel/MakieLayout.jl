@@ -750,7 +750,7 @@ function align_to_bbox!(gl::GridLayout, suggestedbbox::BBox)
 
         solving_bbox = bbox_for_solving_from_side(maxgrid, bbox_cell, idx_rect, c.side)
 
-        c.content.layoutnodes.suggestedbbox[] = solving_bbox
+        suggestedbboxnode(c.content)[] = solving_bbox
     end
 
     nothing
@@ -1101,10 +1101,10 @@ end
 function add_content!(g::GridLayout, content, rows, cols, side::Side)
     rows, cols = adjust_rows_cols!(g, rows, cols)
 
-    gc = if !isnothing(content.layoutnodes.gridcontent)
+    gc = if !isnothing(gridcontent(content))
         # take the existing gridcontent, remove it from its gridlayout if it has one,
         # and modify it with the new span and side
-        gridc = content.layoutnodes.gridcontent
+        gridc = gridcontent(content)
         remove_from_gridlayout!(gridc)
         gridc.span = Span(rows, cols)
         gridc.side = side
@@ -1114,7 +1114,7 @@ function add_content!(g::GridLayout, content, rows, cols, side::Side)
         GridContent(content, Span(rows, cols), side)
     end
 
-    content.layoutnodes.gridcontent = gc
+    layoutnodes(content).gridcontent = gc
 
     connect_layoutnodes!(gc)
 

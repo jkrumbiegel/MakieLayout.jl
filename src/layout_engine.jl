@@ -24,12 +24,6 @@ isrightmostin(gc::GridContent, grid) = ismostin(gc, grid, Right())
 isbottommostin(gc::GridContent, grid) = ismostin(gc, grid, Bottom())
 istopmostin(gc::GridContent, grid) = ismostin(gc, grid, Top())
 
-function protrusionnode(x::T) where T
-    error("protrusionnode() is not defined for type $T, if you want to include
-        such an object in a grid layout, you need to create a method for your
-        type that returns a Node{RectSides{Float32}}. If your object has no
-        protrusions, the values of RectSides can just all be 0f0.")
-end
 
 function protrusion(x::T, side::Side) where T
     protrusions = protrusionnode(x)

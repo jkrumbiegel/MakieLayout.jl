@@ -306,6 +306,8 @@ function default_attributes(::Type{LLegend}, scene)
         polypoints = [Point2f0(0.2, 0.2), Point2f0(0.8, 0.2), Point2f0(0.8, 0.8), Point2f0(0.2, 0.8)],
         polystrokewidth = 2,
         orientation = :vertical,
+        titlegap = 10,
+        groupgap = 20,
     )
 end
 

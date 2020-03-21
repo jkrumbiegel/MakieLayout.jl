@@ -14,11 +14,8 @@ ys = sin.(xs)
 lin = lines!(ax, xs, ys, color = :blue)
 sca = scatter!(ax, xs, ys, color = :red, markersize = 15px)
 
-leg = LLegend(scene, [lin, sca], ["a line", "some dots"])
+leg = LLegend(scene, [lin, sca, [lin, sca]], ["a line", "some dots", "both together"])
 layout[1, 2] = leg
-
-# you can add more elements using push
-push!(leg, "both together", lin, sca)
 
 save("example_legend.png", scene); nothing # hide
 ```
@@ -26,9 +23,10 @@ save("example_legend.png", scene); nothing # hide
 ![example legend](example_legend.png)
 
 
-## Multi-column legend
+## Multi-bank legend
 
-You can control the number of columns with the `ncols` attribute.
+You can control the number of banks with the `nbanks` attribute. Banks are columns
+when in vertical mode, and rows when in horizontal mode.
 
 ```@example
 using MakieLayout
@@ -42,7 +40,7 @@ ax = layout[1, 1] = LAxis(scene)
 xs = 0:0.1:10
 lins = [lines!(ax, xs, sin.(xs .+ 3v), color = RGBf0(v, 0, 1-v)) for v in 0:0.1:1]
 
-leg = LLegend(scene, lins, string.(1:length(lins)), ncols = 3)
+leg = LLegend(scene, lins, string.(1:length(lins)), nbanks = 3)
 layout[1, 2] = leg
 
 
@@ -65,6 +63,9 @@ spines.
 using MakieLayout
 using Makie
 
+haligns = [:left, :right, :center]
+valigns = [:top, :bottom, :center]
+
 scene, layout = layoutscene(resolution = (1400, 900))
 
 ax = layout[1, 1] = LAxis(scene)
@@ -75,18 +76,15 @@ lins = [lines!(ax, xs, sin.(xs .* i), color = color)
 
 legends = [LLegend(
         scene, lins, ["Line $i" for i in 1:3],
+        "$ha & $va",
         width = Auto(false),
         margin = (10, 10, 10, 10),
-    ) for j in 1:3]
+        halign = ha, valign = va, orientation = :horizontal
+    ) for (j, ha, va) in zip(1:3, haligns, valigns)]
 
-haligns = [:left, :right, :center]
-valigns = [:top, :bottom, :center]
 
-for (leg, hal, val) in zip(legends, haligns, valigns)
+for leg in legends
     layout[1, 1] = leg
-    leg.title = "$hal & $val"
-    leg.halign = hal
-    leg.valign = val
 end
 
 save("example_legend_alignment.png", scene); nothing # hide
@@ -120,44 +118,27 @@ scene, layout = layoutscene(resolution = (1400, 900))
 
 ax = layout[1, 1] = LAxis(scene)
 
-leg = layout[1, 2] = LLegend(scene)
 
-entry1 = LegendEntry(
-    "Entry 1",
-    LineElement(color = :red, linestyle = nothing),
-    MarkerElement(color = :blue, marker = 'x', strokecolor = :black),
-)
+elem_1 = [LineElement(color = :red, linestyle = nothing),
+          MarkerElement(color = :blue, marker = 'x', strokecolor = :black)]
 
-entry2 = LegendEntry(
-    "Entry 2",
-    PolyElement(color = :red, strokecolor = :blue),
-    LineElement(color = :black, linestyle = :dash),
-)
+elem_2 = [PolyElement(color = :red, strokecolor = :blue),
+          LineElement(color = :black, linestyle = :dash)]
 
-entry3 = LegendEntry(
-    "Entry 3",
-    LineElement(color = :green, linestyle = nothing,
+elem_3 = LineElement(color = :green, linestyle = nothing,
         linepoints = Point2f0[(0, 0), (0, 1), (1, 0), (1, 1)])
-)
 
-entry4 = LegendEntry(
-    "Entry 4",
-    MarkerElement(color = :blue, marker = 'π',
+elem_4 = MarkerElement(color = :blue, marker = 'π',
         strokecolor = :transparent,
         markerpoints = Point2f0[(0.2, 0.2), (0.5, 0.8), (0.8, 0.2)])
-)
 
-entry5 = LegendEntry(
-    "Entry 5",
-    PolyElement(color = :green, strokecolor = :black,
+elem_5 = PolyElement(color = :green, strokecolor = :black,
         polypoints = Point2f0[(0, 0), (1, 0), (0, 1)])
-)
 
-push!(leg, entry1)
-push!(leg, entry2)
-push!(leg, entry3)
-push!(leg, entry4)
-push!(leg, entry5)
+
+leg = layout[1, 2] = LLegend(scene,
+    [elem_1, elem_2, elem_3, elem_4, elem_5],
+    ["Line & Marker", "Poly & Line", "Line", "Marker", "Poly"])
 
 save("example_legend_entries.png", scene); nothing # hide
 ```
@@ -168,8 +149,8 @@ save("example_legend_entries.png", scene); nothing # hide
 ## Horizontal legend
 
 In case you want the legend entries to be listed horizontally, set the `orientation`
-attribute to `:horizontal`. In this case the `ncols` attribute refers to the
-number of rows instead. To keep an adjacent axis from potentially shrinking to
+attribute to `:horizontal`. In this case the `nbanks` attribute refers to the
+number of rows instead of columns. To keep an adjacent axis from potentially shrinking to
 the width of the horizontal legend, set `width = Auto(false)` and `height = Auto(true)`
 if you place the legend below or above the axis.
 
@@ -200,4 +181,64 @@ layout[2, 1] = leg_horizontal
 save("example_legend_horizontal.png", scene); nothing # hide
 ```
 
-![example legend](example_legend_horizontal.png)
+![example legend horizontal](example_legend_horizontal.png)
+
+
+## Multi-group legends
+
+Sometimes a legend consists of multiple groups, for example in a plot where both
+marker size and color are varied and those properties need to be visualized
+separately, but still together in one legend. Each group's content is given as
+an array of elements and an array of labels, each within one collective array.
+You can shift the position of the titles relative to each group with the
+`titleposition` attribute, either `:left` or `:top`.
+
+```@example
+using MakieLayout
+using Makie
+using AbstractPlotting: px
+
+scene, layout = layoutscene(resolution = (1400, 900))
+
+ax = layout[1, 1] = LAxis(scene)
+
+markersizes = [5, 10, 15, 20]
+colors = [:red, :green, :blue, :orange]
+
+for ms in markersizes, color in colors
+    scatter!(ax, randn(5, 2), markersize = ms * px, color = color)
+end
+
+group_size = [MarkerElement(marker = :circle, color = :black, strokecolor = :transparent,
+    markersize = ms * px) for ms in markersizes]
+
+group_color = [PolyElement(color = color, strokecolor = :transparent)
+    for color in colors]
+
+legends = [LLegend(scene,
+    [group_size, group_color],
+    [string.(markersizes), string.(colors)],
+    ["Size", "Color"]) for _ in 1:6]
+
+layout[1, 2:4] = legends[1:3]
+layout[2:4, 1] = legends[4:6]
+
+for l in legends[4:6]
+    l.orientation = :horizontal
+    l.height = Auto(true)
+    l.width = Auto(false)
+end
+
+legends[2].titleposition = :left
+legends[5].titleposition = :left
+
+legends[3].nbanks = 2
+legends[5].nbanks = 2
+legends[6].nbanks = 2
+
+scene
+
+save("example_multilegend.png", scene); nothing # hide
+```
+
+![example multilegend](example_multilegend.png)

@@ -1,5 +1,5 @@
 mutable struct DebugRect <: MakieLayout.LObject
-    layoutnodes::MakieLayout.LayoutNodes
+    layoutobservables::MakieLayout.LayoutObservables
     attributes::Attributes
 end
 
@@ -37,10 +37,10 @@ function DebugRect(; bbox = nothing, kwargs...)
         MakieLayout.RectSides{Float32}(l, r, b, t)
     end
 
-    layoutnodes = MakieLayout.LayoutNodes{DebugRect, GridLayout}(suggestedbbox, protrusions, computedsize, autosizenode, finalbbox, nothing)
+    layoutobservables = MakieLayout.LayoutObservables{DebugRect, GridLayout}(suggestedbbox, protrusions, computedsize, autosizenode, finalbbox, nothing)
 
     # trigger bbox
     suggestedbbox[] = suggestedbbox[]
 
-    DebugRect(layoutnodes, attrs)
+    DebugRect(layoutobservables, attrs)
 end

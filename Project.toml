@@ -1,7 +1,7 @@
 name = "MakieLayout"
 uuid = "5a521ce4-ebb9-4793-b5b7-b334dfe8393c"
 authors = ["Julius Krumbiegel", "Simon Danisch"]
-version = "0.4.1"
+version = "0.4.2"
 
 [deps]
 AbstractPlotting = "537997a7-5e4e-5d89-9595-2241ea00577e"

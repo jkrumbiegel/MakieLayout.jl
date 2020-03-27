@@ -138,7 +138,8 @@ elem_5 = PolyElement(color = :green, strokecolor = :black,
 
 leg = layout[1, 2] = LLegend(scene,
     [elem_1, elem_2, elem_3, elem_4, elem_5],
-    ["Line & Marker", "Poly & Line", "Line", "Marker", "Poly"])
+    ["Line & Marker", "Poly & Line", "Line", "Marker", "Poly"],
+    patchsize = (35, 35))
 
 save("example_legend_entries.png", scene); nothing # hide
 ```

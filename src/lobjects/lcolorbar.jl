@@ -22,18 +22,10 @@ function LColorbar(parent::Scene; bbox = nothing, kwargs...)
 
     decorations = Dict{Symbol, Any}()
 
-    sizeattrs = sizenode!(attrs.width, attrs.height)
-    alignment = lift(tuple, halign, valign)
+    layoutobservables = LayoutObservables(LColorbar, attrs.width, attrs.height,
+        halign, valign; suggestedbbox = bbox)
 
-    autosizenode = Node{NTuple{2, Optional{Float32}}}((nothing, nothing))
-
-    suggestedbbox = create_suggested_bboxnode(bbox)
-
-    computedsize = computedsizenode!(sizeattrs, autosizenode)
-
-    finalbbox = alignedbboxnode!(suggestedbbox, computedsize, alignment, sizeattrs, autosizenode)
-
-    scenearea = lift(IRect2D, finalbbox)
+    scenearea = lift(IRect2D_rounded, layoutobservables.computedbbox)
 
     scene = Scene(parent, scenearea, camera = campixel!, raw = true)
 
@@ -115,7 +107,7 @@ function LColorbar(parent::Scene; bbox = nothing, kwargs...)
         spinecolor = :transparent, spinevisible = :false, flip_vertical_label = flip_vertical_label)
     decorations[:axis] = axis
 
-    protrusions = lift(axis.protrusion, vertical, flipaxisposition) do axprotrusion,
+    onany(axis.protrusion, vertical, flipaxisposition) do axprotrusion,
             vertical, flipaxisposition
 
 
@@ -135,15 +127,16 @@ function LColorbar(parent::Scene; bbox = nothing, kwargs...)
             end
         end
 
-        RectSides{Float32}(left, right, bottom, top)
+        layoutobservables.protrusions[] = GridLayoutBase.RectSides{Float32}(left, right, bottom, top)
     end
 
-    layoutnodes = LayoutNodes{LColorbar, GridLayout}(suggestedbbox, protrusions, computedsize, autosizenode, finalbbox, nothing)
+    # trigger protrusions with one of the attributes
+    vertical[] = vertical[]
 
     # trigger bbox
-    suggestedbbox[] = suggestedbbox[]
+    layoutobservables.suggestedbbox[] = layoutobservables.suggestedbbox[]
 
-    LColorbar(parent, scene, layoutnodes, attrs, decorations)
+    LColorbar(parent, scene, layoutobservables, attrs, decorations)
 end
 
 function tight_ticklabel_spacing!(lc::LColorbar)

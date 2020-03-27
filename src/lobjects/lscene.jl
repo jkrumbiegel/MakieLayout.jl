@@ -8,29 +8,17 @@ function AbstractPlotting.plot!(
     plot
 end
 
-protrusionnode(ls::LScene) = ls.layoutnodes.protrusions
-computedsizenode(ls::LScene) = ls.layoutnodes.computedsize
+protrusionnode(ls::LScene) = ls.layoutobservables.protrusions
+computedsizenode(ls::LScene) = ls.layoutobservables.computedsize
 
 function LScene(parent::Scene; bbox = nothing, scenekw = NamedTuple(), kwargs...)
 
     attrs = merge!(Attributes(kwargs), default_attributes(LScene, parent))
 
-    sizeattrs = sizenode!(attrs.width, attrs.height)
-    alignment = lift(tuple, attrs.halign, attrs.valign)
+    layoutobservables = LayoutObservables(LScene, attrs.width, attrs.height,
+        attrs.halign, attrs.valign; suggestedbbox = bbox)
 
-    suggestedbbox = create_suggested_bboxnode(bbox)
+    scene = Scene(parent, lift(IRect2D_rounded, layoutobservables.computedbbox); scenekw...)
 
-    autosizenode = Node{NTuple{2, Optional{Float32}}}((nothing, nothing))
-
-    computedsize = computedsizenode!(sizeattrs, autosizenode)
-
-    finalbbox = alignedbboxnode!(suggestedbbox, computedsize, alignment, sizeattrs, autosizenode)
-
-    protrusions = Node(RectSides{Float32}(0, 0, 0, 0))
-
-    scene = Scene(parent, lift(IRect2D, finalbbox); scenekw...)
-
-    layoutnodes = LayoutNodes{LScene, GridLayout}(suggestedbbox, protrusions, computedsize, autosizenode, finalbbox, nothing)
-
-    LScene(scene, attrs, layoutnodes)
+    LScene(scene, attrs, layoutobservables)
 end

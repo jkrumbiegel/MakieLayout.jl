@@ -8,18 +8,8 @@ function LText(parent::Scene; bbox = nothing, kwargs...)
     @extract attrs (text, textsize, font, color, visible, halign, valign,
         rotation, padding)
 
-    sizeattrs = sizenode!(attrs.width, attrs.height)
-
-    alignment = lift(tuple, halign, valign)
-
-    autosizenode = Node{NTuple{2, Optional{Float32}}}((nothing, nothing))
-
-    computedsize = computedsizenode!(sizeattrs, autosizenode)
-
-    suggestedbbox = create_suggested_bboxnode(bbox)
-
-    finalbbox = alignedbboxnode!(suggestedbbox, computedsize, alignment,
-        sizeattrs, autosizenode)
+    layoutobservables = LayoutObservables(LText, attrs.width, attrs.height,
+        halign, valign; suggestedbbox = bbox)
 
     textpos = Node(Point3f0(0, 0, 0))
 
@@ -42,10 +32,10 @@ function LText(parent::Scene; bbox = nothing, kwargs...)
         textbb[] = FRect2D(boundingbox(t))
         autowidth = width(textbb[]) + padding[1] + padding[2]
         autoheight = height(textbb[]) + padding[3] + padding[4]
-        autosizenode[] = (autowidth, autoheight)
+        layoutobservables.autosize[] = (autowidth, autoheight)
     end
 
-    onany(finalbbox, padding) do bbox, padding
+    onany(layoutobservables.computedbbox, padding) do bbox, padding
 
         tw = width(textbb[])
         th = height(textbb[])
@@ -66,17 +56,12 @@ function LText(parent::Scene; bbox = nothing, kwargs...)
     end
 
 
-    # text has no protrusions
-    protrusions = Node(RectSides(0f0, 0f0, 0f0, 0f0))
-
-    layoutnodes = LayoutNodes{LText, GridLayout}(suggestedbbox, protrusions, computedsize, autosizenode, finalbbox, nothing)
-
     # trigger first update, otherwise bounds are wrong somehow
     text[] = text[]
     # trigger bbox
-    suggestedbbox[] = suggestedbbox[]
+    layoutobservables.suggestedbbox[] = layoutobservables.suggestedbbox[]
 
-    lt = LText(parent, layoutnodes, t, attrs)
+    lt = LText(parent, layoutobservables, t, attrs)
 
     lt
 end
@@ -84,11 +69,11 @@ end
 defaultlayout(lt::LText) = ProtrusionLayout(lt)
 
 function align_to_bbox!(lt::LText, bbox)
-    lt.layoutnodes.suggestedbbox[] = bbox
+    lt.layoutobservables.suggestedbbox[] = bbox
 end
 
-computedsizenode(lt::LText) = lt.layoutnodes.computedsize
-protrusionnode(lt::LText) = lt.layoutnodes.protrusions
+computedsizenode(lt::LText) = lt.layoutobservables.computedsize
+protrusionnode(lt::LText) = lt.layoutobservables.protrusions
 
 
 function Base.getproperty(lt::LText, s::Symbol)
@@ -113,13 +98,13 @@ end
 
 function Base.delete!(lt::LText)
 
-    disconnect_layoutnodes!(lt.layoutnodes.gridcontent)
-    remove_from_gridlayout!(lt.layoutnodes.gridcontent)
-    empty!(lt.layoutnodes.suggestedbbox.listeners)
-    empty!(lt.layoutnodes.computedbbox.listeners)
-    empty!(lt.layoutnodes.computedsize.listeners)
-    empty!(lt.layoutnodes.autosize.listeners)
-    empty!(lt.layoutnodes.protrusions.listeners)
+    disconnect_layoutnodes!(lt.layoutobservables.gridcontent)
+    remove_from_gridlayout!(lt.layoutobservables.gridcontent)
+    empty!(lt.layoutobservables.suggestedbbox.listeners)
+    empty!(lt.layoutobservables.computedbbox.listeners)
+    empty!(lt.layoutobservables.computedsize.listeners)
+    empty!(lt.layoutobservables.autosize.listeners)
+    empty!(lt.layoutobservables.protrusions.listeners)
 
     # remove the plot object from the scene
     delete!(lt.parent, lt.textobject)

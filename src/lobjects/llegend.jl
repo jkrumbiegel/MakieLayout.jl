@@ -21,18 +21,10 @@ function LLegend(
 
     decorations = Dict{Symbol, Any}()
 
-    sizeattrs = sizenode!(attrs.width, attrs.height)
-    alignment = lift(tuple, halign, valign)
+    layoutobservables = LayoutObservables(LLegend, attrs.width, attrs.height,
+        halign, valign; suggestedbbox = bbox)
 
-    suggestedbbox = create_suggested_bboxnode(bbox)
-
-    autosizenode = Node{NTuple{2, Optional{Float32}}}((nothing, nothing))
-
-    computedsize = computedsizenode!(sizeattrs, autosizenode)
-
-    finalbbox = alignedbboxnode!(suggestedbbox, computedsize, alignment, sizeattrs, autosizenode)
-
-    scenearea = @lift(IRect2D($finalbbox))
+    scenearea = lift(IRect2D_rounded, layoutobservables.computedbbox)
 
     scene = Scene(parent, scenearea, raw = true, camera = campixel!)
 
@@ -62,10 +54,10 @@ function LLegend(
         if manipulating_grid[]
             return
         end
-        w = determinedirsize(grid, Col())
-        h = determinedirsize(grid, Row())
+        w = GridLayoutBase.determinedirsize(grid, GridLayoutBase.Col())
+        h = GridLayoutBase.determinedirsize(grid, GridLayoutBase.Row())
         if !any(isnothing.((w, h)))
-            autosizenode[] = (w + sum(margin[1:2]), h + sum(margin[3:4]))
+            layoutobservables.autosize[] = (w + sum(margin[1:2]), h + sum(margin[3:4]))
         end
     end
 
@@ -233,7 +225,7 @@ function LLegend(
                 for element in e.elements
                     append!(symbolplots,
                         legendelement_plots!(scene, element,
-                            rect.layoutnodes.computedbbox, e.attributes))
+                            rect.layoutobservables.computedbbox, e.attributes))
                 end
 
                 push!(eplots, symbolplots)
@@ -245,15 +237,11 @@ function LLegend(
         relayout()
     end
 
-    # no protrusions
-    protrusions = Node(RectSides(0f0, 0f0, 0f0, 0f0))
 
     # trigger suggestedbbox
-    suggestedbbox[] = suggestedbbox[]
+    layoutobservables.suggestedbbox[] = layoutobservables.suggestedbbox[]
 
-    layoutnodes = LayoutNodes{LLegend, GridLayout}(suggestedbbox, protrusions, computedsize, autosizenode, finalbbox, nothing)
-
-    leg = LLegend(scene, entry_groups, layoutnodes, attrs, decorations, LText[], Vector{Vector{AbstractPlot}}())
+    leg = LLegend(scene, entry_groups, layoutobservables, attrs, decorations, LText[], Vector{Vector{AbstractPlot}}())
     # trigger first relayout
     entry_groups[] = entry_groups[]
     leg

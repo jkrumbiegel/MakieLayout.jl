@@ -3,152 +3,7 @@ Shorthand for `isnothing(optional) ? fallback : optional`
 """
 @inline ifnothing(optional, fallback) = isnothing(optional) ? fallback : optional
 
-function alignedbboxnode!(
-    suggestedbbox::Node{BBox},
-    computedsize::Node{NTuple{2, Optional{Float32}}},
-    alignment::Node,
-    sizeattrs::Node,
-    autosizenode::Node{NTuple{2, Optional{Float32}}})
-
-    finalbbox = Node(BBox(0, 100, 0, 100))
-
-    onany(suggestedbbox, alignment, computedsize) do sbbox, al, csize
-
-        bw = width(sbbox)
-        bh = height(sbbox)
-
-        # we only passively retrieve sizeattrs here because if they change
-        # they also trigger computedsize, which triggers this node, too
-        # we only need to know here if there are relative sizes given, because
-        # those can only be computed knowing the suggestedbbox
-        widthattr, heightattr = sizeattrs[]
-
-        cwidth, cheight = csize
-
-        w = if isnothing(cwidth)
-            @match widthattr begin
-                wa::Relative => wa.x * bw
-                wa::Nothing => bw
-                wa::Auto => if isnothing(autosizenode[][1])
-                        # we have no autowidth available anyway
-                        # take suggested width
-                        bw
-                    else
-                        # use the width that was auto-computed
-                        autosizenode[][1]
-                    end
-                wa => error("At this point, if computed width is not known,
-                widthattr should be a Relative or Nothing, not $wa.")
-            end
-        else
-            cwidth
-        end
-
-        h = if isnothing(cheight)
-            @match heightattr begin
-                ha::Relative => ha.x * bh
-                ha::Nothing => bh
-                ha::Auto => if isnothing(autosizenode[][2])
-                        # we have no autoheight available anyway
-                        # take suggested height
-                        bh
-                    else
-                        # use the height that was auto-computed
-                        autosizenode[][2]
-                    end
-                ha => error("At this point, if computed height is not known,
-                heightattr should be a Relative or Nothing, not $ha.")
-            end
-        else
-            cheight
-        end
-
-        # how much space is left in the bounding box
-        rw = bw - w
-        rh = bh - h
-
-        xshift = @match al[1] begin
-            :left => 0.0f0
-            :center => 0.5f0 * rw
-            :right => rw
-            x::Real => x * rw
-            x => error("Invalid horizontal alignment $x (only Real or :left, :center, or :right allowed).")
-        end
-
-        yshift = @match al[2] begin
-            :bottom => 0.0f0
-            :center => 0.5f0 * rh
-            :top => rh
-            x::Real => x * rh
-            x => error("Invalid vertical alignment $x (only Real or :bottom, :center, or :top allowed).")
-        end
-
-        # align the final bounding box in the layout bounding box
-        l = left(sbbox) + xshift
-        b = bottom(sbbox) + yshift
-        r = l + w
-        t = b + h
-
-        newbbox = BBox(l, r, b, t)
-        # if finalbbox[] != newbbox
-        #     finalbbox[] = newbbox
-        # end
-        finalbbox[] = newbbox
-    end
-
-    finalbbox
-end
-
-function computedsizenode!(sizeattrs, autosizenode::Node{NTuple{2, Optional{Float32}}})
-
-    # set up csizenode with correct type manually
-    csizenode = Node{NTuple{2, Optional{Float32}}}((nothing, nothing))
-
-    onany(sizeattrs, autosizenode) do sizeattrs, autosize
-
-        wattr, hattr = sizeattrs
-        wauto, hauto = autosize
-
-        wsize = computed_size(wattr, wauto)
-        hsize = computed_size(hattr, hauto)
-
-        csizenode[] = (wsize, hsize)
-    end
-
-    # trigger first value
-    sizeattrs[] = sizeattrs[]
-
-    csizenode
-end
-
-function computed_size(sizeattr, autosize)
-    ms = @match sizeattr begin
-        sa::Nothing => nothing
-        sa::Real => sa
-        sa::Fixed => sa.x
-        sa::Relative => nothing
-        sa::Auto => if sa.trydetermine
-                # if trydetermine we report the autosize to the layout
-                autosize
-            else
-                # but not if it's false, this allows for single span content
-                # not to shrink its column or row, like a small legend next to an
-                # axis or a super title over a single axis
-                nothing
-            end
-        sa => error("""
-            Invalid size attribute $sizeattr.
-            Can only be Nothing, Fixed, Relative, Auto or Real""")
-    end
-end
-
-function sizenode!(widthattr::Node, heightattr::Node)
-    sizeattrs = Node{Tuple{Any, Any}}((widthattr[], heightattr[]))
-    onany(widthattr, heightattr) do w, h
-        sizeattrs[] = (w, h)
-    end
-    sizeattrs
-end
+IRect2D_rounded(r::Rect{2}) = Rect{2, Int}(round.(Int, r.origin), round.(Int, r.widths))
 
 function sceneareanode!(finalbbox, limits, aspect)
 
@@ -192,7 +47,7 @@ function sceneareanode!(finalbbox, limits, aspect)
         newbbox = BBox(l, l + mw, b, b + mh)
 
         # only update scene if pixel positions change
-        new_scenearea = IRect2D(newbbox)
+        new_scenearea = IRect2D_rounded(newbbox)
         if new_scenearea != scenearea[]
             scenearea[] = new_scenearea
         end
@@ -311,28 +166,116 @@ function tightlimits!(la::LAxis, ::Top)
     autolimits!(la)
 end
 
-function Base.foreach(f::Function, contenttype::Type, layout::GridLayout; recursive = true)
-    for c in layout.content
-        if recursive && c.content isa GridLayout
-            foreach(f, contenttype, c.content)
-        elseif c.content isa contenttype
-            f(c.content)
-        end
-    end
+
+"""
+    layoutscene(padding = 30; kwargs...)
+
+Create a `Scene` in `campixel!` mode and a `GridLayout` aligned to the scene's pixel area with `alignmode = Outside(padding)`.
+"""
+function layoutscene(padding = 30; kwargs...)
+    scene = Scene(; camera = campixel!, kwargs...)
+    gl = GridLayout(scene, alignmode = Outside(padding))
+    scene, gl
 end
 
 """
-Swaps or rotates the layout positions of the given elements to their neighbor's. 
+    layoutscene(nrows::Int, ncols::Int, padding = 30; kwargs...)
+
+Create a `Scene` in `campixel!` mode and a `GridLayout` aligned to the scene's pixel area with size `nrows` x `ncols` and `alignmode = Outside(padding)`.
 """
-function swap!(layout_elements...)
-    gridcontents = [le.layoutnodes.gridcontent for le in layout_elements]
-
-    # copy relevant fields before gridcontents are mutated
-    parents = map(gc -> gc.parent, gridcontents)
-    spans = map(gc -> gc.span, gridcontents)
-    sides = map(gc -> gc.side, gridcontents)
-
-    for (gc, parent, span, side) in zip(circshift(gridcontents, 1), parents, spans, sides)
-        parent[span.rows, span.cols, side] = gc.content
-    end
+function layoutscene(nrows::Int, ncols::Int, padding = 30; kwargs...)
+    scene = Scene(; camera = campixel!, kwargs...)
+    gl = GridLayout(scene, nrows, ncols, alignmode = Outside(padding))
+    scene, gl
 end
+
+
+GridLayoutBase.GridLayout(scene::Scene, args...; kwargs...) = GridLayout(args...; bbox = lift(x -> BBox(x), pixelarea(scene)), kwargs...)
+
+
+bottomleft(bbox::Rect2D{T}) where T = Point2{T}(left(bbox), bottom(bbox))
+topleft(bbox::Rect2D{T}) where T = Point2{T}(left(bbox), top(bbox))
+bottomright(bbox::Rect2D{T}) where T = Point2{T}(right(bbox), bottom(bbox))
+topright(bbox::Rect2D{T}) where T = Point2{T}(right(bbox), top(bbox))
+
+topline(bbox::BBox) = (topleft(bbox), topright(bbox))
+bottomline(bbox::BBox) = (bottomleft(bbox), bottomright(bbox))
+leftline(bbox::BBox) = (bottomleft(bbox), topleft(bbox))
+rightline(bbox::BBox) = (bottomright(bbox), topright(bbox))
+
+
+
+function axislines!(scene, rect, spinewidth, topspinevisible, rightspinevisible,
+    leftspinevisible, bottomspinevisible, topspinecolor, leftspinecolor,
+    rightspinecolor, bottomspinecolor)
+
+    bottomline = lift(rect, spinewidth) do r, sw
+        y = bottom(r) - 0.5f0 * sw
+        p1 = Point2(left(r) - sw, y)
+        p2 = Point2(right(r) + sw, y)
+        [p1, p2]
+    end
+
+    leftline = lift(rect, spinewidth) do r, sw
+        x = left(r) - 0.5f0 * sw
+        p1 = Point2(x, bottom(r) - sw)
+        p2 = Point2(x, top(r) + sw)
+        [p1, p2]
+    end
+
+    topline = lift(rect, spinewidth) do r, sw
+        y = top(r) + 0.5f0 * sw
+        p1 = Point2(left(r) - sw, y)
+        p2 = Point2(right(r) + sw, y)
+        [p1, p2]
+    end
+
+    rightline = lift(rect, spinewidth) do r, sw
+        x = right(r) + 0.5f0 * sw
+        p1 = Point2(x, bottom(r) - sw)
+        p2 = Point2(x, top(r) + sw)
+        [p1, p2]
+    end
+
+    lines!(scene, bottomline, linewidth = spinewidth, show_axis = false,
+        visible = bottomspinevisible, color = bottomspinecolor)
+    lines!(scene, leftline, linewidth = spinewidth, show_axis = false,
+        visible = leftspinevisible, color = leftspinecolor)
+    lines!(scene, rightline, linewidth = spinewidth, show_axis = false,
+        visible = rightspinevisible, color = rightspinecolor)
+    lines!(scene, topline, linewidth = spinewidth, show_axis = false,
+        visible = topspinevisible, color = topspinecolor)
+end
+
+
+function interleave_vectors(vec1::Vector{T}, vec2::Vector{T}) where T
+    n = length(vec1)
+    @assert n == length(vec2)
+
+    vec = Vector{T}(undef, 2 * n)
+    @inbounds for i in 1:n
+        k = 2(i - 1)
+        vec[k + 1] = vec1[i]
+        vec[k + 2] = vec2[i]
+    end
+    vec
+end
+
+function shrinkbymargin(rect, margin)
+    IRect((rect.origin .+ margin), (rect.widths .- 2 .* margin))
+end
+
+function limits(r::Rect{N, T}) where {N, T}
+    ows = r.origin .+ r.widths
+    ntuple(i -> (r.origin[i], ows[i]), N)
+    # tuple(zip(r.origin, ows)...)
+end
+
+function limits(r::Rect{N, T}, dim::Int) where {N, T}
+    o = r.origin[dim]
+    w = r.widths[dim]
+    (o, o + w)
+end
+
+xlimits(r::Rect{2}) = limits(r, 1)
+ylimits(r::Rect{2}) = limits(r, 2)

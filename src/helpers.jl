@@ -279,3 +279,22 @@ end
 
 xlimits(r::Rect{2}) = limits(r, 1)
 ylimits(r::Rect{2}) = limits(r, 2)
+
+################################################################################
+#                    AbstractPlotting convenience functions                    #
+################################################################################
+
+function AbstractPlotting.setlims!(scene::LAxis, lims::NTuple{2, Real}, dim=1)
+    ol = scene.limits[]                          # get the Scene's limits as values
+    o_origin = ol.origin                         # get the original origin
+    o_widths = ol.widths                         # get the original widths
+    n_widths = convert(Vector, o_widths)         # convert to mutable form
+    n_origin = convert(Vector, o_origin)         # convert to mutable form
+    n_origin[dim] = lims[1]                      # set the new origin in dim
+    n_widths[dim] = lims[2] - lims[1]            # set the new width in dim
+    scene.limits[] = AbstractPlotting.HyperRectangle(Vec{2}(n_origin), Vec{2}(n_widths)) # set the limits of the scene
+    return nothing
+end
+
+AbstractPlotting.xlims!(scene::LAxis, lims::NTuple{2, Real}) = AbstractPlotting.setlims!(scene, lims, 1)
+AbstractPlotting.ylims!(scene::LAxis, lims::NTuple{2, Real}) = AbstractPlotting.setlims!(scene, lims, 2)

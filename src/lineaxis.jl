@@ -9,7 +9,8 @@ function LineAxis(parent::Scene; kwargs...)
         ticklabelspace, ticklabelpad, labelpadding,
         ticklabelsize, ticklabelsvisible, spinewidth, spinecolor, label, labelsize, labelcolor,
         labelfont, ticklabelfont,
-        labelvisible, spinevisible, trimspine, flip_vertical_label)
+        labelvisible, spinevisible, trimspine, flip_vertical_label,
+        offsetnumberpad)
 
     pos_extents_horizontal = lift(endpoints) do endpoints
         if endpoints[1][2] == endpoints[2][2]
@@ -134,6 +135,34 @@ function LineAxis(parent::Scene; kwargs...)
         align = labelalign, rotation = labelrotation, font = labelfont,
     )[end]
 
+    offsetstring = Node(" ")
+    offsetposition = lift(pos_extents_horizontal, offsetnumberpad) do (pos, ext, hori), pad
+        if hori
+            Point2f0(ext[2] + pad, pos)
+        else
+            Point2f0(pos, ext[2] + pad)
+        end
+    end
+    offsetalign = lift(pos_extents_horizontal, flipped) do (pos, ext, hori), flipped
+        if hori
+            if flipped
+                (:left, :top)
+            else
+                (:left, :bottom)
+            end
+        else
+            if flipped
+                (:right, :bottom)
+            else
+                (:left, :bottom)
+            end
+        end
+    end
+
+    offsettext = text!(parent, offsetstring, textsize = ticklabelsize,
+        position = offsetposition, align = offsetalign, show_axis = false,
+        visible = ticklabelsvisible, font = ticklabelfont)
+
     decorations[:labeltext] = labeltext
 
     tickvalues = Node(Float32[])
@@ -175,7 +204,11 @@ function LineAxis(parent::Scene; kwargs...)
         # now trigger updates
         tickpositions[] = tickpos
 
-        tickstrings[] = get_tick_labels(ticks[], tickvalues)
+        
+        offsetnumber = round(sum(tickvalues) / length(tickvalues))
+
+        offsetstring[] = "$(offsetnumber >= 0 ? "+" : "")$(offsetnumber)"
+        tickstrings[] = get_tick_labels(ticks[], tickvalues .- offsetnumber)
     end
 
     onany(tickstrings, labelgap, flipped) do tickstrings, labelgap, flipped

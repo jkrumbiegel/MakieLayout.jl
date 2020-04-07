@@ -224,6 +224,7 @@ function default_attributes(::Type{LineAxis})
         ticklabelspace = AbstractPlotting.automatic,
         ticklabelpad = 5f0,
         labelpadding = 15f0,
+        offsetnumberpad = 5f0,
     )
 end
 

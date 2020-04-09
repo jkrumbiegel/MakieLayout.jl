@@ -14,7 +14,7 @@ PlotUtils = "995b91a9-d308-5afd-9ec6-746e21dbc043"
 Showoff = "992d4aef-0814-514b-bc4d-f2e9a6c4116f"
 
 [compat]
-AbstractPlotting = "0.9.27, ^0.10"
+AbstractPlotting = "^0.10"
 Animations = "^0.3"
 Formatting = "^0.4"
 Match = "^1"

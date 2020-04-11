@@ -1,4 +1,4 @@
-function WilkinsonTicks(k_ideal::Int; k_min = 2, k_max = 10,
+function WilkinsonTicks(k_ideal::Int = 5; k_min = 4, k_max = 10,
         Q = [(1.0,1.0), (5.0, 0.9), (2.0, 0.7), (2.5, 0.5), (3.0, 0.2)],
         granularity_weight = 1/4,
         simplicity_weight = 1/6,

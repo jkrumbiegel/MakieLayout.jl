@@ -809,6 +809,23 @@ function hideydecorations!(la::LAxis)
     la.yticksvisible = false
 end
 
+"""
+    hidedecorations!(ax)
+Hide all axis elements (splines, ticks, labels).
+"""
+function hidedecorations!(ax)
+    ax.bottomspinevisible = false
+    ax.leftspinevisible = false
+    ax.topspinevisible = false
+    ax.rightspinevisible = false
+    ax.xgridvisible = false
+    ax.ygridvisible = false
+    ax.xticksvisible = false
+    ax.yticksvisible = false
+    ax.xticklabelsvisible = false
+    ax.yticklabelsvisible = false
+end
+
 
 function tight_yticklabel_spacing!(la::LAxis)
     tight_ticklabel_spacing!(la.decorations[:yaxis])

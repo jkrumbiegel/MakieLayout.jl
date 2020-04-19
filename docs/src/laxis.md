@@ -297,3 +297,8 @@ a button during zooming or panning. By default those buttons are `x` and `y`,
 respectively, but you can change them with the attributes `xpankey`, `ypankey`,
 `xzoomkey` and `yzoomkey`. Buttons can be found in `AbstractPlotting.Keyboard`,
 for example the `x` button is accessed as `AbstractPlotting.Keyboard.x`.
+
+## Axis-related functions
+```@docs
+hidedecorations!
+```

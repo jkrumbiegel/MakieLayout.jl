@@ -47,10 +47,11 @@ export linkxaxes!, linkyaxes!, linkaxes!
 export AxisAspect, DataAspect
 export autolimits!
 export AutoLinearTicks, ManualTicks, CustomTicks, WilkinsonTicks
-export hidexdecorations!, hideydecorations!
-export tight_xticklabel_spacing!, tight_yticklabel_spacing!, tight_ticklabel_spacing!, tightlimits!
 export layoutscene
 export set_close_to!
+# TODO: These functions are exported but are not in the docs and have no docstrings
+export hidexdecorations!, hideydecorations!, hidedecorations!
+export tight_xticklabel_spacing!, tight_yticklabel_spacing!, tight_ticklabel_spacing!, tightlimits!
 
 
 # from GridLayoutBase

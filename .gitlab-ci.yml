@@ -57,6 +57,3 @@ documentation:
   only:
     - master
     - tags
-  except:
-    variables:
-      - $CI_COMMIT_MESSAGE =~ /^bump version.*/ # skip docs for simple version bumps (tag will trigger)

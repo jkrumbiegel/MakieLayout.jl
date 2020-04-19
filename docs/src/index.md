@@ -7,6 +7,8 @@ building a complex figure step by step. This is the final result we will create:
 
 Let's get started!
 
+## Scene and Layout
+
 First, we import the necessary packages and then create the main scene and layout.
 The function `layoutscene` is a convenience function that creates a `Scene`
 which has a `GridLayout` attached to it that always fills the whole scene area.
@@ -31,6 +33,8 @@ nothing # hide
 ```
 ![step_001](step_001.png)
 
+## First LAxis
+
 The scene is completely empty, I have made the background light gray so it's easier
 to see. Now we add an LAxis. This is an axis or subplot type that MakieLayout defines
 which knows how to behave in a layout (which the Makie version doesn't).
@@ -40,12 +44,14 @@ a layout by using indexing syntax. You can save the axis in a variable by chaini
 the `=` expressions.
 
 ```@example tutorial
-ax1 = layout[1, 1] = LAxis(scene, title = "Scatter Plots")
+ax1 = layout[1, 1] = LAxis(scene, title = "Sine")
 
 save("step_002.png", scene) # hide
 nothing # hide
 ```
 ![step_002](step_002.png)
+
+## Plotting into an LAxis
 
 We can plot into the axis with the ! versions of Makie's plotting functions.
 Contrary to Makie, these calls return the plot objects, not the Scene or LAxis,
@@ -62,6 +68,8 @@ nothing # hide
 ```
 ![step_003](step_003.png)
 
+## Multiple Axes
+
 This looks nice already, but we want another axis with some line plots in it, to
 the right of the one we have. Currently our layout has one row and one cell, and
 only one LAxis inside of it:
@@ -74,7 +82,7 @@ We can extend the grid by indexing into new grid cells. Let's place a new axis
 next to the one we have, in row 1 and column 2.
 
 ```@example tutorial
-ax2 = layout[1, 2] = LAxis(scene, title = "Line Plots")
+ax2 = layout[1, 2] = LAxis(scene, title = "Cosine")
 
 save("step_004.png", scene) # hide
 nothing # hide
@@ -105,6 +113,8 @@ nothing # hide
 ![step_005](step_005.png)
 
 
+## Linking Axes
+
 We want to make the left and right axes correspond to each other, so we can compare
 the plots more easily. To do that, we link both x and y axes. That will keep them
 synchronized.
@@ -131,6 +141,8 @@ nothing # hide
 ![step_007](step_007.png)
 
 
+## Adding a Legend
+
 Let's add a legend to our plot that describes elements from both axes. We use
 LLegend for that. LLegend is a relatively complex object and there are many
 ways to create it, but here we'll keep it simple. We place the legend on the
@@ -140,7 +152,7 @@ also say `end+1`.
 ```@example tutorial
 leg = layout[1, end+1] = LLegend(scene,
     [line1, scat1, line2, scat2],
-    ["Sine", "Noisy Sine", "Cosine", "Noisy Cosine"])
+    ["True", "Measured", "True", "Measured"])
 
 save("step_008.png", scene) # hide
 nothing # hide
@@ -168,6 +180,9 @@ save("step_009.png", scene) # hide
 nothing # hide
 ```
 ![step_009](step_009.png)
+
+
+## Fixing Spacing Issues
 
 There are a couple of things wrong with this. The legend is where we want it, below the
 two axes. But it takes too much space vertically, and there is a large gap on the right.
@@ -216,6 +231,8 @@ nothing # hide
 ![step_012](step_012.png)
 
 
+## Sublayouts
+
 Let's add two new axes with heatmaps! We want them stacked on top of each other
 on the right side of the figure. We'll do the naive thing first, which is to
 place them in the first and second row of the third column. There are multiple
@@ -223,7 +240,7 @@ versions of layout assignment syntax for convenience. Here, we create and assign
 two axes at once. The number of cells and objects has to match to do this.
 
 ```@example tutorial
-hm_axes = layout[1:2, 3] = [LAxis(scene) for _ in 1:2]
+hm_axes = layout[1:2, 3] = [LAxis(scene, title = t) for t in ["Low Activity", "High Activity"]]
 
 heatmaps = [heatmap!(ax, i .+ rand(100, 100)) for (i, ax) in enumerate(hm_axes)]
 
@@ -282,6 +299,8 @@ nothing # hide
 ![step_015](step_015.png)
 
 
+## Adding a Colorbar
+
 Now, we also want to add a color bar for the two heatmaps. Right now, their colors
 are independently scaled from each other. We choose a scale that makes sense for
 both of them (in our case, we know data ranges only from 1 to 3) and assign that
@@ -301,7 +320,7 @@ for hm in heatmaps
     hm.colorrange = (1, 3)
 end
 
-cbar = hm_sublayout[:, 2] = LColorbar(scene, heatmaps[1])
+cbar = hm_sublayout[:, 2] = LColorbar(scene, heatmaps[1], label = "Activity Level")
 
 save("step_016.png", scene) # hide
 nothing # hide
@@ -341,6 +360,8 @@ nothing # hide
 ![step_18](step_18.png)
 
 
+## Adding a Title
+
 Now the plot could use a title! While other plotting packages sometimes have
 functions like `supertitle`, they often don't work quite right or force you to
 make manual adjustments. In MakieLayout, the `LText` object is much more flexible
@@ -365,6 +386,8 @@ nothing # hide
 ```
 ![step_19](step_19.png)
 
+
+## Subplot Labels
 
 In figures meant for publication, you often need to label subplots with letters
 or numbers. These can sometimes cause trouble because they overlap with other
@@ -417,3 +440,7 @@ save("step_21.png", scene) # hide
 nothing # hide
 ```
 ![step_21](step_21.png)
+
+And there we have it! Hopefully this tutorial has given you an overview how to
+approach the creation of a complex figure in MakieLayout. Check the rest of the
+documentation for more details and other dynamic parts like sliders and buttons!

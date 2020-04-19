@@ -82,7 +82,7 @@ We can extend the grid by indexing into new grid cells. Let's place a new axis
 next to the one we have, in row 1 and column 2.
 
 ```@example tutorial
-ax2 = layout[1, 2] = LAxis(scene, title = "Cosine")
+ax2 = layout[1, 2] = LAxis(scene, title = "Shifted Cosine")
 
 save("step_004.png", scene) # hide
 nothing # hide
@@ -97,13 +97,13 @@ changed:
 layout
 ```
 
-Let's plot some lines into the new axis, the same way we did the scatter plots before.
+Let's plot into the new axis, the same way we did the scatter plots before.
 
 
 ```@example tutorial
 
-line2 = lines!(ax2, cos.(xx), xx, color = :blue)
-scat2 = scatter!(ax2, cos.(xx) .+ 0.2 .* randn.(), xx,
+line2 = lines!(ax2, cos.(xx), pi .+ xx, color = :blue)
+scat2 = scatter!(ax2, cos.(xx) .+ 0.2 .* randn.(), pi .+ xx,
     color = (:blue, 0.5), markersize = 10px, marker = '▲')
 
 

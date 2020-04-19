@@ -70,7 +70,7 @@ nothing # hide
 
 ## Multiple Axes
 
-This looks nice already, but we want another axis with some line plots in it, to
+This looks nice already, but we want another axis with a cosine this time, to
 the right of the one we have. Currently our layout has one row and one cell, and
 only one LAxis inside of it:
 

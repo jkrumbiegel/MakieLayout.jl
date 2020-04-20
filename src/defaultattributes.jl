@@ -10,199 +10,421 @@ function lift_parent_attribute(::Nothing, attr::Symbol, default_value)
     default_value
 end
 
+
 function default_attributes(::Type{LAxis}, scene)
-    Attributes(
-        xlabel = " ",
-        ylabel = " ",
-        title = " ",
-        titlefont = lift_parent_attribute(scene, :font, "DejaVu Sans"),
-        titlesize = lift_parent_attribute(scene, :fontsize, 20f0),
-        titlegap = 10f0,
-        titlevisible = true,
-        titlealign = :center,
-        xlabelfont = lift_parent_attribute(scene, :font, "DejaVu Sans"),
-        ylabelfont = lift_parent_attribute(scene, :font, "DejaVu Sans"),
-        xlabelcolor = RGBf0(0, 0, 0),
-        ylabelcolor = RGBf0(0, 0, 0),
-        xlabelsize = lift_parent_attribute(scene, :fontsize, 20f0),
-        ylabelsize = lift_parent_attribute(scene, :fontsize, 20f0),
-        xlabelvisible = true,
-        ylabelvisible = true,
-        xlabelpadding = 15f0,
-        ylabelpadding = 15f0, # because of boundingbox inaccuracies of ticklabels
-        xticklabelfont = lift_parent_attribute(scene, :font, "DejaVu Sans"),
-        yticklabelfont = lift_parent_attribute(scene, :font, "DejaVu Sans"),
-        xticklabelsize = lift_parent_attribute(scene, :fontsize, 20f0),
-        yticklabelsize = lift_parent_attribute(scene, :fontsize, 20f0),
-        xticklabelsvisible = true,
-        yticklabelsvisible = true,
-        xticklabelspace = AbstractPlotting.automatic,
-        yticklabelspace = AbstractPlotting.automatic,
-        xticklabelpad = 5f0,
-        yticklabelpad = 5f0,
-        xticklabelrotation = 0f0,
-        yticklabelrotation = 0f0,
-        xticklabelalign = (:center, :top),
-        yticklabelalign = (:right, :center),
-        xticksize = 10f0,
-        yticksize = 10f0,
-        xticksvisible = true,
-        yticksvisible = true,
-        xtickalign = 0f0,
-        ytickalign = 0f0,
-        xtickwidth = 1f0,
-        ytickwidth = 1f0,
-        xtickcolor = RGBf0(0, 0, 0),
-        ytickcolor = RGBf0(0, 0, 0),
-        xpanlock = false,
-        ypanlock = false,
-        xzoomlock = false,
-        yzoomlock = false,
-        spinewidth = 1f0,
-        xgridvisible = true,
-        ygridvisible = true,
-        xgridwidth = 1f0,
-        ygridwidth = 1f0,
-        xgridcolor = RGBAf0(0, 0, 0, 0.1),
-        ygridcolor = RGBAf0(0, 0, 0, 0.1),
-        xgridstyle = nothing,
-        ygridstyle = nothing,
-        bottomspinevisible = true,
-        leftspinevisible = true,
-        topspinevisible = true,
-        rightspinevisible = true,
-        bottomspinecolor = :black,
-        leftspinecolor = :black,
-        topspinecolor = :black,
-        rightspinecolor = :black,
-        aspect = nothing,
-        valign = :center,
-        halign = :center,
-        width = nothing,
-        height = nothing,
-        maxsize = (Inf32, Inf32),
-        xautolimitmargin = (0.05f0, 0.05f0),
-        yautolimitmargin = (0.05f0, 0.05f0),
-        xticks = AutoLinearTicks(5),
-        yticks = AutoLinearTicks(5),
-        panbutton = AbstractPlotting.Mouse.right,
-        xpankey = AbstractPlotting.Keyboard.x,
-        ypankey = AbstractPlotting.Keyboard.y,
-        xzoomkey = AbstractPlotting.Keyboard.x,
-        yzoomkey = AbstractPlotting.Keyboard.y,
-        xaxisposition = :bottom,
-        yaxisposition = :left,
-        xtrimspine = false,
-        ytrimspine = false,
-        backgroundcolor = :white,
-        flip_ylabel = false,
-        autolimitaspect = nothing,
-        targetlimits = BBox(0, 100, 0, 100),
-        alignmode = Inside(),
-    )
+    attrs, docdict, defaultdict = @documented_attributes begin
+        "The xlabel string."
+        xlabel = " "
+        "The ylabel string."
+        ylabel = " "
+        "The axis title string."
+        title = " "
+        "The font family of the title."
+        titlefont = lift_parent_attribute(scene, :font, "DejaVu Sans")
+        "The title's font size."
+        titlesize = lift_parent_attribute(scene, :fontsize, 20f0)
+        "The gap between axis and title."
+        titlegap = 10f0
+        "Controls if the title is visible."
+        titlevisible = true
+        "The horizontal alignment of the title."
+        titlealign = :center
+        "The font family of the xlabel."
+        xlabelfont = lift_parent_attribute(scene, :font, "DejaVu Sans")
+        "The font family of the ylabel."
+        ylabelfont = lift_parent_attribute(scene, :font, "DejaVu Sans")
+        "The color of the xlabel."
+        xlabelcolor = RGBf0(0, 0, 0)
+        "The color of the ylabel."
+        ylabelcolor = RGBf0(0, 0, 0)
+        "The font size of the xlabel."
+        xlabelsize = lift_parent_attribute(scene, :fontsize, 20f0)
+        "The font size of the ylabel."
+        ylabelsize = lift_parent_attribute(scene, :fontsize, 20f0)
+        "Controls if the xlabel is visible."
+        xlabelvisible = true
+        "Controls if the ylabel is visible."
+        ylabelvisible = true
+        "The padding between the xlabel and the ticks or axis."
+        xlabelpadding = 15f0
+        "The padding between the ylabel and the ticks or axis."
+        ylabelpadding = 15f0 # because of boundingbox inaccuracies of ticklabels
+        "The font family of the xticklabels."
+        xticklabelfont = lift_parent_attribute(scene, :font, "DejaVu Sans")
+        "The font family of the yticklabels."
+        yticklabelfont = lift_parent_attribute(scene, :font, "DejaVu Sans")
+        "The font size of the xticklabels."
+        xticklabelsize = lift_parent_attribute(scene, :fontsize, 20f0)
+        "The font size of the yticklabels."
+        yticklabelsize = lift_parent_attribute(scene, :fontsize, 20f0)
+        "Controls if the xticklabels are visible."
+        xticklabelsvisible = true
+        "Controls if the yticklabels are visible."
+        yticklabelsvisible = true
+        "The space reserved for the xticklabels."
+        xticklabelspace = AbstractPlotting.automatic
+        "The space reserved for the yticklabels."
+        yticklabelspace = AbstractPlotting.automatic
+        "The space between xticks and xticklabels."
+        xticklabelpad = 5f0
+        "The space between yticks and yticklabels."
+        yticklabelpad = 5f0
+        "The counterclockwise rotation of the xticklabels in radians."
+        xticklabelrotation = 0f0
+        "The counterclockwise rotation of the yticklabels in radians."
+        yticklabelrotation = 0f0
+        "The horizontal and vertical alignment of the xticklabels."
+        xticklabelalign = (:center, :top)
+        "The horizontal and vertical alignment of the yticklabels."
+        yticklabelalign = (:right, :center)
+        "The size of the xtick marks."
+        xticksize = 10f0
+        "The size of the ytick marks."
+        yticksize = 10f0
+        "Controls if the xtick marks are visible."
+        xticksvisible = true
+        "Controls if the ytick marks are visible."
+        yticksvisible = true
+        "The alignment of the xtick marks relative to the axis spine (0 = out, 1 = in)."
+        xtickalign = 0f0
+        "The alignment of the ytick marks relative to the axis spine (0 = out, 1 = in)."
+        ytickalign = 0f0
+        "The width of the xtick marks."
+        xtickwidth = 1f0
+        "The width of the ytick marks."
+        ytickwidth = 1f0
+        "The color of the xtick marks."
+        xtickcolor = RGBf0(0, 0, 0)
+        "The color of the ytick marks."
+        ytickcolor = RGBf0(0, 0, 0)
+        "Locks interactive panning in the x direction."
+        xpanlock = false
+        "Locks interactive panning in the y direction."
+        ypanlock = false
+        "Locks interactive zooming in the x direction."
+        xzoomlock = false
+        "Locks interactive zooming in the y direction."
+        yzoomlock = false
+        "The width of the axis spines."
+        spinewidth = 1f0
+        "Controls if the x grid lines are visible."
+        xgridvisible = true
+        "Controls if the y grid lines are visible."
+        ygridvisible = true
+        "The width of the x grid lines."
+        xgridwidth = 1f0
+        "The width of the y grid lines."
+        ygridwidth = 1f0
+        "The color of the x grid lines."
+        xgridcolor = RGBAf0(0, 0, 0, 0.1)
+        "The color of the y grid lines."
+        ygridcolor = RGBAf0(0, 0, 0, 0.1)
+        "The linestyle of the x grid lines."
+        xgridstyle = nothing
+        "The linestyle of the y grid lines."
+        ygridstyle = nothing
+        "Controls if the bottom axis spine is visible."
+        bottomspinevisible = true
+        "Controls if the left axis spine is visible."
+        leftspinevisible = true
+        "Controls if the top axis spine is visible."
+        topspinevisible = true
+        "Controls if the right axis spine is visible."
+        rightspinevisible = true
+        "The color of the bottom axis spine."
+        bottomspinecolor = :black
+        "The color of the left axis spine."
+        leftspinecolor = :black
+        "The color of the top axis spine."
+        topspinecolor = :black
+        "The color of the right axis spine."
+        rightspinecolor = :black
+        "The forced aspect ratio of the axis. `nothing` leaves the axis unconstrained, `DataAspect()` forces the same ratio as the ratio in data limits between x and y axis, `AxisAspect(ratio)` sets a manual ratio."
+        aspect = nothing
+        "The vertical alignment of the axis within its suggested bounding box."
+        valign = :center
+        "The horizontal alignment of the axis within its suggested bounding box."
+        halign = :center
+        "The width of the axis."
+        width = nothing
+        "The height of the axis."
+        height = nothing
+        maxsize = (Inf32, Inf32)
+        "The relative margins added to the autolimits in x direction."
+        xautolimitmargin = (0.05f0, 0.05f0)
+        "The relative margins added to the autolimits in y direction."
+        yautolimitmargin = (0.05f0, 0.05f0)
+        "The xticks tick object."
+        xticks = AutoLinearTicks(5)
+        "The yticks tick object."
+        yticks = AutoLinearTicks(5)
+        "The button for panning."
+        panbutton = AbstractPlotting.Mouse.right
+        "The key for limiting panning to the x direction."
+        xpankey = AbstractPlotting.Keyboard.x
+        "The key for limiting panning to the y direction."
+        ypankey = AbstractPlotting.Keyboard.y
+        "The key for limiting zooming to the x direction."
+        xzoomkey = AbstractPlotting.Keyboard.x
+        "The key for limiting zooming to the y direction."
+        yzoomkey = AbstractPlotting.Keyboard.y
+        "The position of the x axis (`:bottom` or `:top`)."
+        xaxisposition = :bottom
+        "The position of the y axis (`:left` or `:right`)."
+        yaxisposition = :left
+        "Controls if the x spine is limited to the furthest tick marks or not."
+        xtrimspine = false
+        "Controls if the y spine is limited to the furthest tick marks or not."
+        ytrimspine = false
+        "The background color of the axis."
+        backgroundcolor = :white
+        "Controls if the ylabel's rotation is flipped."
+        flip_ylabel = false
+        "Constrains the data aspect ratio (`nothing` leaves the ratio unconstrained)."
+        autolimitaspect = nothing
+        targetlimits = BBox(0, 100, 0, 100)
+        "The align mode of the axis in its parent GridLayout."
+        alignmode = Inside()
+    end
+
+    (attributes = attrs, documentation = docdict, defaults = defaultdict)
 end
+
+@doc """
+LAxis has the following attributes:
+
+$(let
+    _, docs, defaults = default_attributes(LAxis, nothing)
+    docvarstring(docs, defaults)
+end)
+"""
+LAxis
 
 function default_attributes(::Type{LColorbar}, scene)
-    Attributes(
-        label = " ",
-        labelcolor = RGBf0(0, 0, 0),
-        labelfont = lift_parent_attribute(scene, :font, "DejaVu Sans"),
-        labelsize = lift_parent_attribute(scene, :fontsize, 20f0),
-        labelvisible = true,
-        labelpadding = 15f0,
-        ticklabelfont = lift_parent_attribute(scene, :font, "DejaVu Sans"),
-        ticklabelsize = lift_parent_attribute(scene, :fontsize, 20f0),
-        ticklabelsvisible = true,
-        ticksize = 10f0,
-        ticksvisible = true,
-        ticks = AutoLinearTicks(5),
-        ticklabelspace = AbstractPlotting.automatic,
-        ticklabelpad = 5f0,
-        tickalign = 0f0,
-        tickwidth = 1f0,
-        tickcolor = RGBf0(0, 0, 0),
-        ticklabelalign = (:left, :center),
-        spinewidth = 1f0,
-        topspinevisible = true,
-        rightspinevisible = true,
-        leftspinevisible = true,
-        bottomspinevisible = true,
-        topspinecolor = RGBf0(0, 0, 0),
-        leftspinecolor = RGBf0(0, 0, 0),
-        rightspinecolor = RGBf0(0, 0, 0),
-        bottomspinecolor = RGBf0(0, 0, 0),
-        valign = :center,
-        halign = :center,
-        vertical = true,
-        flipaxisposition = true,
-        flip_vertical_label = false,
-        width = nothing,
-        height = nothing,
-        colormap = :viridis,
-        limits = (0f0, 1f0),
-        alignmode = Inside(),
+    attrs, docdict, defaultdict = @documented_attributes begin
+        "The color bar label string."
+        label = " "
+        "The label color."
+        labelcolor = RGBf0(0, 0, 0)
+        "The label font family."
+        labelfont = lift_parent_attribute(scene, :font, "DejaVu Sans")
+        "The label font size."
+        labelsize = lift_parent_attribute(scene, :fontsize, 20f0)
+        "Controls if the label is visible."
+        labelvisible = true
+        "The gap between the label and the ticks."
+        labelpadding = 15f0
+        "The font family of the tick labels."
+        ticklabelfont = lift_parent_attribute(scene, :font, "DejaVu Sans")
+        "The font size of the tick labels."
+        ticklabelsize = lift_parent_attribute(scene, :fontsize, 20f0)
+        "Controls if the tick labels are visible."
+        ticklabelsvisible = true
+        "The size of the tick marks."
+        ticksize = 10f0
+        "Controls if the tick marks are visible."
+        ticksvisible = true
+        "The ticks object."
+        ticks = AutoLinearTicks(5)
+        "The space reserved for the tick labels."
+        ticklabelspace = AbstractPlotting.automatic
+        "The gap between tick labels and tick marks."
+        ticklabelpad = 5f0
+        "The alignment of the tick marks relative to the axis spine (0 = out, 1 = in)."
+        tickalign = 0f0
+        "The line width of the tick marks."
+        tickwidth = 1f0
+        "The color of the tick marks."
+        tickcolor = RGBf0(0, 0, 0)
+        "The horizontal and vertical alignment of the tick labels."
+        ticklabelalign = (:left, :center)
+        "The line width of the spines."
+        spinewidth = 1f0
+        "Controls if the top spine is visible."
+        topspinevisible = true
+        "Controls if the right spine is visible."
+        rightspinevisible = true
+        "Controls if the left spine is visible."
+        leftspinevisible = true
+        "Controls if the bottom spine is visible."
+        bottomspinevisible = true
+        "The color of the top spine."
+        topspinecolor = RGBf0(0, 0, 0)
+        "The color of the left spine."
+        leftspinecolor = RGBf0(0, 0, 0)
+        "The color of the right spine."
+        rightspinecolor = RGBf0(0, 0, 0)
+        "The color of the bottom spine."
+        bottomspinecolor = RGBf0(0, 0, 0)
+        "The vertical alignment of the colorbar in its suggested bounding box."
+        valign = :center
+        "The horizontal alignment of the colorbar in its suggested bounding box."
+        halign = :center
+        "Controls if the colorbar is oriented vertically."
+        vertical = true
+        "Flips the axis to the right if vertical and to the top if horizontal."
+        flipaxisposition = true
+        "Flips the colorbar label if the axis is vertical."
+        flip_vertical_label = false
+        "The width setting of the colorbar."
+        width = nothing
+        "The height setting of the colorbar."
+        height = nothing
+        "The colormap that the colorbar uses."
+        colormap = :viridis
+        "The range of values depicted in the colorbar."
+        limits = (0f0, 1f0)
+        "The align mode of the colorbar in its parent GridLayout."
+        alignmode = Inside()
+        "The number of steps in the heatmap underlying the colorbar gradient."
         nsteps = 100
-    )
+    end
+    (attributes = attrs, documentation = docdict, defaults = defaultdict)
 end
+
+@doc """
+LColorbar has the following attributes:
+
+$(let
+    _, docs, defaults = default_attributes(LColorbar, nothing)
+    docvarstring(docs, defaults)
+end)
+"""
+LColorbar
 
 function default_attributes(::Type{LText}, scene)
-    Attributes(
-        text = "Text",
-        visible = true,
-        color = RGBf0(0, 0, 0),
-        textsize = lift_parent_attribute(scene, :fontsize, 20f0),
-        font = lift_parent_attribute(scene, :font, "DejaVu Sans"),
-        valign = :center,
-        halign = :center,
-        rotation = 0f0,
-        padding = (0f0, 0f0, 0f0, 0f0),
-        height = Auto(),
-        width = Auto(),
-        alignmode = Inside(),
-    )
+    attrs, docdict, defaultdict = @documented_attributes begin
+        "The displayed text string."
+        text = "Text"
+        "Controls if the text is visible."
+        visible = true
+        "The color of the text."
+        color = RGBf0(0, 0, 0)
+        "The font size of the text."
+        textsize = lift_parent_attribute(scene, :fontsize, 20f0)
+        "The font family of the text."
+        font = lift_parent_attribute(scene, :font, "DejaVu Sans")
+        "The vertical alignment of the text in its suggested boundingbox"
+        valign = :center
+        "The horizontal alignment of the text in its suggested boundingbox"
+        halign = :center
+        "The counterclockwise rotation of the text in radians."
+        rotation = 0f0
+        "The extra space added to the sides of the text boundingbox."
+        padding = (0f0, 0f0, 0f0, 0f0)
+        "The height setting of the text."
+        height = Auto()
+        "The width setting of the text."
+        width = Auto()
+        "The align mode of the text in its parent GridLayout."
+        alignmode = Inside()
+    end
+    (attributes = attrs, documentation = docdict, defaults = defaultdict)
 end
 
-function default_attributes(::Type{LRect})
-    Attributes(
-        visible = true,
-        color = RGBf0(0.9, 0.9, 0.9),
-        valign = :center,
-        halign = :center,
-        padding = (0f0, 0f0, 0f0, 0f0),
-        strokewidth = 2f0,
-        strokevisible = true,
-        strokecolor = RGBf0(0, 0, 0),
-        width = nothing,
-        height = nothing,
-        alignmode = Inside(),
-    )
+@doc """
+LText has the following attributes:
+
+$(let
+    _, docs, defaults = default_attributes(LText, nothing)
+    docvarstring(docs, defaults)
+end)
+"""
+LText
+
+function default_attributes(::Type{LRect}, scene)
+    attrs, docdict, defaultdict = @documented_attributes begin
+        "Controls if the rectangle is visible."
+        visible = true
+        "The color of the rectangle."
+        color = RGBf0(0.9, 0.9, 0.9)
+        "The vertical alignment of the rectangle in its suggested boundingbox"
+        valign = :center
+        "The horizontal alignment of the rectangle in its suggested boundingbox"
+        halign = :center
+        "The extra space added to the sides of the rectangle boundingbox."
+        padding = (0f0, 0f0, 0f0, 0f0)
+        "The line width of the rectangle's border."
+        strokewidth = 2f0
+        "Controls if the border of the rectangle is visible."
+        strokevisible = true
+        "The color of the border."
+        strokecolor = RGBf0(0, 0, 0)
+        "The width setting of the rectangle."
+        width = nothing
+        "The height setting of the rectangle."
+        height = nothing
+        "The align mode of the rectangle in its parent GridLayout."
+        alignmode = Inside()
+    end
+    (attributes = attrs, documentation = docdict, defaults = defaultdict)
 end
 
-function default_attributes(::Type{LButton})
-    Attributes(
-        halign = :center,
-        valign = :center,
-        padding = (10f0, 10f0, 10f0, 10f0),
-        textsize = 20f0,
-        label = "Button",
-        font = "Dejavu Sans",
-        width = Auto(true),
-        height = Auto(true),
-        cornerradius = 4,
-        cornersegments = 10,
-        strokewidth = 2f0,
-        strokecolor = :transparent,
-        buttoncolor = RGBf0(0.9, 0.9, 0.9),
-        labelcolor = :black,
-        labelcolor_hover = :black,
-        labelcolor_active = :white,
-        buttoncolor_active = COLOR_ACCENT[],
-        # buttoncolor_hover = RGBf0(0.8, 0.8, 0.8),
-        buttoncolor_hover = COLOR_ACCENT_DIMMED[],
-        clicks = 0,
-        alignmode = Inside(),
-    )
+@doc """
+LRect has the following attributes:
+
+$(let
+    _, docs, defaults = default_attributes(LRect, nothing)
+    docvarstring(docs, defaults)
+end)
+"""
+LRect
+
+function default_attributes(::Type{LButton}, scene)
+    attrs, docdict, defaultdict = @documented_attributes begin
+        "The horizontal alignment of the button in its suggested boundingbox"
+        halign = :center
+        "The vertical alignment of the button in its suggested boundingbox"
+        valign = :center
+        "The extra space added to the sides of the button label's boundingbox."
+        padding = (10f0, 10f0, 10f0, 10f0)
+        "The font size of the button label."
+        textsize = 20f0
+        "The text of the button label."
+        label = "Button"
+        "The font family of the button label."
+        font = "Dejavu Sans"
+        "The width setting of the button."
+        width = Auto(true)
+        "The height setting of the button."
+        height = Auto(true)
+        "The radius of the rounded corners of the button."
+        cornerradius = 4
+        "The number of poly segments used for each rounded corner."
+        cornersegments = 10
+        "The line width of the button border."
+        strokewidth = 2f0
+        "The color of the button border."
+        strokecolor = :transparent
+        "The color of the button."
+        buttoncolor = RGBf0(0.9, 0.9, 0.9)
+        "The color of the label."
+        labelcolor = :black
+        "The color of the label when the mouse hovers over the button."
+        labelcolor_hover = :black
+        "The color of the label when the mouse clicks the button."
+        labelcolor_active = :white
+        "The color of the button when the mouse clicks the button."
+        buttoncolor_active = COLOR_ACCENT[]
+        "The color of the button when the mouse hovers over the button."
+        buttoncolor_hover = COLOR_ACCENT_DIMMED[]
+        "The number of clicks that have been registered by the button."
+        clicks = 0
+        "The align mode of the button in its parent GridLayout."
+        alignmode = Inside()
+    end
+    (attributes = attrs, documentation = docdict, defaults = defaultdict)
 end
+
+@doc """
+LButton has the following attributes:
+
+$(let
+    _, docs, defaults = default_attributes(LButton, nothing)
+    docvarstring(docs, defaults)
+end)
+"""
+LButton
 
 function default_attributes(::Type{LineAxis})
     Attributes(
@@ -232,97 +454,199 @@ function default_attributes(::Type{LineAxis})
     )
 end
 
-function default_attributes(::Type{LSlider})
-    Attributes(
-        linewidth = 4f0,
-        halign = :center,
-        valign = :center,
-        # vertical = true,
-        width = nothing,
-        height = Auto(true),
-        range = 0:10,
-        buttonradius = 7f0,
-        startvalue = 0,
-        value = 0,
-        color_active_dimmed = COLOR_ACCENT_DIMMED[],
-        color_active = COLOR_ACCENT[],
-        color_inactive = RGBf0(0.9, 0.9, 0.9),
-        buttoncolor_inactive = RGBf0(1, 1, 1),
-        horizontal = true,
-        buttonstrokewidth = 4f0,
-        alignmode = Inside(),
-    )
+function default_attributes(::Type{LSlider}, scene)
+    attrs, docdict, defaultdict = @documented_attributes begin
+        "The line width of the main slider line."
+        linewidth = 4f0
+        "The horizontal alignment of the slider in its suggested bounding box."
+        halign = :center
+        "The vertical alignment of the slider in its suggested bounding box."
+        valign = :center
+        "The width setting of the slider."
+        width = nothing
+        "The height setting of the slider."
+        height = Auto(true)
+        "The range of values that the slider can pick from."
+        range = 0:10
+        "The radius of the slider button."
+        buttonradius = 7f0
+        "The start value of the slider or the value that is closest in the slider range."
+        startvalue = 0
+        "The current value of the slider."
+        value = 0
+        "The color of the slider when the mouse hovers over it."
+        color_active_dimmed = COLOR_ACCENT_DIMMED[]
+        "The color of the slider when the mouse clicks and drags the slider."
+        color_active = COLOR_ACCENT[]
+        "The color of the slider when it is not interacted with."
+        color_inactive = RGBf0(0.9, 0.9, 0.9)
+        "The color of the button when it is not interacted with."
+        buttoncolor_inactive = RGBf0(1, 1, 1)
+        "Controls if the slider has a horizontal orientation or not."
+        horizontal = true
+        "The line width of the slider button's border."
+        buttonstrokewidth = 4f0
+        "The align mode of the slider in its parent GridLayout."
+        alignmode = Inside()
+    end
+    (attributes = attrs, documentation = docdict, defaults = defaultdict)
 end
 
-function default_attributes(::Type{LToggle})
-    Attributes(
-        halign = :center,
-        valign = :center,
-        width = 60,
-        height = 30,
-        cornersegments = 10,
-        # strokewidth = 2f0,
-        # strokecolor = :transparent,
-        framecolor_inactive = RGBf0(0.9, 0.9, 0.9),
-        framecolor_active = COLOR_ACCENT[],
-        # buttoncolor = RGBf0(0.2, 0.2, 0.2),
-        buttoncolor = RGBf0(1, 1, 1),
-        active = false,
-        toggleduration = 0.2,
-        rimfraction = 0.25,
-        alignmode = Inside(),
-    )
+@doc """
+LSlider has the following attributes:
+
+$(let
+    _, docs, defaults = default_attributes(LSlider, nothing)
+    docvarstring(docs, defaults)
+end)
+"""
+LSlider
+
+function default_attributes(::Type{LToggle}, scene)
+    attrs, docdict, defaultdict = @documented_attributes begin
+        "The horizontal alignment of the toggle in its suggested bounding box."
+        halign = :center
+        "The vertical alignment of the toggle in its suggested bounding box."
+        valign = :center
+        "The width of the toggle."
+        width = 60
+        "The height of the toggle."
+        height = 30
+        "The number of poly segments in each rounded corner."
+        cornersegments = 10
+        # strokewidth = 2f0
+        # strokecolor = :transparent
+        "The color of the border when the toggle is inactive."
+        framecolor_inactive = RGBf0(0.9, 0.9, 0.9)
+        "The color of the border when the toggle is active."
+        framecolor_active = COLOR_ACCENT[]
+        # buttoncolor = RGBf0(0.2, 0.2, 0.2)
+        "The color of the toggle button."
+        buttoncolor = RGBf0(1, 1, 1)
+        "Indicates if the toggle is active or not."
+        active = false
+        "The duration of the toggle animation."
+        toggleduration = 0.2
+        "The border width as a fraction of the toggle height "
+        rimfraction = 0.25
+        "The align mode of the toggle in its parent GridLayout."
+        alignmode = Inside()
+    end
+    (attributes = attrs, documentation = docdict, defaults = defaultdict)
 end
+
+@doc """
+LToggle has the following attributes:
+
+$(let
+    _, docs, defaults = default_attributes(LToggle, nothing)
+    docvarstring(docs, defaults)
+end)
+"""
+LToggle
 
 
 function default_attributes(::Type{LLegend}, scene)
-    Attributes(
-        halign = :center,
-        valign = :center,
-        width = Auto(true),
-        height = Auto(false),
-        titlefont = lift_parent_attribute(scene, :font, "DejaVu Sans"),
-        titlesize = lift_parent_attribute(scene, :fontsize, 20f0),
-        titlehalign = :center,
-        titlevalign = :center,
-        titlevisible = true,
-        titleposition = :top,
-        labelsize = lift_parent_attribute(scene, :fontsize, 20f0),
-        labelfont = lift_parent_attribute(scene, :font, "DejaVu Sans"),
-        labelcolor = :black,
-        labelhalign = :left,
-        labelvalign = :center,
-        padding = (10f0, 10f0, 10f0, 10f0),
-        margin = (0f0, 0f0, 0f0, 0f0),
-        bgcolor = :white,
-        framecolor = :black,
-        framewidth = 1f0,
-        framevisible = true,
-        patchsize = (20f0, 20f0),
-        patchstrokecolor = :transparent,
-        patchstrokewidth = 1f0,
-        patchcolor = :transparent,
-        label = "undefined",
-        nbanks = 1,
-        colgap = 20,
-        rowgap = 4,
-        patchlabelgap = 5,
-        linepoints = [Point2f0(0, 0.5), Point2f0(1, 0.5)],
-        linewidth = 3,
-        markerpoints = [Point2f0(0.5, 0.5)],
-        markersize = 12,
-        markerstrokewidth = 2,
-        polypoints = [Point2f0(0, 0), Point2f0(1, 0), Point2f0(1, 1), Point2f0(0, 1)],
-        polystrokewidth = 2,
-        orientation = :vertical,
-        titlegap = 15,
-        groupgap = 30,
-        gridshalign = :center,
-        gridsvalign = :center,
-        alignmode = Inside(),
-    )
+    attrs, docdict, defaultdict = @documented_attributes begin
+        "The horizontal alignment of the legend in its suggested bounding box."
+        halign = :center
+        "The vertical alignment of the legend in its suggested bounding box."
+        valign = :center
+        "The width setting of the legend."
+        width = Auto(true)
+        "The height setting of the legend."
+        height = Auto(false)
+        "The font family of the legend group titles."
+        titlefont = lift_parent_attribute(scene, :font, "DejaVu Sans")
+        "The font size of the legend group titles."
+        titlesize = lift_parent_attribute(scene, :fontsize, 20f0)
+        "The horizontal alignment of the legend group titles."
+        titlehalign = :center
+        "The vertical alignment of the legend group titles."
+        titlevalign = :center
+        "Controls if the legend titles are visible."
+        titlevisible = true
+        "The group title positions relative to their groups. Can be `:top` or `:left`."
+        titleposition = :top
+        "The font size of the entry labels."
+        labelsize = lift_parent_attribute(scene, :fontsize, 20f0)
+        "The font family of the entry labels."
+        labelfont = lift_parent_attribute(scene, :font, "DejaVu Sans")
+        "The color of the entry labels."
+        labelcolor = :black
+        "The horizontal alignment of the entry labels."
+        labelhalign = :left
+        "The vertical alignment of the entry labels."
+        labelvalign = :center
+        "The additional space between the legend content and the border."
+        padding = (10f0, 10f0, 10f0, 10f0)
+        "The additional space between the legend and its suggested boundingbox."
+        margin = (0f0, 0f0, 0f0, 0f0)
+        "The background color of the legend."
+        bgcolor = :white
+        "The color of the legend border."
+        framecolor = :black
+        "The line width of the legend border."
+        framewidth = 1f0
+        "Controls if the legend border is visible."
+        framevisible = true
+        "The size of the rectangles containing the legend markers."
+        patchsize = (20f0, 20f0)
+        "The color of the border of the patches containing the legend markers."
+        patchstrokecolor = :transparent
+        "The line width of the border of the patches containing the legend markers."
+        patchstrokewidth = 1f0
+        "The color of the patches containing the legend markers."
+        patchcolor = :transparent
+        "The default entry label."
+        label = "undefined"
+        "The number of banks in which the legend entries are grouped. Columns if the legend is vertically oriented, otherwise rows."
+        nbanks = 1
+        "The gap between the label of one legend entry and the patch of the next."
+        colgap = 20
+        "The gap between the entry rows."
+        rowgap = 4
+        "The gap between the patch and the label of each legend entry."
+        patchlabelgap = 5
+        "The default points used for LineElements in normalized coordinates relative to each label patch."
+        linepoints = [Point2f0(0, 0.5), Point2f0(1, 0.5)]
+        "The default line width used for LineElements."
+        linewidth = 3
+        "The default marker points used for MarkerElements in normalized coordinates relative to each label patch."
+        markerpoints = [Point2f0(0.5, 0.5)]
+        "The default marker size used for MarkerElements."
+        markersize = 12
+        "The default marker stroke width used for MarkerElements."
+        markerstrokewidth = 2
+        "The default poly points used for PolyElements in normalized coordinates relative to each label patch."
+        polypoints = [Point2f0(0, 0), Point2f0(1, 0), Point2f0(1, 1), Point2f0(0, 1)]
+        "The default poly stroke width used for PolyElements."
+        polystrokewidth = 2
+        "The orientation of the legend (:horizontal or :vertical)."
+        orientation = :vertical
+        "The gap between each group title and its group."
+        titlegap = 15
+        "The gap between each group and the next."
+        groupgap = 30
+        "The horizontal alignment of entry groups in their parent GridLayout."
+        gridshalign = :center
+        "The vertical alignment of entry groups in their parent GridLayout."
+        gridsvalign = :center
+        "The align mode of the legend in its parent GridLayout."
+        alignmode = Inside()
+    end
+    (attributes = attrs, documentation = docdict, defaults = defaultdict)
 end
 
+@doc """
+LLegend has the following attributes:
+
+$(let
+    _, docs, defaults = default_attributes(LLegend, nothing)
+    docvarstring(docs, defaults)
+end)
+"""
+LLegend
 
 function attributenames(::Type{LegendEntry})
     (:label, :labelsize, :labelfont, :labelcolor, :labelhalign, :labelvalign,
@@ -351,11 +675,27 @@ function default_attributes(::Type{GridLayout})
 end
 
 function default_attributes(::Type{LScene}, scene)
-    Attributes(
-        height = nothing,
-        width = nothing,
-        halign = :center,
-        valign = :center,
-        alignmode = Inside(),
-    )
+    attrs, docdict, defaultdict = @documented_attributes begin
+        "The height setting of the scene."
+        height = nothing
+        "The width setting of the scene."
+        width = nothing
+        "The horizontal alignment of the scene in its suggested bounding box."
+        halign = :center
+        "The vertical alignment of the scene in its suggested bounding box."
+        valign = :center
+        "The alignment of the scene in its suggested bounding box."
+        alignmode = Inside()
+    end
+    (attributes = attrs, documentation = docdict, defaults = defaultdict)
 end
+
+@doc """
+LScene has the following attributes:
+
+$(let
+    _, docs, defaults = default_attributes(LScene, nothing)
+    docvarstring(docs, defaults)
+end)
+"""
+LScene

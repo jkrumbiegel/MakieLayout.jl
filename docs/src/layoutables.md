@@ -135,3 +135,9 @@ save("example_ltoggle.png", scene); nothing # hide
 ```
 
 ![example ltoggle](example_ltoggle.png)
+
+
+## Deleting Layoutables
+
+To remove axes, colorbars and other layoutables from their layout and the scene,
+use `delete!(layoutable)`.

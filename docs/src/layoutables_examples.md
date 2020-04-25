@@ -144,7 +144,10 @@ and the value with `optionvalue(element)`. The attribute `selection` is set
 to the option value of an element when it is selected.
 
 ```@example
-scene, layout = layoutscene()
+using Makie
+using MakieLayout
+
+scene, layout = layoutscene(resolution = (1400, 900))
 
 menu = LMenu(scene, options = ["viridis", "heat", "blues"])
 

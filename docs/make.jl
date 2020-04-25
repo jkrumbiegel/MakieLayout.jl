@@ -9,10 +9,10 @@ makedocs(
         "index.md",
         "GridLayout" => "grids.md",
         "LAxis" => "laxis.md",
-        "Attributes of Layoutables" => "layoutables_attributes.md",
         "LLegend" => "llegend.md",
-        "Other Layoutables" => "layoutables.md",
-        "How layouting works" => "layouting.md",
+        "Layoutables Examples" => "layoutables_examples.md",
+        "Layoutables Reference" => "layoutables_reference.md",
+        "How Layouting Works" => "layouting.md",
         "Frequently Asked Questions" => "faq.md",
     ],
     format = Documenter.HTML(

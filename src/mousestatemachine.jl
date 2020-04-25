@@ -16,7 +16,7 @@ mousestates = (:MouseOut, :MouseEnter, :MouseOver,
     :MouseLeftDragStop, :MouseRightDragStop, :MouseMiddleDragStop,
     :MouseLeftClick, :MouseRightClick, :MouseMiddleClick,
     :MouseLeftDoubleclick, :MouseRightDoubleclick, :MouseMiddleDoubleclick,
-    :MouseUpOutside
+    :MouseUpOutside, :MouseDownOutside
     )
 
 for statetype in mousestates
@@ -210,6 +210,10 @@ function addmousestate!(scene, elements...)
                 # mouse went down outside of the element, this is useful for losing focus
                 if dragstate == Mouse.up
                     mousestate[] = MouseState(MouseUpOutside(), t, pos, tprev[], prev[])
+                end
+
+                if dragstate == Mouse.down
+                    mousestate[] = MouseState(MouseDownOutside(), t, pos, tprev[], prev[])
                 end
             end
         end

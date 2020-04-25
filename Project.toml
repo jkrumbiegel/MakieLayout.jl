@@ -1,7 +1,7 @@
 name = "MakieLayout"
 uuid = "5a521ce4-ebb9-4793-b5b7-b334dfe8393c"
 authors = ["Julius Krumbiegel", "Simon Danisch"]
-version = "0.6.2"
+version = "0.7.0"
 
 [deps]
 AbstractPlotting = "537997a7-5e4e-5d89-9595-2241ea00577e"
@@ -19,7 +19,7 @@ Animations = "^0.3"
 Formatting = "^0.4"
 Match = "^1"
 Observables = "^0.2, 0.3"
-PlotUtils = "0.6.4"
+PlotUtils = "0.6.4, 1.0"
 julia = "1"
 GridLayoutBase = "0.2.1"
 Showoff = "0.3.1"

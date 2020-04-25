@@ -42,3 +42,8 @@ LRect
 ```@docs
 LScene
 ```
+
+## LMenu
+```@docs
+LMenu
+```

@@ -16,4 +16,5 @@ using Test
 
     to = gl2[1, 4] = LToggle(scene)
     te = layout[0, :] = LText(scene, "A super title")
+    me = layout[end+1, :] = LMenu(scene, options = ["one", "two", "three"])
 end

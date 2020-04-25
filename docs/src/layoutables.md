@@ -137,6 +137,54 @@ save("example_ltoggle.png", scene); nothing # hide
 ![example ltoggle](example_ltoggle.png)
 
 
+## LMenu
+
+A dropdown menu with `options`, where each element's label is determined with `optionlabel(element)`
+and the value with `optionvalue(element)`. The attribute `selection` is set
+to the option value of an element when it is selected.
+
+```@example
+scene, layout = layoutscene()
+
+menu = LMenu(scene, options = ["viridis", "heat", "blues"])
+
+funcs = [sqrt, x->x^2, sin, cos]
+
+menu2 = LMenu(scene, options = zip(["Square Root", "Square", "Sine", "Cosine"], funcs))
+
+layout[1, 1] = vbox!(
+    LText(scene, "Colormap", width = nothing),
+    menu,
+    LText(scene, "Function", width = nothing),
+    menu2;
+    height = Auto(false), width = 200)
+
+ax = layout[1, 2] = LAxis(scene)
+
+func = Node{Any}(funcs[1])
+
+ys = @lift($func.(0:0.3:10))
+scat = scatter!(ax, ys, markersize = 20px, color = ys)
+
+cb = layout[1, 3] = LColorbar(scene, scat, width = 30)
+
+on(menu.selection) do s
+    scat.colormap = s
+end
+
+on(menu2.selection) do s
+    func[] = s
+    autolimits!(ax)
+end
+
+menu2.is_open = true
+
+save("example_lmenu.png", scene); nothing # hide
+```
+
+![example lmenu](example_lmenu.png)
+
+
 ## Deleting Layoutables
 
 To remove axes, colorbars and other layoutables from their layout and the scene,

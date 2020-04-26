@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Layoutables Examples · MakieLayout.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">MakieLayout.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">MakieLayout.jl Tutorial</a></li><li><a class="tocitem" href="../grids/">GridLayout</a></li><li><a class="tocitem" href="../laxis/">LAxis</a></li><li><a class="tocitem" href="../llegend/">LLegend</a></li><li class="is-active"><a class="tocitem" href>Layoutables Examples</a><ul class="internal"><li><a class="tocitem" href="#LSlider-1"><span>LSlider</span></a></li><li><a class="tocitem" href="#LText-1"><span>LText</span></a></li><li><a class="tocitem" href="#LButton-1"><span>LButton</span></a></li><li><a class="tocitem" href="#LRect-1"><span>LRect</span></a></li><li><a class="tocitem" href="#LScene-1"><span>LScene</span></a></li><li><a class="tocitem" href="#LToggle-1"><span>LToggle</span></a></li><li><a class="tocitem" href="#LMenu-1"><span>LMenu</span></a></li><li><a class="tocitem" href="#Deleting-Layoutables-1"><span>Deleting Layoutables</span></a></li></ul></li><li><a class="tocitem" href="../layoutables_reference/">Layoutables Reference</a></li><li><a class="tocitem" href="../layouting/">How Layouting Works</a></li><li><a class="tocitem" href="../faq/">Frequently Asked Questions</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Layoutables Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Layoutables Examples</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com//blob/master/docs/src/layoutables_examples.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h2 id="LSlider-1"><a class="docs-heading-anchor" href="#LSlider-1">LSlider</a><a class="docs-heading-anchor-permalink" href="#LSlider-1" title="Permalink"></a></h2><p>A simple slider without a label. You can create a label using an <code>LText</code> object, for example. You need to specify a range that constrains the slider&#39;s possible values. You can then lift the <code>value</code> observable to make interactive plots.</p><pre><code class="language-julia">using Makie
+using MakieLayout
+
+scene, layout = layoutscene(resolution = (1400, 900))
+
+ax = layout[1, 1] = LAxis(scene)
+sl1 = layout[2, 1] = LSlider(scene, range = 0:0.01:10, startvalue = 3)
+sl2 = layout[3, 1] = LSlider(scene, range = 0:0.01:10, startvalue = 5)
+sl3 = layout[4, 1] = LSlider(scene, range = 0:0.01:10, startvalue = 7)
+
+sl4 = layout[:, 2] = LSlider(scene, range = 0:0.01:10, horizontal = false,
+    width = Auto(true), height = nothing)</code></pre><p><img src="../example_lslider.png" alt="example lslider"/></p><h2 id="LText-1"><a class="docs-heading-anchor" href="#LText-1">LText</a><a class="docs-heading-anchor-permalink" href="#LText-1" title="Permalink"></a></h2><p>This is just normal text, except it&#39;s also layoutable. A text&#39;s size is known, so rows and columns in a GridLayout can shrink to the appropriate width or height.</p><pre><code class="language-julia">using Makie
+using MakieLayout
+
+scene, layout = layoutscene(resolution = (1400, 900))
+
+axs = layout[1:2, 1:3] = [LAxis(scene) for _ in 1:6]
+
+supertitle = layout[0, :] = LText(scene, &quot;Six plots&quot;, textsize = 30)
+
+sideinfo = layout[2:3, 0] = LText(scene, &quot;This text goes vertically&quot;, rotation = pi/2)</code></pre><p><img src="../example_ltext.png" alt="example ltext"/></p><h2 id="LButton-1"><a class="docs-heading-anchor" href="#LButton-1">LButton</a><a class="docs-heading-anchor-permalink" href="#LButton-1" title="Permalink"></a></h2><pre><code class="language-julia">using Makie
+using MakieLayout
+
+scene, layout = layoutscene(resolution = (1400, 900))
+
+layout[1, 1] = LAxis(scene)
+layout[2, 1] = buttongrid = GridLayout(width = Auto(false))
+
+buttongrid[1, 1:5] = [LButton(scene, label = &quot;Button $i&quot;) for i in 1:5]
+
+scene</code></pre><p><img src="../example_lbutton.png" alt="example lbutton"/></p><h2 id="LRect-1"><a class="docs-heading-anchor" href="#LRect-1">LRect</a><a class="docs-heading-anchor-permalink" href="#LRect-1" title="Permalink"></a></h2><p>A simple rectangle poly that is layoutable. This can be useful to make boxes for facet plots or when a rectangular placeholder is needed.</p><pre><code class="language-julia">using Makie
+using MakieLayout
+using ColorSchemes
+
+scene, layout = layoutscene(resolution = (1400, 900))
+
+rects = layout[1:4, 1:6] = [LRect(scene, color = c) for c in get.(Ref(ColorSchemes.rainbow), (0:23) ./ 23)]</code></pre><p><img src="../example_lrect.png" alt="example lrect"/></p><h2 id="LScene-1"><a class="docs-heading-anchor" href="#LScene-1">LScene</a><a class="docs-heading-anchor-permalink" href="#LScene-1" title="Permalink"></a></h2><p>If you need a normal Makie scene in a layout, for example for 3D plots, you have to use <code>LScene</code> right now. It&#39;s just a wrapper around the normal <code>Scene</code> that makes it layoutable. The underlying Scene is accessible via the <code>scene</code> field. You can plot into the <code>LScene</code> directly, though.</p><p>Currently you should pass a couple of attributes explicitly to make sure they are not inherited from the main scene (which has a pixel camera, e.g.).</p><pre><code class="language-julia">using Makie
+using MakieLayout
+
+scene, layout = layoutscene(resolution = (1400, 900))
+
+lscenes = layout[1:2, 1:3] = [LScene(scene, camera = cam3d!, raw = false) for _ in 1:6]
+
+[scatter!(lscenes[i], rand(100, 3), color = c)
+    for (i, c) in enumerate([:red, :blue, :green, :orange, :black, :gray])]</code></pre><p><img src="../example_lscene.png" alt="example lscene"/></p><h2 id="LToggle-1"><a class="docs-heading-anchor" href="#LToggle-1">LToggle</a><a class="docs-heading-anchor-permalink" href="#LToggle-1" title="Permalink"></a></h2><p>A toggle with an attribute <code>active</code> that can either be true or false, to enable or disable properties of an interactive plot.</p><pre><code class="language-julia">using Makie
+using MakieLayout
+
+scene, layout = layoutscene(resolution = (1400, 900))
+
+ax = layout[1, 1] = LAxis(scene)
+
+toggles = [LToggle(scene, active = ac) for ac in [true, false]]
+labels = [LText(scene, lift(x -&gt; x ? &quot;active&quot; : &quot;inactive&quot;, t.active))
+    for t in toggles]
+
+layout[1, 2] = grid!(hcat(toggles, labels), height = Auto(false))</code></pre><p><img src="../example_ltoggle.png" alt="example ltoggle"/></p><h2 id="LMenu-1"><a class="docs-heading-anchor" href="#LMenu-1">LMenu</a><a class="docs-heading-anchor-permalink" href="#LMenu-1" title="Permalink"></a></h2><p>A dropdown menu with <code>options</code>, where each element&#39;s label is determined with <code>optionlabel(element)</code> and the value with <code>optionvalue(element)</code>. The attribute <code>selection</code> is set to the option value of an element when it is selected.</p><pre><code class="language-julia">using Makie
+using MakieLayout
+
+scene, layout = layoutscene(resolution = (1400, 900))
+
+menu = LMenu(scene, options = [&quot;viridis&quot;, &quot;heat&quot;, &quot;blues&quot;])
+
+funcs = [sqrt, x-&gt;x^2, sin, cos]
+
+menu2 = LMenu(scene, options = zip([&quot;Square Root&quot;, &quot;Square&quot;, &quot;Sine&quot;, &quot;Cosine&quot;], funcs))
+
+layout[1, 1] = vbox!(
+    LText(scene, &quot;Colormap&quot;, width = nothing),
+    menu,
+    LText(scene, &quot;Function&quot;, width = nothing),
+    menu2;
+    height = Auto(false), width = 200)
+
+ax = layout[1, 2] = LAxis(scene)
+
+func = Node{Any}(funcs[1])
+
+ys = @lift($func.(0:0.3:10))
+scat = scatter!(ax, ys, markersize = 20px, color = ys)
+
+cb = layout[1, 3] = LColorbar(scene, scat, width = 30)
+
+on(menu.selection) do s
+    scat.colormap = s
+end
+
+on(menu2.selection) do s
+    func[] = s
+    autolimits!(ax)
+end
+
+menu2.is_open = true</code></pre><p><img src="../example_lmenu.png" alt="example lmenu"/></p><h2 id="Deleting-Layoutables-1"><a class="docs-heading-anchor" href="#Deleting-Layoutables-1">Deleting Layoutables</a><a class="docs-heading-anchor-permalink" href="#Deleting-Layoutables-1" title="Permalink"></a></h2><p>To remove axes, colorbars and other layoutables from their layout and the scene, use <code>delete!(layoutable)</code>.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../llegend/">« LLegend</a><a class="docs-footer-nextpage" href="../layoutables_reference/">Layoutables Reference »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 26 April 2020 12:16">Sunday 26 April 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

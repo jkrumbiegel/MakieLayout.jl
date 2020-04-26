@@ -18,23 +18,33 @@ function default_attributes(::Type{LTextbox}, scene)
         "The alignment of the textbox in its suggested bounding box."
         alignmode = Inside()
         "The currently displayed string"
-        displayed_string = "Textbox"
+        displayed_string = "Write here"
         "The currently saved string"
-        saved_string = ""
+        saved_string = "Write here"
         "Text size"
-        textsize = 30f0
+        textsize = lift_parent_attribute(scene, :fontsize, 20f0)
+        "Font family"
+        font = lift_parent_attribute(scene, :font, "DejaVu Sans")
         "Color of the box"
-        boxcolor = :transparent
+        boxcolor = :white
+        "Color of the box when hovered"
+        boxcolor_hover = :transparent
         "Color of the box border"
-        bordercolor = :black
+        bordercolor = gray(0.95)
+        "Color of the box border"
+        bordercolor_hover = COLOR_ACCENT_DIMMED[]
         "Color of the box border when focused"
-        bordercolor_focused = :blue
+        bordercolor_focused = COLOR_ACCENT[]
         "Width of the box border"
-        borderwidth = 3f0,
+        borderwidth = 3f0
         "Padding of the text against the box"
         textpadding = (10, 10, 10, 10)
         "If the textbox is focused and receives text input"
         focused = false
+        "Corner radius of text box"
+        cornerradius = 15
+        "Corner segments of one rounded corner"
+        cornersegments = 20
 
     end
     (attributes = attrs, documentation = docdict, defaults = defaultdict)
@@ -60,8 +70,8 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         default_attributes(LTextbox, parent).attributes)
 
     @extract attrs (halign, valign, textsize, displayed_string, saved_string,
-        boxcolor, bordercolor, textpadding, bordercolor_focused, focused,
-        borderwidth)
+        boxcolor, bordercolor, textpadding, bordercolor_focused, bordercolor_hover, focused,
+        borderwidth, cornerradius, cornersegments)
 
     decorations = Dict{Symbol, Any}()
 
@@ -74,49 +84,96 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     bbox = lift(FRect2D ∘ AbstractPlotting.zero_origin, scenearea)
 
-    box = LRect(scene, bbox = bbox, linewidth = borderwidth,
-        color = boxcolor, strokecolor = @lift($focused ? $bordercolor_focused : $bordercolor),
-        width = nothing, height = nothing)
+    roundedrectpoints = lift(roundedrectvertices, scenearea, cornerradius, cornersegments)
+
+    box = poly!(parent, roundedrectpoints, strokewidth = borderwidth,
+        strokecolor = bordercolor[],
+        color = boxcolor, raw = true)[end]
+
 
     t = LText(scene, text = displayed_string, bbox = bbox, halign = :left, valign = :top,
         width = Auto(true), height = Auto(true),
         textsize = textsize, padding = textpadding)
 
-    # trigger bbox
-    layoutobservables.suggestedbbox[] = layoutobservables.suggestedbbox[]
-
     on(t.layoutobservables.computedsize) do sz
-        @show sz
         layoutobservables.autosize[] = sz
     end
 
+    # trigger text for autosize
+    t.text = displayed_string[]
+
+    # trigger bbox
+    layoutobservables.suggestedbbox[] = layoutobservables.suggestedbbox[]
+
     mousestate = addmousestate!(scene)
 
-    onmouseleftclick(mousestate) do state
+    function focus()
+        box.strokecolor = bordercolor_focused[]
         focused[] = true
     end
 
-    onmousedownoutside(mousestate) do state
+    function defocus()
         focused[] = false
+        box.strokecolor = bordercolor[]
     end
 
-    on(events(scene).keyboardbuttons) do but
-        if !focused[] || length(but) != 1
+    onmouseleftclick(mousestate) do state
+        focus()
+    end
+
+    onmouseover(mousestate) do state
+        if !focused[]
+            box.strokecolor = bordercolor_hover[]
+        end
+    end
+
+    onmouseout(mousestate) do state
+        if !focused[]
+            box.strokecolor = bordercolor[]
+        end
+    end
+
+    onmousedownoutside(mousestate) do state
+        displayed_string[] = saved_string[]
+        defocus()
+    end
+
+    on(events(scene).unicode_input) do char_array
+        if !focused[] || isempty(char_array)
             return
         end
 
-        KB = AbstractPlotting.Keyboard
+        displayed_string[] = let
+            newstring = join(char_array)
+            if iswhitespace(displayed_string[])
+                newstring
+            else
+                displayed_string[] * newstring
+            end
+        end
+    end
 
-        b = first(but)
+    lastset = Set{AbstractPlotting.Keyboard.Button}()
+    on(events(scene).keyboardbuttons) do button_set
+        if !focused[] || isempty(button_set)
+            return
+        end
 
-        if b == KB.backspace
-            displayed_string[] = chop(displayed_string[])
-        else
-            for char in 'a':'z'
-                if b == getfield(KB, Symbol(char))
-                    displayed_string[] = displayed_string[] * char
-                    return
+        newkeys = setdiff(button_set, lastset)
+
+        for key in newkeys
+            if key == Keyboard.backspace
+                displayed_string[] = let
+                    c = chop(displayed_string[])
+                    # TODO: fix when empty string doesn't error anymore
+                    isempty(c) ? " " : c
                 end
+            elseif key == Keyboard.enter
+                saved_string[] = displayed_string[]
+                defocus()
+            elseif key == Keyboard.escape
+                displayed_string[] = saved_string[]
+                defocus()
             end
         end
     end

@@ -27,11 +27,13 @@ function default_attributes(::Type{LTextbox}, scene)
         font = lift_parent_attribute(scene, :font, "DejaVu Sans")
         "Color of the box"
         boxcolor = :white
+        "Color of the box when focused"
+        boxcolor_focused = :white
         "Color of the box when hovered"
         boxcolor_hover = :transparent
         "Color of the box border"
         bordercolor = gray(0.95)
-        "Color of the box border"
+        "Color of the box border when hovered"
         bordercolor_hover = COLOR_ACCENT_DIMMED[]
         "Color of the box border when focused"
         bordercolor_focused = COLOR_ACCENT[]
@@ -71,7 +73,7 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     @extract attrs (halign, valign, textsize, displayed_string, saved_string,
         boxcolor, bordercolor, textpadding, bordercolor_focused, bordercolor_hover, focused,
-        borderwidth, cornerradius, cornersegments)
+        borderwidth, cornerradius, cornersegments, boxcolor_focused)
 
     decorations = Dict{Symbol, Any}()
 
@@ -95,6 +97,34 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         width = Auto(true), height = Auto(true),
         textsize = textsize, padding = textpadding)
 
+    cursorpoints = Node([Point2f0(0, 0), Point2f0(1, 0)])
+
+    on(displayed_string) do s
+        # positions, _ = AbstractPlotting.layout_text(s, t.textobject.position[],
+        # t.textobject.textsize[],
+        # to_font(t.textobject.font[]),
+        # to_align(t.textobject.align[]),
+        # to_rotation(t.textobject.rotation[]),
+        # t.textobject.model[],
+        # )
+        #
+        # p = Point2f0(positions[end])
+        #
+        # cursorpoints[] = [p .+ Point2f0(10, -5), p .+ Point2f0(10, 25)]
+    end
+
+    cursorcolor = Node{Any}(:transparent)
+    cursor = linesegments!(scene, cursorpoints, color = cursorcolor, linewidth = 4)[end]
+
+    cursoranim = Animations.Loop(
+        Animations.Animation(
+            [0, 1.0],
+            [Colors.alphacolor(COLOR_ACCENT[], 0), Colors.alphacolor(COLOR_ACCENT[], 1)],
+            Animations.sineio(n = 2, yoyo = true, postwait = 0.2)),
+            0.0, 0.0, 1000)
+
+    cursoranimtask = nothing
+
     on(t.layoutobservables.computedsize) do sz
         layoutobservables.autosize[] = sz
     end
@@ -108,13 +138,26 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
     mousestate = addmousestate!(scene)
 
     function focus()
-        box.strokecolor = bordercolor_focused[]
-        focused[] = true
+        if !focused[]
+            box.strokecolor = bordercolor_focused[]
+            box.color = boxcolor_focused[]
+            focused[] = true
+            cursoranimtask = Animations.animate_async(cursoranim; fps = 30) do t, color
+                cursorcolor[] = color
+            end
+        end
     end
 
     function defocus()
-        focused[] = false
+        stopanim = false
+        box.color = boxcolor[]
         box.strokecolor = bordercolor[]
+        if !isnothing(cursoranimtask)
+            Animations.stop(cursoranimtask)
+            cursoranimtask = nothing
+        end
+        cursorcolor[] = :transparent
+        focused[] = false
     end
 
     onmouseleftclick(mousestate) do state
@@ -176,6 +219,8 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
                 defocus()
             end
         end
+
+        # lastset = button_set
     end
 
     LTextbox(scene, attrs, layoutobservables, decorations)

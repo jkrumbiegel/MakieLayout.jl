@@ -44,6 +44,45 @@ nothing # hide
 
 ![protrusion changes](example_protrusion_changes.mp4)
 
+## Setting axis limits and reversing axes
+
+You can set axis limits with the functions `xlims!`, `ylims!` or `limits!`. The
+numbers are meant in the order left right for `xlims!`, and bottom top for `ylims!`.
+Therefore, if the second number is smaller than the first, the respective axis
+will reverse. You can manually reverse an axis by setting `ax.xreversed = true` or
+`ax.yreversed = true`.
+
+Note that if you enforce an aspect ratio between x-axis and y-axis using `autolimitaspect`,
+the values you set with these functions will probably not be exactly what you get,
+but they will be changed to fit the chosen ratio.
+
+```@example
+using MakieLayout
+using Makie
+
+scene, layout = layoutscene(resolution = (1200, 900))
+
+axes = layout[] = [LAxis(scene) for i in 1:2, j in 1:3]
+
+xs = LinRange(0, 2pi, 50)
+for (i, ax) in enumerate(axes)
+    ax.title = "Axis $i"
+    lines!(ax, xs, sin.(xs))
+end
+
+xlims!(axes[1], [0, 2pi]) # as vector
+xlims!(axes[2], 2pi, 0) # separate, reversed
+ylims!(axes[3], -1, 1) # separate
+ylims!(axes[4], (1, -1)) # as tuple, reversed
+limits!(axes[5], 0, 2pi, -1, 1) # x1, x2, y1, y2
+limits!(axes[6], BBox(0, 2pi, -1, 1)) # as rectangle
+
+save("example_axis_limits.png", scene) # hide
+nothing # hide
+```
+
+![axis limits](example_axis_limits.png)
+
 ## Hiding axis decorations
 
 Hiding axis decorations frees up the space for them in the layout if there
@@ -134,7 +173,7 @@ using FileIO
 using Random # hide
 Random.seed!(1) # hide
 
-scene, layout = layoutscene(30, resolution = (1200, 900))
+scene, layout = layoutscene(resolution = (1200, 900))
 
 axes = [LAxis(scene) for i in 1:2, j in 1:3]
 tightlimits!.(axes)

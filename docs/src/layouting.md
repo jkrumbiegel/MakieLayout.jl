@@ -63,9 +63,11 @@ also control how the layout responds to the element's size (used here for either
 
 - `Fixed` or `Real`: The size is always fixed, no matter what the layout suggests. A `GridLayout` can auto-adjust column sizes to this size.
 - `Relative`: The size is a fraction of the suggested size. A `GridLayout` can not auto-adjust column sizes to this size.
-- `Auto(true)`: The size is equal to the auto-determined size if that is not `nothing`, otherwise it's equal to the suggested size. A `GridLayout` can auto-adjust to this size if it's not `nothing`.
-- `Auto(false)`: The size is equal to the auto-determined size if that is not `nothing`, otherwise it's equal to the suggested size. A `GridLayout` can *not* auto-adjust to this size (useful for single-spanned elements that should not affect the row or column they are in, but use their auto-size themselves).
+- `Auto`: The size is equal to the auto-determined size if it's not `nothing`. A `GridLayout` can auto-adjust to this size if it's not `nothing`.
 - `nothing`: The size is equal to the suggested size. A `GridLayout` can not auto-adjust column sizes to this size.
+
+For all sizes that a `GridLayout` can auto-adjust to, you can prohibit that by setting
+`tellheight` or `tellwidth` of the element to `false`.
 
 ### Alignment attributes
 

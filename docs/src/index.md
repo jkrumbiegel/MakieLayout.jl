@@ -202,16 +202,16 @@ nothing # hide
 ![step_010](step_010.png)
 
 This is much better already! But the legend still takes too much space vertically.
-The reason for that is the default height setting of the legend. It's set to
-`Auto(false)`, which essentially means that it can compute its own height, but
+The reason for that is the default `tellheight` setting of the legend. It's set to
+`false`, which essentially means that it can compute its own height, but
 doesn't tell the layout about it. This makes sense for the most common situation
 where the legend sits on the right of an axis. We wouldn't want the axis to shrink
 to the height of the legend. But now that the legend has its own row, we do want
-this behavior. So we set the `height` attribute to `Auto(true)`.
+this behavior. So we set the `tellheight` attribute to `true`.
 
 
 ```@example tutorial
-leg.height = Auto(true)
+leg.tellheight = true
 
 save("step_011.png", scene) # hide
 nothing # hide

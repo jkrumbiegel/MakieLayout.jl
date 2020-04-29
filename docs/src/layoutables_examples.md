@@ -16,7 +16,7 @@ sl2 = layout[3, 1] = LSlider(scene, range = 0:0.01:10, startvalue = 5)
 sl3 = layout[4, 1] = LSlider(scene, range = 0:0.01:10, startvalue = 7)
 
 sl4 = layout[:, 2] = LSlider(scene, range = 0:0.01:10, horizontal = false,
-    width = Auto(true), height = nothing)
+    tellwidth = true, height = nothing)
 
 save("example_lslider.png", scene); nothing # hide
 ```
@@ -54,7 +54,7 @@ using MakieLayout
 scene, layout = layoutscene(resolution = (1400, 900))
 
 layout[1, 1] = LAxis(scene)
-layout[2, 1] = buttongrid = GridLayout(width = Auto(false))
+layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
 
 buttongrid[1, 1:5] = [LButton(scene, label = "Button $i") for i in 1:5]
 
@@ -129,7 +129,7 @@ toggles = [LToggle(scene, active = ac) for ac in [true, false]]
 labels = [LText(scene, lift(x -> x ? "active" : "inactive", t.active))
     for t in toggles]
 
-layout[1, 2] = grid!(hcat(toggles, labels), height = Auto(false))
+layout[1, 2] = grid!(hcat(toggles, labels), tellheight = false)
 
 save("example_ltoggle.png", scene); nothing # hide
 ```
@@ -160,7 +160,7 @@ layout[1, 1] = vbox!(
     menu,
     LText(scene, "Function", width = nothing),
     menu2;
-    height = Auto(false), width = 200)
+    tellheight = false, width = 200)
 
 ax = layout[1, 2] = LAxis(scene)
 

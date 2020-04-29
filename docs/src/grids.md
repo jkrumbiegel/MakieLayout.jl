@@ -152,11 +152,11 @@ for i in 2:6, j in 1:5
 end
 
 for (j, label) in enumerate(["Fixed(200)", "Relative(0.25)", "Auto()", "Auto()", "Auto(2)"])
-    layout[1, j] = LText(scene, width = Auto(false), text = label)
+    layout[1, j] = LText(scene, tellwidth = false, text = label)
 end
 
 for (i, label) in enumerate(["Fixed(100)", "Relative(0.25)", "Aspect(2, 1)", "Auto()", "Auto()"])
-    layout[i + 1, 6] = LText(scene, height = Auto(false), text = label)
+    layout[i + 1, 6] = LText(scene, tellheight = false, text = label)
 end
 
 save("example_row_col_sizes.png", scene); nothing # hide

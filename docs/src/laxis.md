@@ -83,6 +83,63 @@ nothing # hide
 
 ![axis limits](example_axis_limits.png)
 
+## Modifying ticks
+
+There are multiple ways to set or determine tick values and labels. Internally,
+first `get_tickvalues(ticks, vmin, vmax)` is called with the `ax.xticks` or `ax.yticks`
+attribute as `ticks`,
+and the limits of the respective axis as `vmin` and `vmax`. This function retrieves
+the numeric values of the ticks.
+To determine the actual strings being displayed, `get_ticklabels(format, ticks, values)`
+is then called where `format` is the content
+of the attribute `ax.xtickformat` or `ax.ytickformat` and `values` is the result
+of `get_tickvalues`.
+
+The most common use cases are predefined but custom tick finding behavior can be implemented
+by overloading `get_tickvalues` and `get_ticklabels`. Here are the signatures of
+the existing methods:
+
+```@docs
+MakieLayout.get_tickvalues
+```
+
+```@docs
+MakieLayout.get_ticklabels
+```
+
+
+```@example
+using MakieLayout
+using Makie
+
+scene, layout = layoutscene(resolution = (1200, 900))
+
+axes = layout[] = [LAxis(scene) for i in 1:2, j in 1:2]
+
+xs = LinRange(0, 2pi, 50)
+for (i, ax) in enumerate(axes)
+    ax.title = "Axis $i"
+    lines!(ax, xs, sin.(xs))
+end
+
+axes[1].xticks = 0:6
+
+axes[2].xticks = 0:pi:2pi
+axes[2].xtickformat = xs -> ["$(x/pi)π" for x in xs]
+
+axes[3].xticks = (0:pi:2pi, ["start", "middle", "end"])
+
+axes[4].xticks = 0:pi:2pi
+axes[4].xtickformat = "{:.2f}ms"
+axes[4].xlabel = "Time"
+
+
+save("example_axis_ticks.png", scene) # hide
+nothing # hide
+```
+
+![axis ticks](example_axis_ticks.png)
+
 ## Hiding axis decorations
 
 Hiding axis decorations frees up the space for them in the layout if there

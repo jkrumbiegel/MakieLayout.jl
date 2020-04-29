@@ -29,7 +29,7 @@ function LAxis(parent::Scene; bbox = nothing, kwargs...)
         bottomspinecolor, leftspinecolor, topspinecolor, rightspinecolor,
         backgroundcolor,
         xlabelfont, ylabelfont, xticklabelfont, yticklabelfont,
-        flip_ylabel
+        flip_ylabel, xreversed, yreversed,
     )
 
     decorations = Dict{Symbol, Any}()
@@ -75,16 +75,19 @@ function LAxis(parent::Scene; bbox = nothing, kwargs...)
 
 
 
-    on(limits) do lims
+    onany(limits, xreversed, yreversed) do lims, xrev, yrev
 
         nearclip = -10_000f0
         farclip = 10_000f0
 
-        limox, limoy = lims.origin
-        limw, limh = lims.widths
+        left, bottom = minimum(lims)
+        right, top = maximum(lims)
+
+        leftright = xrev ? (right, left) : (left, right)
+        bottomtop = yrev ? (top, bottom) : (bottom, top)
 
         projection = AbstractPlotting.orthographicprojection(
-            limox, limox + limw, limoy, limoy + limh, nearclip, farclip)
+            leftright..., bottomtop..., nearclip, farclip)
         camera(scene).projection[] = projection
         camera(scene).projectionview[] = projection
     end
@@ -172,7 +175,8 @@ function LAxis(parent::Scene; bbox = nothing, kwargs...)
         label = xlabel, labelfont = xlabelfont, ticklabelfont = xticklabelfont, labelcolor = xlabelcolor, tickalign = xtickalign,
         ticklabelspace = xticklabelspace, ticks = xticks, ticklabelsvisible = xticklabelsvisible,
         ticksvisible = xticksvisible, spinevisible = xspinevisible, spinecolor = xspinecolor, spinewidth = spinewidth,
-        ticklabelsize = xticklabelsize, trimspine = xtrimspine, ticksize = xticksize)
+        ticklabelsize = xticklabelsize, trimspine = xtrimspine, ticksize = xticksize,
+        reversed = xreversed)
     decorations[:xaxis] = xaxis
 
     yaxis  =  LineAxis(parent, endpoints = yaxis_endpoints, limits = lift(ylimits, limits),
@@ -182,7 +186,7 @@ function LAxis(parent::Scene; bbox = nothing, kwargs...)
         label = ylabel, labelfont = ylabelfont, ticklabelfont = yticklabelfont, labelcolor = ylabelcolor, tickalign = ytickalign,
         ticklabelspace = yticklabelspace, ticks = yticks, ticklabelsvisible = yticklabelsvisible,
         ticksvisible = yticksvisible, spinevisible = yspinevisible, spinecolor = yspinecolor, spinewidth = spinewidth,
-        trimspine = ytrimspine, ticklabelsize = yticklabelsize, ticksize = yticksize, flip_vertical_label = flip_ylabel)
+        trimspine = ytrimspine, ticklabelsize = yticklabelsize, ticksize = yticksize, flip_vertical_label = flip_ylabel, reversed = yreversed)
     decorations[:yaxis] = yaxis
 
     xoppositelinepoints = lift(scene.px_area, spinewidth, xaxisposition) do r, sw, xaxpos
@@ -680,6 +684,11 @@ function add_pan!(ax::LAxis)
 
                 diff_limits = diff_fraction .* widths(tlimits[])
 
+                # correct for reversals
+                reversals = (ax.xreversed[], ax.yreversed[])
+
+                diff_limits = diff_limits .* (-2 .* reversals .+ 1)
+
                 xori, yori = Vec2f0(tlimits[].origin) .+ Vec2f0(diff_limits)
 
                 if xpanlock[] || ispressed(scene, ypankey[])
@@ -727,10 +736,14 @@ function add_zoom!(ax::LAxis)
             # don't let z go negative
             z = max(0.1f0, 1f0 + (zoom * zoomspeed))
 
-            # limits[] = FRect(limits[].origin..., (limits[].widths .* 0.99)...)
-            mp_fraction = (Vec2f0(e.mouseposition[]) - minimum(pa)) ./ widths(pa)
+            mp_axscene = Vec4f0((e.mouseposition[] .- pa.origin)..., 0, 1)
 
-            mp_data = tlimits[].origin .+ mp_fraction .* tlimits[].widths
+            # first to normal -1..1 space
+            mp_axfraction =  (cam.pixel_space[] * mp_axscene)[1:2] .*
+                # now to 1..-1 if an axis is reversed to correct zoom point
+                (-2 .* ((ax.xreversed[], ax.yreversed[])) .+ 1) .*
+                # now to 0..1
+                0.5 .+ 0.5
 
             xorigin = tlimits[].origin[1]
             yorigin = tlimits[].origin[2]
@@ -741,8 +754,8 @@ function add_zoom!(ax::LAxis)
             newxwidth = xzoomlock[] ? xwidth : xwidth * z
             newywidth = yzoomlock[] ? ywidth : ywidth * z
 
-            newxorigin = xzoomlock[] ? xorigin : xorigin + mp_fraction[1] * (xwidth - newxwidth)
-            newyorigin = yzoomlock[] ? yorigin : yorigin + mp_fraction[2] * (ywidth - newywidth)
+            newxorigin = xzoomlock[] ? xorigin : xorigin + mp_axfraction[1] * (xwidth - newxwidth)
+            newyorigin = yzoomlock[] ? yorigin : yorigin + mp_axfraction[2] * (ywidth - newywidth)
 
             timed_ticklabelspace_reset(ax, reset_timer, prev_xticklabelspace, prev_yticklabelspace, 0.1)
 
@@ -899,18 +912,55 @@ function Base.show(io::IO, ax::LAxis)
 end
 
 
-function AbstractPlotting.xlims!(ax::LAxis, xlims::Tuple{Real, Real})
+function AbstractPlotting.xlims!(ax::LAxis, xlims)
+    if xlims[1] == xlims[2]
+        error("Can't set x limits to the same value $(xlims[1]).")
+    elseif xlims[1] > xlims[2]
+        xlims = reverse(xlims)
+        ax.xreversed[] = true
+    else
+        ax.xreversed[] = false
+    end
+
 	lims = ax.targetlimits[]
 	newlims = FRect2D((xlims[1], lims.origin[2]), (xlims[2] - xlims[1], lims.widths[2]))
 	ax.targetlimits[] = newlims
+    nothing
 end
 
-AbstractPlotting.xlims!(ax::LAxis, lims::Real...) = xlims!(ax, lims)
+AbstractPlotting.xlims!(ax::LAxis, x1, x2) = xlims!(ax, (x1, x2))
 
-function AbstractPlotting.ylims!(ax::LAxis, ylims::Tuple{Real, Real})
+function AbstractPlotting.ylims!(ax::LAxis, ylims)
+    if ylims[1] == ylims[2]
+        error("Can't set y limits to the same value $(ylims[1]).")
+    elseif ylims[1] > ylims[2]
+        ylims = reverse(ylims)
+        ax.yreversed[] = true
+    else
+        ax.yreversed[] = false
+    end
+
 	lims = ax.targetlimits[]
 	newlims = FRect2D((lims.origin[1], ylims[1]), (lims.widths[1], ylims[2] - ylims[1]))
 	ax.targetlimits[] = newlims
+    nothing
 end
 
-AbstractPlotting.ylims!(ax::LAxis, lims::Real...) = ylims!(ax, lims)
+AbstractPlotting.ylims!(ax::LAxis, y1, y2) = ylims!(ax, (y1, y2))
+
+function limits!(ax::LAxis, xlims, ylims)
+    xlims!(ax, xlims)
+    ylims!(ax, ylims)
+end
+
+function limits!(ax::LAxis, x1, x2, y1, y2)
+    xlims!(ax, x1, x2)
+    ylims!(ax, y1, y2)
+end
+
+function limits!(ax::LAxis, rect::Rect2D)
+    xmin, ymin = minimum(rect)
+    xmax, ymax = maximum(rect)
+    xlims!(ax, xmin, xmax)
+    ylims!(ax, ymin, ymax)
+end

@@ -15,13 +15,13 @@ Showoff = "992d4aef-0814-514b-bc4d-f2e9a6c4116f"
 
 [compat]
 AbstractPlotting = "^0.10"
-Animations = "^0.3"
+Animations = "^0.4"
 Formatting = "^0.4"
 Match = "^1"
 Observables = "^0.2, 0.3"
 PlotUtils = "0.6.4, 1.0"
 julia = "1"
-GridLayoutBase = "0.2.1"
+GridLayoutBase = "0.3.0"
 Showoff = "0.3.1"
 
 [extras]

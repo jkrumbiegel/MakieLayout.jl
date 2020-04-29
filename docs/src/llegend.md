@@ -55,7 +55,7 @@ save("example_legend_ncols.png", scene); nothing # hide
 
 To place a legend inside an axis you can simply add it to the same layout slot
 that the axis lives in. As long as the axis is bigger than the legend you can
-set the legend's height and width to `Auto(false)` and position it using the align
+set the legend's `tellheight` and `tellwidth` to `false` and position it using the align
 variables. You can use the margin keyword to keep the legend from touching the axis
 spines.
 
@@ -77,7 +77,8 @@ lins = [lines!(ax, xs, sin.(xs .* i), color = color)
 legends = [LLegend(
         scene, lins, ["Line $i" for i in 1:3],
         "$ha & $va",
-        width = Auto(false),
+        tellheight = false,
+        tellwidth = false,
         margin = (10, 10, 10, 10),
         halign = ha, valign = va, orientation = :horizontal
     ) for (j, ha, va) in zip(1:3, haligns, valigns)]
@@ -152,7 +153,7 @@ save("example_legend_entries.png", scene); nothing # hide
 In case you want the legend entries to be listed horizontally, set the `orientation`
 attribute to `:horizontal`. In this case the `nbanks` attribute refers to the
 number of rows instead of columns. To keep an adjacent axis from potentially shrinking to
-the width of the horizontal legend, set `width = Auto(false)` and `height = Auto(true)`
+the width of the horizontal legend, set `tellwidth = false` and `tellheight = true`
 if you place the legend below or above the axis.
 
 
@@ -175,7 +176,7 @@ leg = LLegend(scene, [lin, sca, lin], ["a line", "some dots", "line again"])
 layout[1, 2] = leg
 
 leg_horizontal = LLegend(scene, [lin, sca, lin], ["a line", "some dots", "line again"],
-    orientation = :horizontal, width = Auto(false), height = Auto(true))
+    orientation = :horizontal, tellwidth = false, tellheight = true)
 layout[2, 1] = leg_horizontal
 
 
@@ -226,8 +227,8 @@ layout[2:4, 1] = legends[4:6]
 
 for l in legends[4:6]
     l.orientation = :horizontal
-    l.height = Auto(true)
-    l.width = Auto(false)
+    l.tellheight = true
+    l.tellwidth = false
 end
 
 legends[2].titleposition = :left

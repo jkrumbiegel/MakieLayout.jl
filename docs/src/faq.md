@@ -30,8 +30,9 @@ single-spanned elements that are placed in them, and if any elements report thei
 size the row or column will shrink to the maximum reported size. This is so smaller
 elements with a known size take as little space as needed. But if there is other
 content in the row that should take more space, you can give the offending element
-a size of `Auto(false)`. This way, its own size can be determined automatically, but
-it doesn't report that to the row or column. Alternatively, you can set the size
+the attribute `tellheight = false` or `tellwidth = false`. This way, its own size
+can be determined automatically, but
+it doesn't report it to the row or column of the layout. Alternatively, you can set the size
 of that row or column to `Auto(false)` (or any other value than `Auto(true)`).
 
 ```@example
@@ -42,8 +43,8 @@ scene, layout = layoutscene(resolution = (1200, 1200))
 
 layout[1, 1] = LAxis(scene, title = "Shrunk")
 layout[2, 1] = LAxis(scene, title = "Expanded")
-layout[1, 2] = LText(scene, "My height is Auto(true)", height = Auto(true))
-layout[2, 2] = LText(scene, "My height is Auto(false)", height = Auto(false))
+layout[1, 2] = LText(scene, "tellheight = true", tellheight = true)
+layout[2, 2] = LText(scene, "tellheight = false", tellheight = false)
 
 save("faq_shrunk_row.png", scene); nothing # hide
 ```

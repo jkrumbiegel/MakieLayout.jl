@@ -14,7 +14,7 @@ begin
     maingl[1, 2] = LAxis(scene)
     maingl[1, 3] = LAxis(scene)
 
-    guigl = maingl[1, 1] = GridLayout(1, 3; height=Auto(false))
+    guigl = maingl[1, 1] = GridLayout(1, 3; tellheight = false)
 
     # guigl[1, 1] = LButton(scene, 100, 30, "button")
     guigl[1, 1] = LText(scene, text="HelloWorld", halign=:left)

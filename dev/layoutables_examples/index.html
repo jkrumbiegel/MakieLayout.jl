@@ -10,7 +10,7 @@ sl2 = layout[3, 1] = LSlider(scene, range = 0:0.01:10, startvalue = 5)
 sl3 = layout[4, 1] = LSlider(scene, range = 0:0.01:10, startvalue = 7)
 
 sl4 = layout[:, 2] = LSlider(scene, range = 0:0.01:10, horizontal = false,
-    width = Auto(true), height = nothing)</code></pre><p><img src="../example_lslider.png" alt="example lslider"/></p><h2 id="LText-1"><a class="docs-heading-anchor" href="#LText-1">LText</a><a class="docs-heading-anchor-permalink" href="#LText-1" title="Permalink"></a></h2><p>This is just normal text, except it&#39;s also layoutable. A text&#39;s size is known, so rows and columns in a GridLayout can shrink to the appropriate width or height.</p><pre><code class="language-julia">using Makie
+    tellwidth = true, height = nothing)</code></pre><p><img src="../example_lslider.png" alt="example lslider"/></p><h2 id="LText-1"><a class="docs-heading-anchor" href="#LText-1">LText</a><a class="docs-heading-anchor-permalink" href="#LText-1" title="Permalink"></a></h2><p>This is just normal text, except it&#39;s also layoutable. A text&#39;s size is known, so rows and columns in a GridLayout can shrink to the appropriate width or height.</p><pre><code class="language-julia">using Makie
 using MakieLayout
 
 scene, layout = layoutscene(resolution = (1400, 900))
@@ -25,7 +25,7 @@ using MakieLayout
 scene, layout = layoutscene(resolution = (1400, 900))
 
 layout[1, 1] = LAxis(scene)
-layout[2, 1] = buttongrid = GridLayout(width = Auto(false))
+layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
 
 buttongrid[1, 1:5] = [LButton(scene, label = &quot;Button $i&quot;) for i in 1:5]
 
@@ -35,7 +35,7 @@ using ColorSchemes
 
 scene, layout = layoutscene(resolution = (1400, 900))
 
-rects = layout[1:4, 1:6] = [LRect(scene, color = c) for c in get.(Ref(ColorSchemes.rainbow), (0:23) ./ 23)]</code></pre><p><img src="../example_lrect.png" alt="example lrect"/></p><h2 id="LScene-1"><a class="docs-heading-anchor" href="#LScene-1">LScene</a><a class="docs-heading-anchor-permalink" href="#LScene-1" title="Permalink"></a></h2><p>If you need a normal Makie scene in a layout, for example for 3D plots, you have to use <code>LScene</code> right now. It&#39;s just a wrapper around the normal <code>Scene</code> that makes it layoutable. The underlying Scene is accessible via the <code>scene</code> field. You can plot into the <code>LScene</code> directly, though.</p><p>Currently you should pass a couple of attributes explicitly to make sure they are not inherited from the main scene (which has a pixel camera, e.g.).</p><pre><code class="language-julia">using Makie
+rects = layout[1:4, 1:6] = [LRect(scene, color = c) for c in get.(Ref(ColorSchemes.rainbow), (0:23) ./ 23)]</code></pre><p><img src="../example_lrect.png" alt="example lrect"/></p><h2 id="LScene-1"><a class="docs-heading-anchor" href="#LScene-1">LScene</a><a class="docs-heading-anchor-permalink" href="#LScene-1" title="Permalink"></a></h2><p>If you need a normal Makie scene in a layout, for example for 3D plots, you have to use <code>LScene</code> right now. It&#39;s just a wrapper around the normal <code>Scene</code> that makes it layoutable. The underlying Scene is accessible via the <code>scene</code> field. You can plot into the <code>LScene</code> directly, though.</p><p>Currently you should pass a couple of attributes explicitly to make sure they are not inherited from the main scene (which has a pixel camera, e.g.).</p><pre><code class="language-">using Makie
 using MakieLayout
 
 scene, layout = layoutscene(resolution = (1400, 900))
@@ -43,7 +43,9 @@ scene, layout = layoutscene(resolution = (1400, 900))
 lscenes = layout[1:2, 1:3] = [LScene(scene, camera = cam3d!, raw = false) for _ in 1:6]
 
 [scatter!(lscenes[i], rand(100, 3), color = c)
-    for (i, c) in enumerate([:red, :blue, :green, :orange, :black, :gray])]</code></pre><p><img src="../example_lscene.png" alt="example lscene"/></p><h2 id="LToggle-1"><a class="docs-heading-anchor" href="#LToggle-1">LToggle</a><a class="docs-heading-anchor-permalink" href="#LToggle-1" title="Permalink"></a></h2><p>A toggle with an attribute <code>active</code> that can either be true or false, to enable or disable properties of an interactive plot.</p><pre><code class="language-julia">using Makie
+    for (i, c) in enumerate([:red, :blue, :green, :orange, :black, :gray])]
+
+save(&quot;example_lscene.png&quot;, scene); nothing # hide</code></pre><p><img src="../example_lscene.png" alt="example lscene"/></p><h2 id="LToggle-1"><a class="docs-heading-anchor" href="#LToggle-1">LToggle</a><a class="docs-heading-anchor-permalink" href="#LToggle-1" title="Permalink"></a></h2><p>A toggle with an attribute <code>active</code> that can either be true or false, to enable or disable properties of an interactive plot.</p><pre><code class="language-julia">using Makie
 using MakieLayout
 
 scene, layout = layoutscene(resolution = (1400, 900))
@@ -54,7 +56,7 @@ toggles = [LToggle(scene, active = ac) for ac in [true, false]]
 labels = [LText(scene, lift(x -&gt; x ? &quot;active&quot; : &quot;inactive&quot;, t.active))
     for t in toggles]
 
-layout[1, 2] = grid!(hcat(toggles, labels), height = Auto(false))</code></pre><p><img src="../example_ltoggle.png" alt="example ltoggle"/></p><h2 id="LMenu-1"><a class="docs-heading-anchor" href="#LMenu-1">LMenu</a><a class="docs-heading-anchor-permalink" href="#LMenu-1" title="Permalink"></a></h2><p>A dropdown menu with <code>options</code>, where each element&#39;s label is determined with <code>optionlabel(element)</code> and the value with <code>optionvalue(element)</code>. The attribute <code>selection</code> is set to the option value of an element when it is selected.</p><pre><code class="language-julia">using Makie
+layout[1, 2] = grid!(hcat(toggles, labels), tellheight = false)</code></pre><p><img src="../example_ltoggle.png" alt="example ltoggle"/></p><h2 id="LMenu-1"><a class="docs-heading-anchor" href="#LMenu-1">LMenu</a><a class="docs-heading-anchor-permalink" href="#LMenu-1" title="Permalink"></a></h2><p>A dropdown menu with <code>options</code>, where each element&#39;s label is determined with <code>optionlabel(element)</code> and the value with <code>optionvalue(element)</code>. The attribute <code>selection</code> is set to the option value of an element when it is selected.</p><pre><code class="language-julia">using Makie
 using MakieLayout
 
 scene, layout = layoutscene(resolution = (1400, 900))
@@ -70,7 +72,7 @@ layout[1, 1] = vbox!(
     menu,
     LText(scene, &quot;Function&quot;, width = nothing),
     menu2;
-    height = Auto(false), width = 200)
+    tellheight = false, width = 200)
 
 ax = layout[1, 2] = LAxis(scene)
 
@@ -90,4 +92,4 @@ on(menu2.selection) do s
     autolimits!(ax)
 end
 
-menu2.is_open = true</code></pre><p><img src="../example_lmenu.png" alt="example lmenu"/></p><h2 id="Deleting-Layoutables-1"><a class="docs-heading-anchor" href="#Deleting-Layoutables-1">Deleting Layoutables</a><a class="docs-heading-anchor-permalink" href="#Deleting-Layoutables-1" title="Permalink"></a></h2><p>To remove axes, colorbars and other layoutables from their layout and the scene, use <code>delete!(layoutable)</code>.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../llegend/">« LLegend</a><a class="docs-footer-nextpage" href="../layoutables_reference/">Layoutables Reference »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 26 April 2020 15:54">Sunday 26 April 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+menu2.is_open = true</code></pre><p><img src="../example_lmenu.png" alt="example lmenu"/></p><h2 id="Deleting-Layoutables-1"><a class="docs-heading-anchor" href="#Deleting-Layoutables-1">Deleting Layoutables</a><a class="docs-heading-anchor-permalink" href="#Deleting-Layoutables-1" title="Permalink"></a></h2><p>To remove axes, colorbars and other layoutables from their layout and the scene, use <code>delete!(layoutable)</code>.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../llegend/">« LLegend</a><a class="docs-footer-nextpage" href="../layoutables_reference/">Layoutables Reference »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 29 April 2020 12:44">Wednesday 29 April 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

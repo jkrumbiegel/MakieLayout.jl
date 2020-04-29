@@ -25,7 +25,7 @@ xs = 0:0.1:10
 lins = [lines!(ax, xs, sin.(xs .+ 3v), color = RGBf0(v, 0, 1-v)) for v in 0:0.1:1]
 
 leg = LLegend(scene, lins, string.(1:length(lins)), nbanks = 3)
-layout[1, 2] = leg</code></pre><p><img src="../example_legend_ncols.png" alt="example legend ncols"/></p><h2 id="Legend-inside-an-axis-1"><a class="docs-heading-anchor" href="#Legend-inside-an-axis-1">Legend inside an axis</a><a class="docs-heading-anchor-permalink" href="#Legend-inside-an-axis-1" title="Permalink"></a></h2><p>To place a legend inside an axis you can simply add it to the same layout slot that the axis lives in. As long as the axis is bigger than the legend you can set the legend&#39;s height and width to <code>Auto(false)</code> and position it using the align variables. You can use the margin keyword to keep the legend from touching the axis spines.</p><pre><code class="language-julia">using MakieLayout
+layout[1, 2] = leg</code></pre><p><img src="../example_legend_ncols.png" alt="example legend ncols"/></p><h2 id="Legend-inside-an-axis-1"><a class="docs-heading-anchor" href="#Legend-inside-an-axis-1">Legend inside an axis</a><a class="docs-heading-anchor-permalink" href="#Legend-inside-an-axis-1" title="Permalink"></a></h2><p>To place a legend inside an axis you can simply add it to the same layout slot that the axis lives in. As long as the axis is bigger than the legend you can set the legend&#39;s <code>tellheight</code> and <code>tellwidth</code> to <code>false</code> and position it using the align variables. You can use the margin keyword to keep the legend from touching the axis spines.</p><pre><code class="language-julia">using MakieLayout
 using Makie
 
 haligns = [:left, :right, :center]
@@ -42,7 +42,8 @@ lins = [lines!(ax, xs, sin.(xs .* i), color = color)
 legends = [LLegend(
         scene, lins, [&quot;Line $i&quot; for i in 1:3],
         &quot;$ha &amp; $va&quot;,
-        width = Auto(false),
+        tellheight = false,
+        tellwidth = false,
         margin = (10, 10, 10, 10),
         halign = ha, valign = va, orientation = :horizontal
     ) for (j, ha, va) in zip(1:3, haligns, valigns)]
@@ -80,7 +81,7 @@ elem_5 = PolyElement(color = :green, strokecolor = :black,
 leg = layout[1, 2] = LLegend(scene,
     [elem_1, elem_2, elem_3, elem_4, elem_5],
     [&quot;Line &amp; Marker&quot;, &quot;Poly &amp; Line&quot;, &quot;Line&quot;, &quot;Marker&quot;, &quot;Poly&quot;],
-    patchsize = (35, 35))</code></pre><p><img src="../example_legend_entries.png" alt="example legend entries"/></p><h2 id="Horizontal-legend-1"><a class="docs-heading-anchor" href="#Horizontal-legend-1">Horizontal legend</a><a class="docs-heading-anchor-permalink" href="#Horizontal-legend-1" title="Permalink"></a></h2><p>In case you want the legend entries to be listed horizontally, set the <code>orientation</code> attribute to <code>:horizontal</code>. In this case the <code>nbanks</code> attribute refers to the number of rows instead of columns. To keep an adjacent axis from potentially shrinking to the width of the horizontal legend, set <code>width = Auto(false)</code> and <code>height = Auto(true)</code> if you place the legend below or above the axis.</p><pre><code class="language-julia">using MakieLayout
+    patchsize = (35, 35))</code></pre><p><img src="../example_legend_entries.png" alt="example legend entries"/></p><h2 id="Horizontal-legend-1"><a class="docs-heading-anchor" href="#Horizontal-legend-1">Horizontal legend</a><a class="docs-heading-anchor-permalink" href="#Horizontal-legend-1" title="Permalink"></a></h2><p>In case you want the legend entries to be listed horizontally, set the <code>orientation</code> attribute to <code>:horizontal</code>. In this case the <code>nbanks</code> attribute refers to the number of rows instead of columns. To keep an adjacent axis from potentially shrinking to the width of the horizontal legend, set <code>tellwidth = false</code> and <code>tellheight = true</code> if you place the legend below or above the axis.</p><pre><code class="language-julia">using MakieLayout
 using Makie
 using AbstractPlotting: px
 
@@ -97,7 +98,7 @@ leg = LLegend(scene, [lin, sca, lin], [&quot;a line&quot;, &quot;some dots&quot;
 layout[1, 2] = leg
 
 leg_horizontal = LLegend(scene, [lin, sca, lin], [&quot;a line&quot;, &quot;some dots&quot;, &quot;line again&quot;],
-    orientation = :horizontal, width = Auto(false), height = Auto(true))
+    orientation = :horizontal, tellwidth = false, tellheight = true)
 layout[2, 1] = leg_horizontal</code></pre><p><img src="../example_legend_horizontal.png" alt="example legend horizontal"/></p><h2 id="Multi-group-legends-1"><a class="docs-heading-anchor" href="#Multi-group-legends-1">Multi-group legends</a><a class="docs-heading-anchor-permalink" href="#Multi-group-legends-1" title="Permalink"></a></h2><p>Sometimes a legend consists of multiple groups, for example in a plot where both marker size and color are varied and those properties need to be visualized separately, but still together in one legend. Each group&#39;s content is given as an array of elements and an array of labels, each within one collective array. You can shift the position of the titles relative to each group with the <code>titleposition</code> attribute, either <code>:left</code> or <code>:top</code>.</p><pre><code class="language-julia">using MakieLayout
 using Makie
 using AbstractPlotting: px
@@ -129,8 +130,8 @@ layout[2:4, 1] = legends[4:6]
 
 for l in legends[4:6]
     l.orientation = :horizontal
-    l.height = Auto(true)
-    l.width = Auto(false)
+    l.tellheight = true
+    l.tellwidth = false
 end
 
 legends[2].titleposition = :left
@@ -140,4 +141,4 @@ legends[3].nbanks = 2
 legends[5].nbanks = 2
 legends[6].nbanks = 2
 
-scene</code></pre><p><img src="../example_multilegend.png" alt="example multilegend"/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../laxis/">« LAxis</a><a class="docs-footer-nextpage" href="../layoutables_examples/">Layoutables Examples »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 26 April 2020 15:54">Sunday 26 April 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+scene</code></pre><p><img src="../example_multilegend.png" alt="example multilegend"/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../laxis/">« LAxis</a><a class="docs-footer-nextpage" href="../layoutables_examples/">Layoutables Examples »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 29 April 2020 12:44">Wednesday 29 April 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

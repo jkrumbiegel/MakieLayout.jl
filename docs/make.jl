@@ -12,6 +12,7 @@ makedocs(
         "LLegend" => "llegend.md",
         "Layoutables Examples" => "layoutables_examples.md",
         "Layoutables Reference" => "layoutables_reference.md",
+        "Theming Layoutables" => "theming.md",
         "How Layouting Works" => "layouting.md",
         "Frequently Asked Questions" => "faq.md",
     ],

@@ -1,4 +1,5 @@
 using Makie
+using MakieLayout
 using GLFW; GLFW.WindowHint(GLFW.FLOATING, 1)
 using LinearAlgebra
 using StaticArrays
@@ -126,15 +127,15 @@ z = 3 .* [sin(x) * cos(y) for x in -10:0.3:10, y in -10:0.3:10]
 
 points = [(x, y, 3 * sin(x) * cos(y)) for x in -10:0.3:10 for y in -10:0.3:10]
 
-using GeometryTypes
+import GeometryBasics
 function mesh_triangles(ni::Int, nj::Int)
-    triangles = Face{3, Int}[]
+    triangles = GeometryBasics.NgonFace{3, Int}[]
 
     n(i, j) = (i - 1) * nj + j
 
     for i in 1:ni-1, j in 1:nj-1
-        push!(triangles, Point(n(i, j), n(i+1, j), n(i, j+1)))
-        push!(triangles, Point(n(i+1, j), n(i+1, j+1), n(i, j+1)))
+        push!(triangles, GeometryBasics.Point(n(i, j), n(i+1, j), n(i, j+1)))
+        push!(triangles, GeometryBasics.Point(n(i+1, j), n(i+1, j+1), n(i, j+1)))
     end
 
     triangles

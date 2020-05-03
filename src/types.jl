@@ -60,6 +60,13 @@ mutable struct LAxis <: AbstractPlotting.AbstractScene
     decorations::Dict{Symbol, Any}
 end
 
+struct LAxis3D <: AbstractPlotting.AbstractScene
+    scene::Scene
+    attributes::Attributes
+    layoutobservables::GridLayoutBase.LayoutObservables
+    decorations::Dict{Symbol, Any}
+end
+
 mutable struct LColorbar <: LObject
     parent::Scene
     layoutobservables::LayoutObservables

@@ -1,4 +1,4 @@
-const Layoutable = Union{LAxis, LObject, GridLayout}
+const Layoutable = Union{LAxis, LAxis3D, LObject, GridLayout}
 
 defaultlayout(layoutable::Layoutable) = ProtrusionLayout(layoutable)
 

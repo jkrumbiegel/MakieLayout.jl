@@ -23,7 +23,10 @@ save("example_lslider.png", scene); nothing # hide
 
 ![example lslider](example_lslider.png)
 
-If you want to programatically move the slider, you can use the convenience function `set_close_to!(ls::LSlider, value)`.
+If you want to programmatically move the slider, use the function `set_close_to!(ls::LSlider, value)`.
+Don't manipulate the `value` attribute directly, as there is no guarantee that
+this value exists in the range underlying the slider, and the slider's displayed value would
+not change anyway by changing the slider's output.
 
 ## LText
 

@@ -3,6 +3,20 @@
 Every layoutable object can be themed by adding attributes under a key with
 the same name as the layoutable (LAxis, LColorbar, etc.).
 
+Also, you can set default column and row gaps, as well as the font family and size
+used by almost all layoutables by default:
+
+```julia
+set_theme!(
+    font = "Arial", # inherited by layoutables if not overridden
+    fontsize = 12, # inherited by layoutables if not overridden
+    rowgap = 10,
+    colgap = 20,
+)
+```
+
+Here is an example of theming `LAxis` and `LColorbar`:
+
 ```@example
 using MakieLayout
 using Makie

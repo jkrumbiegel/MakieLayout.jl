@@ -23,6 +23,8 @@ save("example_lslider.png", scene); nothing # hide
 
 ![example lslider](example_lslider.png)
 
+If you want to programatically move the slider, you can use the convenience function `set_close_to!(ls::LSlider, value)`.
+
 ## LText
 
 This is just normal text, except it's also layoutable. A text's size is known,

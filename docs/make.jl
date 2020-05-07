@@ -1,20 +1,21 @@
-using Documenter, MakieLayout, Makie, Animations, ColorSchemes, Colors
+using Documenter, MakieLayout, CairoMakie, AbstractPlotting, Animations, ColorSchemes, Colors
 
-# don't open windows while generating animations
-Makie.AbstractPlotting.inline!(true)
+
+CairoMakie.activate!()
+
 
 makedocs(
     sitename="MakieLayout.jl",
     pages = [
         "index.md",
-        "GridLayout" => "grids.md",
-        "LAxis" => "laxis.md",
-        "LLegend" => "llegend.md",
-        "Layoutables Examples" => "layoutables_examples.md",
-        "Layoutables Reference" => "layoutables_reference.md",
-        "Theming Layoutables" => "theming.md",
-        "How Layouting Works" => "layouting.md",
-        "Frequently Asked Questions" => "faq.md",
+        # "GridLayout" => "grids.md",
+        # "LAxis" => "laxis.md",
+        # "LLegend" => "llegend.md",
+        # "Layoutables Examples" => "layoutables_examples.md",
+        # "Layoutables Reference" => "layoutables_reference.md",
+        # "Theming Layoutables" => "theming.md",
+        # "How Layouting Works" => "layouting.md",
+        # "Frequently Asked Questions" => "faq.md",
     ],
     format = Documenter.HTML(
             prettyurls = get(ENV, "CI", nothing) == "true"

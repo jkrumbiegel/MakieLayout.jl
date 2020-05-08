@@ -15,7 +15,7 @@ set_theme!(
 # replace the font paths with only the docs font folder
 empty!(AbstractPlotting.FreeTypeAbstraction.valid_fontpaths)
 push!(AbstractPlotting.FreeTypeAbstraction.valid_fontpaths, joinpath(@__DIR__, "fonts"))
-nothing
+nothing # hide
 ```
 
 # MakieLayout.jl Tutorial

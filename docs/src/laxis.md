@@ -27,7 +27,7 @@ axes = [LAxis(scene, xlabel = "x label", ylabel = "y label", title = "title")
     for i in 1:2, j in 1:2]
 layout[1:2, 1:2] = axes
 
-a_title = Animation([0, 2], [30.0, 50.0], sineio(n=2, yoyo=true, prewait=0.2))
+a_title = Animation([0, 2], [20.0, 50.0], sineio(n=2, yoyo=true, prewait=0.2))
 a_xlabel = Animation([2, 4], [20.0, 40.0], sineio(n=2, yoyo=true, prewait=0.2))
 a_ylabel = Animation([4, 6], [20.0, 40.0], sineio(n=2, yoyo=true, prewait=0.2))
 
@@ -77,11 +77,11 @@ ylims!(axes[4], (1, -1)) # as tuple, reversed
 limits!(axes[5], 0, 2pi, -1, 1) # x1, x2, y1, y2
 limits!(axes[6], BBox(0, 2pi, -1, 1)) # as rectangle
 
-save("example_axis_limits.png", scene) # hide
+save("example_axis_limits.svg", scene) # hide
 nothing # hide
 ```
 
-![axis limits](example_axis_limits.png)
+![axis limits](example_axis_limits.svg)
 
 ## Modifying ticks
 
@@ -134,11 +134,11 @@ axes[4].xtickformat = "{:.2f}ms"
 axes[4].xlabel = "Time"
 
 
-save("example_axis_ticks.png", scene) # hide
+save("example_axis_ticks.svg", scene) # hide
 nothing # hide
 ```
 
-![axis ticks](example_axis_ticks.png)
+![axis ticks](example_axis_ticks.svg)
 
 ## Hiding axis decorations
 
@@ -259,11 +259,11 @@ axes[2, 2].aspect = AxisAspect(2)
 axes[2, 3].title = "AxisAspect(0.5)"
 axes[2, 3].aspect = AxisAspect(0.5)
 
-save("example_axis_aspects.png", scene) # hide
+save("example_axis_aspects.svg", scene) # hide
 nothing # hide
 ```
 
-![axis aspects](example_axis_aspects.png)
+![axis aspects](example_axis_aspects.svg)
 
 
 ## Controlling data aspect ratios
@@ -345,7 +345,7 @@ separately.
 using Makie
 using MakieLayout
 
-scene, layout = layoutscene()
+scene, layout = layoutscene(resolution = (1200, 900))
 
 layout[1, 1:3] = axs = [LAxis(scene) for i in 1:3]
 linkxaxes!(axs[1:2]...)
@@ -365,11 +365,11 @@ for i in 1:3
     end
 end
 
-save("example_linked_axes.png", scene) # hide
+save("example_linked_axes.svg", scene) # hide
 nothing # hide
 ```
 
-![linked axes](example_linked_axes.png)
+![linked axes](example_linked_axes.svg)
 
 
 ## Axis interaction

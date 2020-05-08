@@ -19,7 +19,7 @@ Here is an example of theming `LAxis` and `LColorbar`:
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 
 set_theme!(
     LAxis = (topspinevisible = false, rightspinevisible = false,
@@ -32,7 +32,8 @@ scene, layout = layoutscene(resolution = (1400, 900))
 ax = layout[1, 1] = LAxis(scene)
 cb = layout[1, 2] = LColorbar(scene)
 
-save("example_theming.png", scene); nothing # hide
+set_theme!(Theme()) # hide
+save("example_theming.svg", scene); nothing # hide
 ```
 
-![example theming](example_theming.png)
+![example theming](example_theming.svg)

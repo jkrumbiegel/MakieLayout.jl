@@ -22,10 +22,10 @@ subgl_right[1:3, 1] = [LAxis(scene) for i in 1:3]
 layout[1, 1] = subgl_left
 layout[1, 2] = subgl_right
 
-save("example_nested_grids.png", scene); nothing # hide
+save("example_nested_grids.svg", scene); nothing # hide
 ```
 
-![example nested grids](example_nested_grids.png)
+![example nested grids](example_nested_grids.svg)
 
 ## Alignment
 
@@ -56,10 +56,10 @@ subgl_3[1, 1] = LAxis(scene, title="Outside(50)")
 
 layout[1:3, 2] = [LRect(scene, color = :transparent, strokecolor = :red) for i in 1:3]
 
-save("example_grid_alignment.png", scene); nothing # hide
+save("example_grid_alignment.svg", scene); nothing # hide
 ```
 
-![example grid alignment](example_grid_alignment.png)
+![example grid alignment](example_grid_alignment.svg)
 
 ## Spanned Placement
 
@@ -79,10 +79,10 @@ layout[:, 3] = LAxis(scene, title="[:, 3]")
 layout[1:3, end] = LAxis(scene, title="[1:3, end]")
 layout[end, end] = LAxis(scene, title="[end, end]")
 
-save("example_spanned_grid_content.png", scene); nothing # hide
+save("example_spanned_grid_content.svg", scene); nothing # hide
 ```
 
-![spanned grid content](example_spanned_grid_content.png)
+![spanned grid content](example_spanned_grid_content.svg)
 
 ## Auto-resizing
 
@@ -110,10 +110,10 @@ layout[2:end-1, 0] = LText(scene, text="Left Text", textsize=50,
 layout[2:end-1, end+1] = LText(scene, text="Right Text", textsize=50,
     rotation=-pi/2)
 
-save("example_indexing_outside_grid.png", scene); nothing # hide
+save("example_indexing_outside_grid.svg", scene); nothing # hide
 ```
 
-![indexing outside grid](example_indexing_outside_grid.png)
+![indexing outside grid](example_indexing_outside_grid.svg)
 
 ## Column and row sizes
 
@@ -159,10 +159,10 @@ for (i, label) in enumerate(["Fixed(100)", "Relative(0.25)", "Aspect(2, 1)", "Au
     layout[i + 1, 6] = LText(scene, tellheight = false, text = label)
 end
 
-save("example_row_col_sizes.png", scene); nothing # hide
+save("example_row_col_sizes.svg", scene); nothing # hide
 ```
 
-![row col sizes](example_row_col_sizes.png)
+![row col sizes](example_row_col_sizes.svg)
 
 
 ## Trimming empty rows and columns

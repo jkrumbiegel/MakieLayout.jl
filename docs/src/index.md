@@ -1,37 +1,52 @@
+```@eval
+using AbstractPlotting
+using AbstractPlotting: px
+
+set_theme!(
+    font = "Noto Sans Light",
+    LAxis = (
+        titlefont = "Noto Sans Semibold",
+    ),
+    LLegend = (
+        titlefont = "Noto Sans Semibold",
+    )
+)
+
+empty!(AbstractPlotting.FreeTypeAbstraction.valid_fontpaths)
+push!(AbstractPlotting.FreeTypeAbstraction.valid_fontpaths, joinpath(@__DIR__, "fonts"))
+```
+
 # MakieLayout.jl Tutorial
 
 In this tutorial, we will see some of the capabilities of MakieLayout.jl while
 building a complex figure step by step. This is the final result we will create:
 
-![step_21](step_21.png)
+![step_21](step_21.svg)
 
-Let's get started!
+All right, let's get started!
 
 ## Scene and Layout
 
 First, we import the necessary packages and then create the main scene and layout.
 The function `layoutscene` is a convenience function that creates a `Scene`
 which has a `GridLayout` attached to it that always fills the whole scene area.
-
-!!! note
-    By default, this layout has a padding of 30 pixels applied, so our content doesn't
-    touch the figure border. You can set it to zero, for example, with the syntax
-    `layoutscene(0)`.
+You can pass the outer padding of the top layout as the first argument.
 
 ```@example tutorial
 using MakieLayout
-using Makie
+using CairoMakie; CairoMakie.activate!()
 using Random # hide
-using AbstractPlotting: px
+using AbstractPlotting
 Random.seed!(2) # hide
 
-scene, layout = layoutscene(resolution = (1200, 900),
+outer_padding = 30
+scene, layout = layoutscene(outer_padding, resolution = (1200, 700),
     backgroundcolor = RGBf0(0.98, 0.98, 0.98))
 
-save("step_001.png", scene) # hide
+save("step_001.svg", scene) # hide
 nothing # hide
 ```
-![step_001](step_001.png)
+![step_001](step_001.svg)
 
 ## First LAxis
 
@@ -46,10 +61,10 @@ the `=` expressions.
 ```@example tutorial
 ax1 = layout[1, 1] = LAxis(scene, title = "Sine")
 
-save("step_002.png", scene) # hide
+save("step_002.svg", scene) # hide
 nothing # hide
 ```
-![step_002](step_002.png)
+![step_002](step_002.svg)
 
 ## Plotting into an LAxis
 
@@ -61,12 +76,12 @@ so it's easier to save them.
 xx = 0:0.2:4pi
 line1 = lines!(ax1, sin.(xx), xx, color = :red)
 scat1 = scatter!(ax1, sin.(xx) .+ 0.2 .* randn.(), xx,
-    color = (:red, 0.5), markersize = 10px, marker = '■')
+    color = (:red, 0.5), markersize = 15px, marker = '■')
 
-save("step_003.png", scene) # hide
+save("step_003.svg", scene) # hide
 nothing # hide
 ```
-![step_003](step_003.png)
+![step_003](step_003.svg)
 
 ## Multiple Axes
 
@@ -84,10 +99,10 @@ next to the one we have, in row 1 and column 2.
 ```@example tutorial
 ax2 = layout[1, 2] = LAxis(scene, title = "Shifted Cosine")
 
-save("step_004.png", scene) # hide
+save("step_004.svg", scene) # hide
 nothing # hide
 ```
-![step_004](step_004.png)
+![step_004](step_004.svg)
 
 As you can see, the first axis has shrunk to the left to make space for the new
 axis on the right. We can take another look at the `layout` to see how it has
@@ -104,13 +119,13 @@ Let's plot into the new axis, the same way we did the scatter plots before.
 
 line2 = lines!(ax2, cos.(xx), pi .+ xx, color = :blue)
 scat2 = scatter!(ax2, cos.(xx) .+ 0.2 .* randn.(), pi .+ xx,
-    color = (:blue, 0.5), markersize = 10px, marker = '▲')
+    color = (:blue, 0.5), markersize = 15px, marker = '▲')
 
 
-save("step_005.png", scene) # hide
+save("step_005.svg", scene) # hide
 nothing # hide
 ```
-![step_005](step_005.png)
+![step_005](step_005.svg)
 
 
 ## Linking Axes
@@ -122,10 +137,10 @@ synchronized.
 ```@example tutorial
 linkaxes!(ax1, ax2)
 
-save("step_006.png", scene) # hide
+save("step_006.svg", scene) # hide
 nothing # hide
 ```
-![step_006](step_006.png)
+![step_006](step_006.svg)
 
 
 This looks good, but now both y-axes are the same, so we can hide the right one
@@ -135,11 +150,24 @@ now that the y-axis is gone the two LAxes grow to fill the gap.
 ```@example tutorial
 hideydecorations!(ax2, grid = false)
 
-save("step_007.png", scene) # hide
+save("step_007.svg", scene) # hide
 nothing # hide
 ```
-![step_007](step_007.png)
+![step_007](step_007.svg)
 
+
+Even though our plots are entirely made up, we should follow best practice and label
+the axes. We can do this with the `xlabel` and `ylabel` attributes of the `LAxis`.
+
+```@example tutorial
+ax1.xlabel = "Amplitude"
+ax2.xlabel = "Amplitude"
+ax1.ylabel = "Time [ms]"
+
+save("step_007_2.svg", scene) # hide
+nothing # hide
+```
+![step_007 2](step_007_2.svg)
 
 ## Adding a Legend
 
@@ -154,10 +182,10 @@ leg = layout[1, end+1] = LLegend(scene,
     [line1, scat1, line2, scat2],
     ["True", "Measured", "True", "Measured"])
 
-save("step_008.png", scene) # hide
+save("step_008.svg", scene) # hide
 nothing # hide
 ```
-![step_008](step_008.png)
+![step_008](step_008.svg)
 
 You can see one nice feature of MakieLayout here, which is that the legend takes
 much less horizontal space than the two axes. In fact, it takes exactly the space
@@ -176,10 +204,10 @@ We want it in the second row, and spanning the first two columns.
 ```@example tutorial
 layout[2, 1:2] = leg
 
-save("step_009.png", scene) # hide
+save("step_009.svg", scene) # hide
 nothing # hide
 ```
-![step_009](step_009.png)
+![step_009](step_009.svg)
 
 
 ## Fixing Spacing Issues
@@ -196,10 +224,10 @@ We can remove empty cells in a layout by calling `trim!` on it:
 ```@example tutorial
 trim!(layout)
 
-save("step_010.png", scene) # hide
+save("step_010.svg", scene) # hide
 nothing # hide
 ```
-![step_010](step_010.png)
+![step_010](step_010.svg)
 
 This is much better already! But the legend still takes too much space vertically.
 The reason for that is the default `tellheight` setting of the legend. It's set to
@@ -213,10 +241,10 @@ this behavior. So we set the `tellheight` attribute to `true`.
 ```@example tutorial
 leg.tellheight = true
 
-save("step_011.png", scene) # hide
+save("step_011.svg", scene) # hide
 nothing # hide
 ```
-![step_011](step_011.png)
+![step_011](step_011.svg)
 
 
 Now the legend's row is shrunk to fit. One thing that we can do to improve the
@@ -225,10 +253,10 @@ use of space is to change the legend's orientation to `:horizontal`.
 ```@example tutorial
 leg.orientation = :horizontal
 
-save("step_012.png", scene) # hide
+save("step_012.svg", scene) # hide
 nothing # hide
 ```
-![step_012](step_012.png)
+![step_012](step_012.svg)
 
 
 ## Sublayouts
@@ -244,10 +272,10 @@ hm_axes = layout[1:2, 3] = [LAxis(scene, title = t) for t in ["Low Activity", "H
 
 heatmaps = [heatmap!(ax, i .+ rand(100, 100)) for (i, ax) in enumerate(hm_axes)]
 
-save("step_013.png", scene) # hide
+save("step_013.svg", scene) # hide
 nothing # hide
 ```
-![step_013](step_013.png)
+![step_013](step_013.svg)
 
 
 This looks weird, the two axes do not have the same height. Rather, the lower
@@ -277,10 +305,10 @@ layout[1:2, 3] = hm_sublayout
 # a vector of content
 hm_sublayout[:v] = hm_axes
 
-save("step_014.png", scene) # hide
+save("step_014.svg", scene) # hide
 nothing # hide
 ```
-![step_014](step_014.png)
+![step_014](step_014.svg)
 
 We don't care about the axis decorations, as it's often the case with image plots.
 The function `hidedecorations!` hides both x and y decorations at once.
@@ -293,10 +321,10 @@ good in our case. We can set the autolimit margins to zero using `tightlimits!`.
 tightlimits!.(hm_axes)
 hidedecorations!.(hm_axes)
 
-save("step_015.png", scene) # hide
+save("step_015.svg", scene) # hide
 nothing # hide
 ```
-![step_015](step_015.png)
+![step_015](step_015.svg)
 
 
 ## Adding a Colorbar
@@ -322,23 +350,23 @@ end
 
 cbar = hm_sublayout[:, 2] = LColorbar(scene, heatmaps[1], label = "Activity Level")
 
-save("step_016.png", scene) # hide
+save("step_016.svg", scene) # hide
 nothing # hide
 ```
-![step_016](step_016.png)
+![step_016](step_016.svg)
 
 
 The color bar is quite chunky because it takes 50% of the available width in the
-sublayout. Let's give it a fixed width of 30 pixels.
+sublayout. Let's give it a fixed width of 30 units.
 
 
 ```@example tutorial
 cbar.width = 30
 
-save("step_017.png", scene) # hide
+save("step_017.svg", scene) # hide
 nothing # hide
 ```
-![step_017](step_017.png)
+![step_017](step_017.svg)
 
 
 Much better! Note that you can usually set all attributes during creation of an object
@@ -354,10 +382,10 @@ If you only specify a number like `30`, it is interpreted as `Fixed(30)`.
 ```@example tutorial
 cbar.height = Relative(2/3)
 
-save("step_18.png", scene) # hide
+save("step_18.svg", scene) # hide
 nothing # hide
 ```
-![step_18](step_18.png)
+![step_18](step_18.svg)
 
 
 ## Adding a Title
@@ -379,12 +407,12 @@ to reflect the new GridLayout size.
 
 ```@example tutorial
 supertitle = layout[0, :] = LText(scene, "Plotting with MakieLayout",
-    textsize = 40)
+    textsize = 30, font = "Noto Sans Bold", color = (:black, 0.25))
 
-save("step_19.png", scene) # hide
+save("step_19.svg", scene) # hide
 nothing # hide
 ```
-![step_19](step_19.png)
+![step_19](step_19.svg)
 
 
 ## Subplot Labels
@@ -416,30 +444,32 @@ choice. (Remember that our previously first row is now the second row, due to th
 super title.)
 
 ```@example tutorial
-label_a = layout[2, 1, TopLeft()] = LText(scene, "A", textsize = 30)
-label_b = layout[2, 3, TopLeft()] = LText(scene, "B", textsize = 30)
+label_a = layout[2, 1, TopLeft()] = LText(scene, "A", textsize = 35,
+    font = "Noto Sans Bold", halign = :right)
+label_b = layout[2, 3, TopLeft()] = LText(scene, "B", textsize = 35,
+    font = "Noto Sans Bold", halign = :right)
 
-save("step_20.png", scene) # hide
+save("step_20.svg", scene) # hide
 nothing # hide
 ```
-![step_20](step_20.png)
+![step_20](step_20.svg)
 
 That looks good! You can see that the letters, larger than the axis titles, have
 increased the gap between the title and the axes to fit them. In most other
 plotting software, you would probably have an overlap issue now.
 
-One last thing we'll fix, is giving the labels a bit of padding at the bottom and
-the right, so they are not too close to the axes. The order of the padding values
+One last thing we'll fix, is giving the labels a bit of padding at the bottom and the right,
+so they are not too close to the axes. The order of the padding values
 is (left, right, bottom, top).
 
 ```@example tutorial
-label_a.padding = (0, 10, 10, 0)
-label_b.padding = (0, 10, 10, 0)
+label_a.padding = (0, 6, 16, 6)
+label_b.padding = (0, 6, 16, 0)
 
-save("step_21.png", scene) # hide
+save("step_21.svg", scene) # hide
 nothing # hide
 ```
-![step_21](step_21.png)
+![step_21](step_21.svg)
 
 And there we have it! Hopefully this tutorial has given you an overview how to
 approach the creation of a complex figure in MakieLayout. Check the rest of the

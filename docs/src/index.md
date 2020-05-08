@@ -12,8 +12,10 @@ set_theme!(
     )
 )
 
+# replace the font paths with only the docs font folder
 empty!(AbstractPlotting.FreeTypeAbstraction.valid_fontpaths)
 push!(AbstractPlotting.FreeTypeAbstraction.valid_fontpaths, joinpath(@__DIR__, "fonts"))
+nothing
 ```
 
 # MakieLayout.jl Tutorial
@@ -463,7 +465,7 @@ so they are not too close to the axes. The order of the padding values
 is (left, right, bottom, top).
 
 ```@example tutorial
-label_a.padding = (0, 6, 16, 6)
+label_a.padding = (0, 6, 16, 0)
 label_b.padding = (0, 6, 16, 0)
 
 save("step_21.svg", scene) # hide

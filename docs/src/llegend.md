@@ -17,10 +17,10 @@ sca = scatter!(ax, xs, ys, color = :red, markersize = 15px)
 leg = LLegend(scene, [lin, sca, [lin, sca]], ["a line", "some dots", "both together"])
 layout[1, 2] = leg
 
-save("example_legend.png", scene); nothing # hide
+save("example_legend.svg", scene); nothing # hide
 ```
 
-![example legend](example_legend.png)
+![example legend](example_legend.svg)
 
 
 ## Multi-bank legend
@@ -44,10 +44,10 @@ leg = LLegend(scene, lins, string.(1:length(lins)), nbanks = 3)
 layout[1, 2] = leg
 
 
-save("example_legend_ncols.png", scene); nothing # hide
+save("example_legend_ncols.svg", scene); nothing # hide
 ```
 
-![example legend ncols](example_legend_ncols.png)
+![example legend ncols](example_legend_ncols.svg)
 
 
 
@@ -88,10 +88,10 @@ for leg in legends
     layout[1, 1] = leg
 end
 
-save("example_legend_alignment.png", scene); nothing # hide
+save("example_legend_alignment.svg", scene); nothing # hide
 ```
 
-![example legend alignment](example_legend_alignment.png)
+![example legend alignment](example_legend_alignment.svg)
 
 
 ## Creating legend entries manually
@@ -142,10 +142,10 @@ leg = layout[1, 2] = LLegend(scene,
     ["Line & Marker", "Poly & Line", "Line", "Marker", "Poly"],
     patchsize = (35, 35))
 
-save("example_legend_entries.png", scene); nothing # hide
+save("example_legend_entries.svg", scene); nothing # hide
 ```
 
-![example legend entries](example_legend_entries.png)
+![example legend entries](example_legend_entries.svg)
 
 
 ## Horizontal legend
@@ -180,10 +180,10 @@ leg_horizontal = LLegend(scene, [lin, sca, lin], ["a line", "some dots", "line a
 layout[2, 1] = leg_horizontal
 
 
-save("example_legend_horizontal.png", scene); nothing # hide
+save("example_legend_horizontal.svg", scene); nothing # hide
 ```
 
-![example legend horizontal](example_legend_horizontal.png)
+![example legend horizontal](example_legend_horizontal.svg)
 
 
 ## Multi-group legends
@@ -240,7 +240,7 @@ legends[6].nbanks = 2
 
 scene
 
-save("example_multilegend.png", scene); nothing # hide
+save("example_multilegend.svg", scene); nothing # hide
 ```
 
-![example multilegend](example_multilegend.png)
+![example multilegend](example_multilegend.svg)

@@ -1,70 +1,27 @@
+```@eval
+using AbstractPlotting
+using AbstractPlotting: px
+
+set_theme!(
+    font = "Noto Sans Light",
+    LAxis = (
+        titlefont = "Noto Sans Semibold",
+    ),
+    LLegend = (
+        titlefont = "Noto Sans Semibold",
+    )
+)
+
+empty!(AbstractPlotting.FreeTypeAbstraction.valid_fontpaths)
+push!(AbstractPlotting.FreeTypeAbstraction.valid_fontpaths, joinpath(@__DIR__, "fonts"))
+```
+
 # MakieLayout.jl Tutorial
 
 In this tutorial, we will see some of the capabilities of MakieLayout.jl while
 building a complex figure step by step. This is the final result we will create:
 
 ![step_21](step_21.svg)
-
-Before we get started, here's the theme used for this tutorial.
-If you don't have these specific fonts, just pick others that you like!
-We are planning to save these plots as `svg`s, so you can think of the units
-as `pt`.
-
-```@eval
-using AbstractPlotting
-empty!(AbstractPlotting.FreeTypeAbstraction.valid_fontpaths)
-push!(AbstractPlotting.FreeTypeAbstraction.valid_fontpaths, joinpath(@__DIR__, "fonts"))
-
-using MakieLayout
-MakieLayout.GridLayoutBase.DEFAULT_COLGAP_GETTER[] = ()->12
-MakieLayout.GridLayoutBase.DEFAULT_ROWGAP_GETTER[] = ()->12
-nothing
-```
-
-```@example
-using AbstractPlotting
-using AbstractPlotting: px
-
-set_theme!(
-    font = "Noto Sans Light",
-    fontsize = 10,
-    rowgap = 12,
-    colgap = 12,
-    LAxis = (
-        xticksize = 3,
-        yticksize = 3,
-        xlabelpadding = 3,
-        ylabelpadding = 3,
-        titlegap = 5,
-        titlesize = 11,
-        titlefont = "Noto Sans Semibold",
-        xgridwidth = 0.75,
-        ygridwidth = 0.75,
-        xticklabelpad = 3,
-        yticklabelpad = 3,
-    ),
-    LColorbar = (
-        labelpadding = 3,
-        width = 12,
-        ticksize = 3,
-        ticklabelpad = 3,
-    ),
-    LLegend = (
-        titlegap = 5,
-        patchlabelgap = 3,
-        colgap = 10,
-        patchsize = (10, 10),
-        padding = (5, 5, 5, 5),
-        rowgap = 2,
-        groupgap = 8,
-        linewidth = 1,
-        gridshalign = :left,
-        titlehalign = :left,
-        titlefont = "Noto Sans Semibold",
-        markersize = 10px,
-    )
-)
-```
 
 All right, let's get started!
 
@@ -82,8 +39,8 @@ using Random # hide
 using AbstractPlotting
 Random.seed!(2) # hide
 
-outer_padding = 15
-scene, layout = layoutscene(outer_padding, resolution = (600, 350),
+outer_padding = 30
+scene, layout = layoutscene(outer_padding, resolution = (1200, 700),
     backgroundcolor = RGBf0(0.98, 0.98, 0.98))
 
 save("step_001.svg", scene) # hide
@@ -119,7 +76,7 @@ so it's easier to save them.
 xx = 0:0.2:4pi
 line1 = lines!(ax1, sin.(xx), xx, color = :red)
 scat1 = scatter!(ax1, sin.(xx) .+ 0.2 .* randn.(), xx,
-    color = (:red, 0.5), markersize = 7px, marker = '■')
+    color = (:red, 0.5), markersize = 15px, marker = '■')
 
 save("step_003.svg", scene) # hide
 nothing # hide
@@ -162,7 +119,7 @@ Let's plot into the new axis, the same way we did the scatter plots before.
 
 line2 = lines!(ax2, cos.(xx), pi .+ xx, color = :blue)
 scat2 = scatter!(ax2, cos.(xx) .+ 0.2 .* randn.(), pi .+ xx,
-    color = (:blue, 0.5), markersize = 7px, marker = '▲')
+    color = (:blue, 0.5), markersize = 15px, marker = '▲')
 
 
 save("step_005.svg", scene) # hide
@@ -400,11 +357,11 @@ nothing # hide
 
 
 The color bar is quite chunky because it takes 50% of the available width in the
-sublayout. Let's give it a fixed width of 15 units.
+sublayout. Let's give it a fixed width of 30 units.
 
 
 ```@example tutorial
-cbar.width = 15
+cbar.width = 30
 
 save("step_017.svg", scene) # hide
 nothing # hide
@@ -413,7 +370,7 @@ nothing # hide
 
 
 Much better! Note that you can usually set all attributes during creation of an object
-(`LColorbar(scene, width = 15)`) or after the fact, like in this example.
+(`LColorbar(scene, width = 30)`) or after the fact, like in this example.
 
 Objects can also have a width or height relative to the space given to them by their
 parent `GridLayout`. If we feel that the colorbar is a bit too tall, we can shrink it
@@ -450,7 +407,7 @@ to reflect the new GridLayout size.
 
 ```@example tutorial
 supertitle = layout[0, :] = LText(scene, "Plotting with MakieLayout",
-    textsize = 16, font = "Noto Sans Bold", color = (:black, 0.25))
+    textsize = 30, font = "Noto Sans Bold", color = (:black, 0.25))
 
 save("step_19.svg", scene) # hide
 nothing # hide
@@ -487,9 +444,9 @@ choice. (Remember that our previously first row is now the second row, due to th
 super title.)
 
 ```@example tutorial
-label_a = layout[2, 1, TopLeft()] = LText(scene, "A", textsize = 18,
+label_a = layout[2, 1, TopLeft()] = LText(scene, "A", textsize = 35,
     font = "Noto Sans Bold", halign = :right)
-label_b = layout[2, 3, TopLeft()] = LText(scene, "B", textsize = 18,
+label_b = layout[2, 3, TopLeft()] = LText(scene, "B", textsize = 35,
     font = "Noto Sans Bold", halign = :right)
 
 save("step_20.svg", scene) # hide
@@ -506,8 +463,8 @@ so they are not too close to the axes. The order of the padding values
 is (left, right, bottom, top).
 
 ```@example tutorial
-label_a.padding = (0, 3, 8, 3)
-label_b.padding = (0, 3, 8, 0)
+label_a.padding = (0, 6, 16, 6)
+label_b.padding = (0, 6, 16, 0)
 
 save("step_21.svg", scene) # hide
 nothing # hide

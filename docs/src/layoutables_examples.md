@@ -8,7 +8,7 @@ You can then lift the `value` observable to make interactive plots.
 using AbstractPlotting
 using MakieLayout
 
-scene, layout = layoutscene(resolution = (700, 450))
+scene, layout = layoutscene(resolution = (1200, 900))
 
 ax = layout[1, 1] = LAxis(scene)
 sl1 = layout[2, 1] = LSlider(scene, range = 0:0.01:10, startvalue = 3)
@@ -16,7 +16,7 @@ sl2 = layout[3, 1] = LSlider(scene, range = 0:0.01:10, startvalue = 5)
 sl3 = layout[4, 1] = LSlider(scene, range = 0:0.01:10, startvalue = 7)
 
 sl4 = layout[:, 2] = LSlider(scene, range = 0:0.01:10, horizontal = false,
-    tellwidth = true, height = nothing)
+    tellwidth = true, height = nothing, width = Auto())
 
 save("example_lslider.svg", scene); nothing # hide
 ```
@@ -37,7 +37,7 @@ so rows and columns in a GridLayout can shrink to the appropriate width or heigh
 using AbstractPlotting
 using MakieLayout
 
-scene, layout = layoutscene(resolution = (700, 450))
+scene, layout = layoutscene(resolution = (1200, 900))
 
 axs = layout[1:2, 1:3] = [LAxis(scene) for _ in 1:6]
 
@@ -56,7 +56,7 @@ save("example_ltext.svg", scene); nothing # hide
 using AbstractPlotting
 using MakieLayout
 
-scene, layout = layoutscene(resolution = (700, 450))
+scene, layout = layoutscene(resolution = (1200, 900))
 
 layout[1, 1] = LAxis(scene)
 layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
@@ -81,7 +81,7 @@ using AbstractPlotting
 using MakieLayout
 using ColorSchemes
 
-scene, layout = layoutscene(resolution = (700, 450))
+scene, layout = layoutscene(resolution = (1200, 900))
 
 rects = layout[1:4, 1:6] = [LRect(scene, color = c) for c in get.(Ref(ColorSchemes.rainbow), (0:23) ./ 23)]
 
@@ -100,21 +100,17 @@ You can plot into the `LScene` directly, though.
 Currently you should pass a couple of attributes explicitly to make sure they
 are not inherited from the main scene (which has a pixel camera, e.g.).
 
-```@example
+```julia
 using AbstractPlotting
 using MakieLayout
 
-scene, layout = layoutscene(resolution = (700, 450))
+scene, layout = layoutscene(resolution = (1200, 900))
 
-lscenes = layout[1:2, 1:3] = [LScene(scene, camera = cam3d!, raw = false) for _ in 1:6]
+lscene = layout[1, 1] = LScene(scene, camera = cam3d!, raw = false)
 
-[scatter!(lscenes[i], rand(100, 3), color = c)
-    for (i, c) in enumerate([:red, :blue, :green, :orange, :black, :gray])]
-
-save("example_lscene.svg", scene); nothing # hide
+# now you can plot into lscene like you're used to
+scatter!(lscene, randn(100, 3))
 ```
-
-![example lscene](example_lscene.svg)
 
 
 ## LToggle
@@ -126,7 +122,7 @@ or disable properties of an interactive plot.
 using AbstractPlotting
 using MakieLayout
 
-scene, layout = layoutscene(resolution = (700, 450))
+scene, layout = layoutscene(resolution = (1200, 900))
 
 ax = layout[1, 1] = LAxis(scene)
 
@@ -152,20 +148,20 @@ to the option value of an element when it is selected.
 using AbstractPlotting
 using MakieLayout
 
-scene, layout = layoutscene(resolution = (700, 450))
+scene, layout = layoutscene(resolution = (1200, 900))
 
-menu = LMenu(scene, options = ["viridis", "heat", "blues"], textsize = 10)
+menu = LMenu(scene, options = ["viridis", "heat", "blues"])
 
 funcs = [sqrt, x->x^2, sin, cos]
 
-menu2 = LMenu(scene, options = zip(["Square Root", "Square", "Sine", "Cosine"], funcs), textsize = 10)
+menu2 = LMenu(scene, options = zip(["Square Root", "Square", "Sine", "Cosine"], funcs))
 
 layout[1, 1] = vbox!(
     LText(scene, "Colormap", width = nothing),
     menu,
     LText(scene, "Function", width = nothing),
     menu2;
-    tellheight = false, width = 100)
+    tellheight = false, width = 200)
 
 ax = layout[1, 2] = LAxis(scene)
 
@@ -174,7 +170,7 @@ func = Node{Any}(funcs[1])
 ys = @lift($func.(0:0.3:10))
 scat = scatter!(ax, ys, markersize = 10px, color = ys)
 
-cb = layout[1, 3] = LColorbar(scene, scat, width = 15)
+cb = layout[1, 3] = LColorbar(scene, scat, width = 30)
 
 on(menu.selection) do s
     scat.colormap = s

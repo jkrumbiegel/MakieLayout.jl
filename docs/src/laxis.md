@@ -18,7 +18,7 @@ is adjusted to its new size. All axis decorations then also update their positio
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 using Animations
 
 scene, layout = layoutscene(resolution = (600, 600))
@@ -58,7 +58,7 @@ but they will be changed to fit the chosen ratio.
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 
 scene, layout = layoutscene(resolution = (1200, 900))
 
@@ -110,7 +110,7 @@ MakieLayout.get_ticklabels
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 
 scene, layout = layoutscene(resolution = (1200, 900))
 
@@ -150,7 +150,7 @@ see the shrinking white space better.
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 
 scene = Scene(resolution = (600, 600), camera=campixel!)
 
@@ -225,7 +225,7 @@ it necessarily has to break the layout a little bit.
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 using FileIO
 using Random # hide
 Random.seed!(1) # hide
@@ -280,7 +280,7 @@ different ways of setting aspect ratios, in the following example.
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 using Animations
 
 # scene setup for animation
@@ -342,7 +342,7 @@ axes which it updates when it is changed itself. You can link x and y dimensions
 separately.
 
 ```@example
-using Makie
+using AbstractPlotting
 using MakieLayout
 
 scene, layout = layoutscene(resolution = (1200, 900))

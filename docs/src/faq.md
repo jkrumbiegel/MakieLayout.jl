@@ -7,7 +7,7 @@ of `BBox(0, 100, 0, 100)` which ends up being in the lower left corner. You can
 also choose to specify a bounding box manually if you need more control.
 
 ```@example
-using Makie
+using AbstractPlotting
 using MakieLayout
 
 scene, layout = layoutscene(resolution = (1200, 1200))
@@ -36,7 +36,7 @@ it doesn't report it to the row or column of the layout. Alternatively, you can 
 of that row or column to `Auto(false)` (or any other value than `Auto(true)`).
 
 ```@example
-using Makie
+using AbstractPlotting
 using MakieLayout
 
 scene, layout = layoutscene(resolution = (1200, 1200))

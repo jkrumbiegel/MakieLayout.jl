@@ -2,7 +2,7 @@
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 using AbstractPlotting: px
 
 scene, layout = layoutscene(resolution = (1400, 900))
@@ -30,7 +30,7 @@ when in vertical mode, and rows when in horizontal mode.
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 using AbstractPlotting: px
 
 scene, layout = layoutscene(resolution = (1400, 900))
@@ -61,7 +61,7 @@ spines.
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 
 haligns = [:left, :right, :center]
 valigns = [:top, :bottom, :center]
@@ -112,7 +112,7 @@ MakieLayout.attributenames(LegendEntry)
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 using AbstractPlotting: px
 
 scene, layout = layoutscene(resolution = (1400, 900))
@@ -160,7 +160,7 @@ if you place the legend below or above the axis.
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 using AbstractPlotting: px
 
 scene, layout = layoutscene(resolution = (1400, 900))
@@ -197,7 +197,7 @@ You can shift the position of the titles relative to each group with the
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 using AbstractPlotting: px
 
 scene, layout = layoutscene(resolution = (1400, 900))

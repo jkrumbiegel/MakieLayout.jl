@@ -9,7 +9,7 @@ plots in nested grids are nicely aligned along their spines.
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 
 scene, layout = layoutscene(30, resolution = (1200, 900))
 
@@ -38,7 +38,7 @@ grid with Inside alignment, and they are both effectively aligned exactly the sa
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 
 scene, layout = layoutscene(30, resolution = (1200, 1200))
 
@@ -69,7 +69,7 @@ also use end to specify the last row or column.
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 
 scene, layout = layoutscene(4, 4, 30, resolution = (1200, 1200))
 
@@ -93,7 +93,7 @@ side titles.
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 
 scene, layout = layoutscene(30, resolution = (1200, 1200))
 
@@ -132,7 +132,7 @@ Auto struct.
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 
 scene = Scene(resolution = (1200, 900), camera=campixel!)
 
@@ -172,7 +172,7 @@ will remove those for you:
 
 ```@example
 using MakieLayout
-using Makie
+using AbstractPlotting
 
 scene, layout = layoutscene(resolution = (600, 600))
 

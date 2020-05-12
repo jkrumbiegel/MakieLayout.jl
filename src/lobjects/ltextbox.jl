@@ -97,25 +97,24 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         strokecolor = bordercolor[],
         color = boxcolor, raw = true)[end]
 
+    displayed_chars = @lift([c for c in $displayed_string])
 
     t = LText(scene, text = displayed_string, bbox = bbox, halign = :left, valign = :top,
         width = Auto(true), height = Auto(true),
         textsize = textsize, padding = textpadding)
 
-    cursorpoints = Node([Point2f0(0, 0), Point2f0(1, 0)])
+    displayed_charbbs = lift(t.layoutobservables.reportedsize) do sz
+        charbbs(t.textobject)
+    end
 
-    on(displayed_string) do s
-        # positions, _ = AbstractPlotting.layout_text(s, t.textobject.position[],
-        # t.textobject.textsize[],
-        # to_font(t.textobject.font[]),
-        # to_align(t.textobject.align[]),
-        # to_rotation(t.textobject.rotation[]),
-        # t.textobject.model[],
-        # )
-        #
-        # p = Point2f0(positions[end])
-        #
-        # cursorpoints[] = [p .+ Point2f0(10, -5), p .+ Point2f0(10, 25)]
+    cursorindex = Node(length(displayed_string[]))
+
+    cursorpoints = lift(cursorindex, displayed_charbbs) do ci, bbs
+        if ci == 0
+            [leftline(bbs[1])...]
+        else
+            [rightline(bbs[ci])...]
+        end
     end
 
     cursorcolor = Node{Any}(:transparent)
@@ -186,20 +185,40 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
     #     defocus()
     # end
 
+    function insertchar!(c, index)
+        newchars = [displayed_chars[][1:index-1]; c; displayed_chars[][index:end]]
+        displayed_string[] = join(newchars)
+    end
+
+    function appendchar!(c)
+        insertchar!(c, length(displayed_string[]))
+    end
+
+    function removechar!(index)
+        newchars = [displayed_chars[][1:index-1]; displayed_chars[][index+1:end]]
+
+        if isempty(newchars)
+            newchars = [' ']
+        end
+
+        if cursorindex[] >= index
+            cursorindex[] = max(1, cursorindex[] - 1)
+        end
+
+        displayed_string[] = join(newchars)
+    end
+
     on(events(scene).unicode_input) do char_array
         if !focused[] || isempty(char_array)
             return
         end
 
-        displayed_string[] = let
-            newstring = join(char_array)
-            if iswhitespace(displayed_string[])
-                newstring
-            else
-                displayed_string[] * newstring
-            end
+        for c in char_array
+            insertchar!(c, cursorindex[] + 1)
+            cursorindex[] += 1
         end
-    end
+   end
+
 
     lastset = Set{AbstractPlotting.Keyboard.Button}()
     on(events(scene).keyboardbuttons) do button_set
@@ -211,17 +230,17 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
         for key in newkeys
             if key == Keyboard.backspace
-                displayed_string[] = let
-                    c = chop(displayed_string[])
-                    # TODO: fix when empty string doesn't error anymore
-                    isempty(c) ? " " : c
-                end
+                removechar!(cursorindex[])
             elseif key == Keyboard.enter
                 saved_string[] = displayed_string[]
                 defocus()
             elseif key == Keyboard.escape
                 displayed_string[] = saved_string[]
                 defocus()
+            elseif key == Keyboard.right
+                cursorindex[] = min(length(displayed_string[]), cursorindex[] + 1)
+            elseif key == Keyboard.left
+                cursorindex[] = max(0, cursorindex[] - 1)
             end
         end
 
@@ -229,4 +248,26 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
     end
 
     LTextbox(scene, attrs, layoutobservables, decorations)
+end
+
+
+function charbbs(text)
+    positions = AbstractPlotting.layout_text(text[1][], text.position[], text.textsize[],
+        text.font[], text.align[], text.rotation[], text.model[],
+        text.justification[], text.lineheight[])
+
+    font = AbstractPlotting.to_font(text.font[])
+
+    bbs = [
+        AbstractPlotting.FreeTypeAbstraction.height_insensitive_boundingbox(
+            AbstractPlotting.FreeTypeAbstraction.get_extent(font, char),
+            font
+        )
+        for char in text[1][]
+    ]
+
+    bbs_shifted_scaled = [Rect2D(
+            (AbstractPlotting.origin(bb) .* text.textsize[] .+ pos[1:2])...,
+            (widths(bb) .* text.textsize[])...)
+        for (bb, pos) in zip(bbs, positions)]
 end

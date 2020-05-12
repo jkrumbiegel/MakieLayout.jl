@@ -8,9 +8,13 @@ end
 function default_attributes(::Type{LTextbox}, scene)
     attrs, docdict, defaultdict = @documented_attributes begin
         "The height setting of the textbox."
-        height = Auto(true)
+        height = Auto()
         "The width setting of the textbox."
-        width = Auto(true)
+        width = Auto()
+        "Controls if the parent layout can adjust to this element's width"
+        tellwidth = true
+        "Controls if the parent layout can adjust to this element's height"
+        tellheight = true
         "The horizontal alignment of the textbox in its suggested bounding box."
         halign = :center
         "The vertical alignment of the textbox in its suggested bounding box."
@@ -32,7 +36,7 @@ function default_attributes(::Type{LTextbox}, scene)
         "Color of the box when hovered"
         boxcolor_hover = :transparent
         "Color of the box border"
-        bordercolor = gray(0.95)
+        bordercolor = RGBf0(0.95, 0.95, 0.95)
         "Color of the box border when hovered"
         bordercolor_hover = COLOR_ACCENT_DIMMED[]
         "Color of the box border when focused"
@@ -78,7 +82,8 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
     decorations = Dict{Symbol, Any}()
 
     layoutobservables = LayoutObservables(LTextbox, attrs.width, attrs.height,
-    halign, valign, attrs.alignmode; suggestedbbox = bbox)
+        attrs.tellwidth, attrs.tellheight,
+        halign, valign, attrs.alignmode; suggestedbbox = bbox)
 
     scenearea = lift(IRect2D_rounded, layoutobservables.computedbbox)
 
@@ -125,7 +130,7 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     cursoranimtask = nothing
 
-    on(t.layoutobservables.computedsize) do sz
+    on(t.layoutobservables.reportedsize) do sz
         layoutobservables.autosize[] = sz
     end
 
@@ -176,10 +181,10 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         end
     end
 
-    onmousedownoutside(mousestate) do state
-        displayed_string[] = saved_string[]
-        defocus()
-    end
+    # onmousedownoutside(mousestate) do state
+    #     displayed_string[] = saved_string[]
+    #     defocus()
+    # end
 
     on(events(scene).unicode_input) do char_array
         if !focused[] || isempty(char_array)

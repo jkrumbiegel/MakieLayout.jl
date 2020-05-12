@@ -153,7 +153,6 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
     end
 
     function defocus()
-        stopanim = false
         box.color = boxcolor[]
         box.strokecolor = bordercolor[]
         if !isnothing(cursoranimtask)
@@ -166,6 +165,16 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     onmouseleftclick(mousestate) do state
         focus()
+        pos = state.pos
+        closest_charindex = argmin(
+            [sum((pos .- center(bb)).^2) for bb in displayed_charbbs[]]
+        )
+        # set cursor to index of closest char if right of center, or previous char if left of center
+        cursorindex[] = if (pos .- center(displayed_charbbs[][closest_charindex]))[1] > 0
+            closest_charindex
+        else
+            closest_charindex - 1
+        end
     end
 
     onmouseover(mousestate) do state
@@ -180,14 +189,19 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         end
     end
 
-    # onmousedownoutside(mousestate) do state
-    #     displayed_string[] = saved_string[]
-    #     defocus()
-    # end
+    onmousedownoutside(mousestate) do state
+        displayed_string[] = saved_string[]
+        defocus()
+    end
 
     function insertchar!(c, index)
+        if displayed_chars[] == [' ']
+            empty!(displayed_chars[])
+            index = 1
+        end
         newchars = [displayed_chars[][1:index-1]; c; displayed_chars[][index:end]]
         displayed_string[] = join(newchars)
+        cursorindex[] = index
     end
 
     function appendchar!(c)
@@ -215,7 +229,6 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
         for c in char_array
             insertchar!(c, cursorindex[] + 1)
-            cursorindex[] += 1
         end
    end
 

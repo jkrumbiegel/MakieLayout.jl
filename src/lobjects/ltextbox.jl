@@ -30,9 +30,11 @@ function default_attributes(::Type{LTextbox}, scene)
         "Font family"
         font = lift_parent_attribute(scene, :font, "DejaVu Sans")
         "Color of the box"
-        boxcolor = :white
+        boxcolor = :transparent
         "Color of the box when focused"
-        boxcolor_focused = :white
+        boxcolor_focused = :transparent
+        "Color of the box when focused"
+        boxcolor_focused_invalid = RGBAf0(1, 0, 0, 0.3)
         "Color of the box when hovered"
         boxcolor_hover = :transparent
         "Color of the box border"
@@ -41,6 +43,8 @@ function default_attributes(::Type{LTextbox}, scene)
         bordercolor_hover = COLOR_ACCENT_DIMMED[]
         "Color of the box border when focused"
         bordercolor_focused = COLOR_ACCENT[]
+        "Color of the box border when focused and invalid"
+        bordercolor_focused_invalid = RGBf0(1, 0, 0)
         "Width of the box border"
         borderwidth = 3f0
         "Padding of the text against the box"
@@ -51,6 +55,8 @@ function default_attributes(::Type{LTextbox}, scene)
         cornerradius = 15
         "Corner segments of one rounded corner"
         cornersegments = 20
+        "Function taking a string and returning a boolean which decides if the input is valid."
+        validator = str -> true
 
     end
     (attributes = attrs, documentation = docdict, defaults = defaultdict)
@@ -76,8 +82,10 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         default_attributes(LTextbox, parent).attributes)
 
     @extract attrs (halign, valign, textsize, displayed_string, saved_string,
-        boxcolor, bordercolor, textpadding, bordercolor_focused, bordercolor_hover, focused,
-        borderwidth, cornerradius, cornersegments, boxcolor_focused)
+        boxcolor, boxcolor_focused_invalid, boxcolor_focused, boxcolor_hover,
+        bordercolor, textpadding, bordercolor_focused, bordercolor_hover, focused,
+        bordercolor_focused_invalid,
+        borderwidth, cornerradius, cornersegments, boxcolor_focused, validator)
 
     decorations = Dict{Symbol, Any}()
 
@@ -93,9 +101,37 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     roundedrectpoints = lift(roundedrectvertices, scenearea, cornerradius, cornersegments)
 
+    content_is_valid = lift(displayed_string, validator) do str, validator
+        valid::Bool = validate_textbox(str, validator)
+    end
+
+    hovering = Node(false)
+
+    realbordercolor = lift(bordercolor, bordercolor_focused,
+        bordercolor_focused_invalid, bordercolor_hover, focused, content_is_valid, hovering,
+        typ = Any) do bc, bcf, bcfi, bch, focused, valid, hovering
+
+        if focused
+            valid ? bcf : bcfi
+        else
+            hovering ? bch : bc
+        end
+    end
+
+    realboxcolor = lift(boxcolor, boxcolor_focused,
+        boxcolor_focused_invalid, boxcolor_hover, focused, content_is_valid, hovering,
+        typ = Any) do bc, bcf, bcfi, bch, focused, valid, hovering
+
+        if focused
+            valid ? bcf : bcfi
+        else
+            hovering ? bch : bc
+        end
+    end
+
     box = poly!(parent, roundedrectpoints, strokewidth = borderwidth,
-        strokecolor = bordercolor[],
-        color = boxcolor, raw = true)[end]
+        strokecolor = realbordercolor,
+        color = realboxcolor, raw = true)[end]
 
     displayed_chars = @lift([c for c in $displayed_string])
 
@@ -106,6 +142,7 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
     displayed_charbbs = lift(t.layoutobservables.reportedsize) do sz
         charbbs(t.textobject)
     end
+
 
     cursorindex = Node(length(displayed_string[]))
 
@@ -143,8 +180,6 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     function focus()
         if !focused[]
-            box.strokecolor = bordercolor_focused[]
-            box.color = boxcolor_focused[]
             focused[] = true
             cursoranimtask = Animations.animate_async(cursoranim; fps = 30) do t, color
                 cursorcolor[] = color
@@ -153,8 +188,6 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
     end
 
     function defocus()
-        box.color = boxcolor[]
-        box.strokecolor = bordercolor[]
         if !isnothing(cursoranimtask)
             Animations.stop(cursoranimtask)
             cursoranimtask = nothing
@@ -178,15 +211,11 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
     end
 
     onmouseover(mousestate) do state
-        if !focused[]
-            box.strokecolor = bordercolor_hover[]
-        end
+        hovering[] = true
     end
 
     onmouseout(mousestate) do state
-        if !focused[]
-            box.strokecolor = bordercolor[]
-        end
+        hovering[] = false
     end
 
     onmousedownoutside(mousestate) do state
@@ -283,4 +312,14 @@ function charbbs(text)
             (AbstractPlotting.origin(bb) .* text.textsize[] .+ pos[1:2])...,
             (widths(bb) .* text.textsize[])...)
         for (bb, pos) in zip(bbs, positions)]
+end
+
+function validate_textbox(str, validator::Function)
+    validator(str)
+end
+
+function validate_textbox(str, validator::Regex)
+    m = match(validator, str)
+    # check that the validator matches the whole string
+    !isnothing(m) && m.match == str
 end

@@ -21,10 +21,10 @@ function default_attributes(::Type{LTextbox}, scene)
         valign = :center
         "The alignment of the textbox in its suggested bounding box."
         alignmode = Inside()
-        "The currently displayed string"
-        displayed_string = "Write here"
+        "A placeholder text that is displayed when the saved string is nothing."
+        placeholder = "Click to edit..."
         "The currently saved string"
-        saved_string = "Write here"
+        saved_string = nothing
         "Text size"
         textsize = lift_parent_attribute(scene, :fontsize, 20f0)
         "Font family"
@@ -82,7 +82,7 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         Attributes(kwargs),
         default_attributes(LTextbox, parent).attributes)
 
-    @extract attrs (halign, valign, textsize, displayed_string, saved_string,
+    @extract attrs (halign, valign, textsize, saved_string, placeholder,
         boxcolor, boxcolor_focused_invalid, boxcolor_focused, boxcolor_hover,
         bordercolor, textpadding, bordercolor_focused, bordercolor_hover, focused,
         bordercolor_focused_invalid,
@@ -102,6 +102,8 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
     bbox = lift(FRect2D ∘ AbstractPlotting.zero_origin, scenearea)
 
     roundedrectpoints = lift(roundedrectvertices, scenearea, cornerradius, cornersegments)
+
+    displayed_string = Node(placeholder[])
 
     content_is_valid = lift(displayed_string, validator) do str, validator
         valid::Bool = validate_textbox(str, validator)
@@ -182,6 +184,10 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     function focus()
         if !focused[]
+            if isnothing(saved_string[])
+                cursorindex[] = 1
+                displayed_string[] = " "
+            end
             focused[] = true
             cursoranimtask = Animations.animate_async(cursoranim; fps = 30) do t, color
                 cursorcolor[] = color
@@ -200,6 +206,12 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     onmouseleftclick(mousestate) do state
         focus()
+
+        if isnothing(saved_string[])
+            # there isn't text to select yet, only placeholder
+            return
+        end
+
         pos = state.pos
         closest_charindex = argmin(
             [sum((pos .- center(bb)).^2) for bb in displayed_charbbs[]]
@@ -273,8 +285,13 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
     end
 
     function abort()
-        cursorindex[] = min(length(saved_string[]), cursorindex[] + 1)
-        displayed_string[] = saved_string[]
+        if isnothing(saved_string[])
+            cursorindex[] = 1
+            displayed_string[] = placeholder[]
+        else
+            cursorindex[] = min(length(saved_string[]), cursorindex[] + 1)
+            displayed_string[] = saved_string[]
+        end
         defocus()
     end
 

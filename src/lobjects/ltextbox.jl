@@ -221,8 +221,7 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
     end
 
     onmousedownoutside(mousestate) do state
-        displayed_string[] = saved_string[]
-        defocus()
+        abort()
     end
 
     function insertchar!(c, index)
@@ -263,34 +262,49 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
                 insertchar!(c, cursorindex[] + 1)
             end
         end
-   end
+    end
 
 
-    lastset = Set{AbstractPlotting.Keyboard.Button}()
+    function submit()
+        if content_is_valid[]
+            saved_string[] = displayed_string[]
+            defocus()
+        end
+    end
+
+    function abort()
+        cursorindex[] = min(length(saved_string[]), cursorindex[] + 1)
+        displayed_string[] = saved_string[]
+        defocus()
+    end
+
+    function cursor_forward()
+        cursorindex[] = min(length(displayed_string[]), cursorindex[] + 1)
+    end
+
+    function cursor_backward()
+        cursorindex[] = max(0, cursorindex[] - 1)
+    end
+
+
     on(events(scene).keyboardbuttons) do button_set
         if !focused[] || isempty(button_set)
             return
         end
 
-        newkeys = setdiff(button_set, lastset)
-
-        for key in newkeys
+        for key in button_set
             if key == Keyboard.backspace
                 removechar!(cursorindex[])
             elseif key == Keyboard.enter
-                saved_string[] = displayed_string[]
-                defocus()
+                submit()
             elseif key == Keyboard.escape
-                displayed_string[] = saved_string[]
-                defocus()
+                abort()
             elseif key == Keyboard.right
-                cursorindex[] = min(length(displayed_string[]), cursorindex[] + 1)
+                cursor_forward()
             elseif key == Keyboard.left
-                cursorindex[] = max(0, cursorindex[] - 1)
+                cursor_backward()
             end
         end
-
-        # lastset = button_set
     end
 
     LTextbox(scene, attrs, layoutobservables, decorations)

@@ -24,9 +24,13 @@ function default_attributes(::Type{LTextbox}, scene)
         "A placeholder text that is displayed when the saved string is nothing."
         placeholder = "Click to edit..."
         "The currently saved string"
-        saved_string = nothing
+        content = nothing
         "Text size"
         textsize = lift_parent_attribute(scene, :fontsize, 20f0)
+        "Text color"
+        textcolor = :black
+        "Text color for the placeholder"
+        textcolor_placeholder = RGBf0(0.5, 0.5, 0.5)
         "Font family"
         font = lift_parent_attribute(scene, :font, "DejaVu Sans")
         "Color of the box"
@@ -38,7 +42,7 @@ function default_attributes(::Type{LTextbox}, scene)
         "Color of the box when hovered"
         boxcolor_hover = :transparent
         "Color of the box border"
-        bordercolor = RGBf0(0.95, 0.95, 0.95)
+        bordercolor = RGBf0(0.80, 0.80, 0.80)
         "Color of the box border when hovered"
         bordercolor_hover = COLOR_ACCENT_DIMMED[]
         "Color of the box border when focused"
@@ -82,7 +86,8 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         Attributes(kwargs),
         default_attributes(LTextbox, parent).attributes)
 
-    @extract attrs (halign, valign, textsize, saved_string, placeholder,
+    @extract attrs (halign, valign, textsize, content, placeholder,
+        textcolor, textcolor_placeholder,
         boxcolor, boxcolor_focused_invalid, boxcolor_focused, boxcolor_hover,
         bordercolor, textpadding, bordercolor_focused, bordercolor_hover, focused,
         bordercolor_focused_invalid,
@@ -139,8 +144,16 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     displayed_chars = @lift([c for c in $displayed_string])
 
+    realtextcolor = lift(textcolor, textcolor_placeholder, focused, typ = Any) do tc, tcph, foc
+        if !foc && isnothing(content[])
+            tcph
+        else
+            tc
+        end
+    end
+
     t = LText(scene, text = displayed_string, bbox = bbox, halign = :left, valign = :top,
-        width = Auto(true), height = Auto(true),
+        width = Auto(true), height = Auto(true), color = realtextcolor,
         textsize = textsize, padding = textpadding)
 
     displayed_charbbs = lift(t.layoutobservables.reportedsize) do sz
@@ -184,7 +197,7 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     function focus()
         if !focused[]
-            if isnothing(saved_string[])
+            if isnothing(content[])
                 cursorindex[] = 1
                 displayed_string[] = " "
             end
@@ -207,7 +220,7 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
     onmouseleftclick(mousestate) do state
         focus()
 
-        if isnothing(saved_string[])
+        if isnothing(content[])
             # there isn't text to select yet, only placeholder
             return
         end
@@ -279,18 +292,17 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     function submit()
         if content_is_valid[]
-            saved_string[] = displayed_string[]
+            content[] = displayed_string[]
             defocus()
         end
     end
 
     function abort()
-        if isnothing(saved_string[])
-            cursorindex[] = 1
+        cursorindex[] = 0
+        if isnothing(content[])
             displayed_string[] = placeholder[]
         else
-            cursorindex[] = min(length(saved_string[]), cursorindex[] + 1)
-            displayed_string[] = saved_string[]
+            displayed_string[] = content[]
         end
         defocus()
     end
@@ -351,6 +363,10 @@ end
 
 function validate_textbox(str, validator::Function)
     validator(str)
+end
+
+function validate_textbox(str, T::Type)
+    !isnothing(tryparse(T, str))
 end
 
 function validate_textbox(str, validator::Regex)

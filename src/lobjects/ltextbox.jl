@@ -55,9 +55,10 @@ function default_attributes(::Type{LTextbox}, scene)
         cornerradius = 15
         "Corner segments of one rounded corner"
         cornersegments = 20
-        "Function taking a string and returning a boolean which decides if the input is valid."
+        "Validator that is called with validate_textbox(string, validator) to determine if the current string is valid. Can by default be a RegEx that needs to match the complete string, or a function taking a string as input and returning a Bool."
         validator = str -> true
-
+        "Restricts the allowed unicode input via is_allowed(char, restriction)"
+        restriction = nothing
     end
     (attributes = attrs, documentation = docdict, defaults = defaultdict)
 end
@@ -85,7 +86,8 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         boxcolor, boxcolor_focused_invalid, boxcolor_focused, boxcolor_hover,
         bordercolor, textpadding, bordercolor_focused, bordercolor_hover, focused,
         bordercolor_focused_invalid,
-        borderwidth, cornerradius, cornersegments, boxcolor_focused, validator)
+        borderwidth, cornerradius, cornersegments, boxcolor_focused,
+        validator, restriction)
 
     decorations = Dict{Symbol, Any}()
 
@@ -257,7 +259,9 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         end
 
         for c in char_array
-            insertchar!(c, cursorindex[] + 1)
+            if is_allowed(c, restriction[])
+                insertchar!(c, cursorindex[] + 1)
+            end
         end
    end
 
@@ -322,4 +326,12 @@ function validate_textbox(str, validator::Regex)
     m = match(validator, str)
     # check that the validator matches the whole string
     !isnothing(m) && m.match == str
+end
+
+function is_allowed(char, restriction::Nothing)
+    true
+end
+
+function is_allowed(char, restriction::Function)
+    allowed::Bool = restriction(char)
 end

@@ -1,8 +1,10 @@
-struct LTextbox <: LObject
+mutable struct LTextbox <: LObject
     scene::Scene
     attributes::Attributes
     layoutobservables::GridLayoutBase.LayoutObservables
     decorations::Dict{Symbol, Any}
+    cursorindex::Node{Int}
+    cursoranimtask
 end
 
 function default_attributes(::Type{LTextbox}, scene)
@@ -11,9 +13,9 @@ function default_attributes(::Type{LTextbox}, scene)
         height = Auto()
         "The width setting of the textbox."
         width = Auto()
-        "Controls if the parent layout can adjust to this element's width"
+        "Controls if the parent layout can adjust to this element's width."
         tellwidth = true
-        "Controls if the parent layout can adjust to this element's height"
+        "Controls if the parent layout can adjust to this element's height."
         tellheight = true
         "The horizontal alignment of the textbox in its suggested bounding box."
         halign = :center
@@ -23,46 +25,50 @@ function default_attributes(::Type{LTextbox}, scene)
         alignmode = Inside()
         "A placeholder text that is displayed when the saved string is nothing."
         placeholder = "Click to edit..."
-        "The currently saved string"
+        "The currently saved string."
         content = nothing
-        "Text size"
+        "The currently displayed string (for internal use)."
+        displayed_string = nothing
+        "Text size."
         textsize = lift_parent_attribute(scene, :fontsize, 20f0)
-        "Text color"
+        "Text color."
         textcolor = :black
-        "Text color for the placeholder"
+        "Text color for the placeholder."
         textcolor_placeholder = RGBf0(0.5, 0.5, 0.5)
-        "Font family"
+        "Font family."
         font = lift_parent_attribute(scene, :font, "DejaVu Sans")
-        "Color of the box"
+        "Color of the box."
         boxcolor = :transparent
-        "Color of the box when focused"
+        "Color of the box when focused."
         boxcolor_focused = :transparent
-        "Color of the box when focused"
+        "Color of the box when focused."
         boxcolor_focused_invalid = RGBAf0(1, 0, 0, 0.3)
-        "Color of the box when hovered"
+        "Color of the box when hovered."
         boxcolor_hover = :transparent
-        "Color of the box border"
+        "Color of the box border."
         bordercolor = RGBf0(0.80, 0.80, 0.80)
-        "Color of the box border when hovered"
+        "Color of the box border when hovered."
         bordercolor_hover = COLOR_ACCENT_DIMMED[]
-        "Color of the box border when focused"
+        "Color of the box border when focused."
         bordercolor_focused = COLOR_ACCENT[]
-        "Color of the box border when focused and invalid"
+        "Color of the box border when focused and invalid."
         bordercolor_focused_invalid = RGBf0(1, 0, 0)
-        "Width of the box border"
-        borderwidth = 3f0
-        "Padding of the text against the box"
+        "Width of the box border."
+        borderwidth = 2f0
+        "Padding of the text against the box."
         textpadding = (10, 10, 10, 10)
-        "If the textbox is focused and receives text input"
+        "If the textbox is focused and receives text input."
         focused = false
-        "Corner radius of text box"
-        cornerradius = 15
-        "Corner segments of one rounded corner"
+        "Corner radius of text box."
+        cornerradius = 8
+        "Corner segments of one rounded corner."
         cornersegments = 20
         "Validator that is called with validate_textbox(string, validator) to determine if the current string is valid. Can by default be a RegEx that needs to match the complete string, or a function taking a string as input and returning a Bool."
         validator = str -> true
-        "Restricts the allowed unicode input via is_allowed(char, restriction)"
+        "Restricts the allowed unicode input via is_allowed(char, restriction)."
         restriction = nothing
+        "The color of the cursor."
+        cursorcolor = :transparent
     end
     (attributes = attrs, documentation = docdict, defaults = defaultdict)
 end
@@ -87,12 +93,12 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         default_attributes(LTextbox, parent).attributes)
 
     @extract attrs (halign, valign, textsize, content, placeholder,
-        textcolor, textcolor_placeholder,
+        textcolor, textcolor_placeholder, displayed_string,
         boxcolor, boxcolor_focused_invalid, boxcolor_focused, boxcolor_hover,
         bordercolor, textpadding, bordercolor_focused, bordercolor_hover, focused,
         bordercolor_focused_invalid,
         borderwidth, cornerradius, cornersegments, boxcolor_focused,
-        validator, restriction)
+        validator, restriction, cursorcolor)
 
     decorations = Dict{Symbol, Any}()
 
@@ -104,11 +110,16 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     scene = Scene(parent, scenearea, raw = true, camera = campixel!)
 
+    cursorindex = Node(0)
+    ltextbox = LTextbox(scene, attrs, layoutobservables, decorations, cursorindex, nothing)
+
+
+
     bbox = lift(FRect2D ∘ AbstractPlotting.zero_origin, scenearea)
 
     roundedrectpoints = lift(roundedrectvertices, scenearea, cornerradius, cornersegments)
 
-    displayed_string = Node(placeholder[])
+    displayed_string[] = isnothing(content[]) ? placeholder[] : content[]
 
     content_is_valid = lift(displayed_string, validator) do str, validator
         valid::Bool = validate_textbox(str, validator)
@@ -144,8 +155,8 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     displayed_chars = @lift([c for c in $displayed_string])
 
-    realtextcolor = lift(textcolor, textcolor_placeholder, focused, typ = Any) do tc, tcph, foc
-        if !foc && isnothing(content[])
+    realtextcolor = lift(textcolor, textcolor_placeholder, focused, content, typ = Any) do tc, tcph, foc, cont
+        if !foc && isnothing(cont)
             tcph
         else
             tc
@@ -160,10 +171,14 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         charbbs(t.textobject)
     end
 
-
-    cursorindex = Node(length(displayed_string[]))
-
     cursorpoints = lift(cursorindex, displayed_charbbs) do ci, bbs
+
+        if (ci) > length(bbs)
+            # correct cursorindex if it's outside of the displayed charbbs range
+            cursorindex[] = length(bbs)
+            return
+        end
+
         if ci == 0
             [leftline(bbs[1])...]
         else
@@ -171,15 +186,7 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         end
     end
 
-    cursorcolor = Node{Any}(:transparent)
-    cursor = linesegments!(scene, cursorpoints, color = cursorcolor, linewidth = 4)[end]
-
-    cursoranim = Animations.Loop(
-        Animations.Animation(
-            [0, 1.0],
-            [Colors.alphacolor(COLOR_ACCENT[], 0), Colors.alphacolor(COLOR_ACCENT[], 1)],
-            Animations.sineio(n = 2, yoyo = true, postwait = 0.2)),
-            0.0, 0.0, 1000)
+    cursor = linesegments!(scene, cursorpoints, color = cursorcolor, linewidth = 2)[end]
 
     cursoranimtask = nothing
 
@@ -195,30 +202,8 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     mousestate = addmousestate!(scene)
 
-    function focus()
-        if !focused[]
-            if isnothing(content[])
-                cursorindex[] = 1
-                displayed_string[] = " "
-            end
-            focused[] = true
-            cursoranimtask = Animations.animate_async(cursoranim; fps = 30) do t, color
-                cursorcolor[] = color
-            end
-        end
-    end
-
-    function defocus()
-        if !isnothing(cursoranimtask)
-            Animations.stop(cursoranimtask)
-            cursoranimtask = nothing
-        end
-        cursorcolor[] = :transparent
-        focused[] = false
-    end
-
     onmouseleftclick(mousestate) do state
-        focus()
+        focus!(ltextbox)
 
         if isnothing(content[])
             # there isn't text to select yet, only placeholder
@@ -271,7 +256,7 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         end
 
         if cursorindex[] >= index
-            cursorindex[] = max(1, cursorindex[] - 1)
+            cursorindex[] = max(0, cursorindex[] - 1)
         end
 
         displayed_string[] = join(newchars)
@@ -292,8 +277,8 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
 
     function submit()
         if content_is_valid[]
+            defocus!(ltextbox)
             content[] = displayed_string[]
-            defocus()
         end
     end
 
@@ -304,7 +289,7 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         else
             displayed_string[] = content[]
         end
-        defocus()
+        defocus!(ltextbox)
     end
 
     function cursor_forward()
@@ -324,6 +309,8 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         for key in button_set
             if key == Keyboard.backspace
                 removechar!(cursorindex[])
+            elseif key == Keyboard.delete
+                removechar!(cursorindex[] + 1)
             elseif key == Keyboard.enter
                 submit()
             elseif key == Keyboard.escape
@@ -336,7 +323,7 @@ function LTextbox(parent::Scene; bbox = nothing, kwargs...)
         end
     end
 
-    LTextbox(scene, attrs, layoutobservables, decorations)
+    ltextbox
 end
 
 
@@ -381,4 +368,78 @@ end
 
 function is_allowed(char, restriction::Function)
     allowed::Bool = restriction(char)
+end
+
+"""
+    reset!(tb::LTextbox)
+
+Resets the content of the given `LTextbox` to `nothing` without triggering listeners, and resets the `LTextbox` to the `placeholder` text.
+"""
+function reset!(tb::LTextbox)
+    tb.content.val = nothing
+    tb.displayed_string = tb.placeholder[]
+    defocus!(tb)
+    nothing
+end
+
+"""
+    set!(tb::LTextbox, string::String)
+
+Sets the content of the given `LTextbox` to `string`, triggering listeners of `tb.content`.
+"""
+function set!(tb::LTextbox, string::String)
+    if !validate_textbox(string, tb.validator[])
+        error("Invalid string \"$(string)\" for textbox.")
+    end
+
+    tb.displayed_string = string
+    tb.content = string
+    nothing
+end
+
+"""
+    focus!(tb::LTextbox)
+
+Focuses an `LTextbox` and makes it ready to receive keyboard input.
+"""
+function focus!(tb::LTextbox)
+    if !tb.focused[]
+        if isnothing(tb.content[])
+            tb.cursorindex[] = 1
+            tb.displayed_string = " "
+        end
+        tb.focused = true
+
+        cursoranim = Animations.Loop(
+            Animations.Animation(
+                [0, 1.0],
+                [Colors.alphacolor(COLOR_ACCENT[], 0), Colors.alphacolor(COLOR_ACCENT[], 1)],
+                Animations.sineio(n = 2, yoyo = true, postwait = 0.2)),
+                0.0, 0.0, 1000)
+
+        if !isnothing(tb.cursoranimtask)
+            Animations.stop(tb.cursoranimtask)
+            tb.cursoranimtask = nothing
+        end
+
+        tb.cursoranimtask = Animations.animate_async(cursoranim; fps = 30) do t, color
+            tb.cursorcolor = color
+        end
+    end
+    nothing
+end
+
+"""
+    defocus!(tb::LTextbox)
+
+Defocuses an `LTextbox` so it doesn't receive keyboard input.
+"""
+function defocus!(tb::LTextbox)
+    if !isnothing(tb.cursoranimtask)
+        Animations.stop(tb.cursoranimtask)
+        tb.cursoranimtask = nothing
+    end
+    tb.cursorcolor = :transparent
+    tb.focused = false
+    nothing
 end

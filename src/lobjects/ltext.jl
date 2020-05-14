@@ -9,7 +9,7 @@ function LText(parent::Scene; bbox = nothing, kwargs...)
     attrs = merge!(merge!(Attributes(kwargs), theme_attrs), default_attrs)
 
     @extract attrs (text, textsize, font, color, visible, halign, valign,
-        rotation, padding)
+        rotation, padding, justification, lineheight)
 
     layoutobservables = LayoutObservables(LText, attrs.width, attrs.height, attrs.tellwidth, attrs.tellheight,
         halign, valign, attrs.alignmode; suggestedbbox = bbox)
@@ -27,7 +27,8 @@ function LText(parent::Scene; bbox = nothing, kwargs...)
     end
 
     t = text!(parent, text, position = textpos, textsize = textsize, font = font, color = color,
-        visible = visible, align = alignnode, rotation = rotation, raw = true)[end]
+        visible = visible, align = alignnode, rotation = rotation, justification = justification,
+        lineheight = lineheight, raw = true)[end]
 
     textbb = Ref(BBox(0, 1, 0, 1))
 

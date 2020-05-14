@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>GridLayout · MakieLayout.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">MakieLayout.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">MakieLayout.jl Tutorial</a></li><li class="is-active"><a class="tocitem" href>GridLayout</a><ul class="internal"><li><a class="tocitem" href="#Nesting-1"><span>Nesting</span></a></li><li><a class="tocitem" href="#Alignment-1"><span>Alignment</span></a></li><li><a class="tocitem" href="#Spanned-Placement-1"><span>Spanned Placement</span></a></li><li><a class="tocitem" href="#Auto-resizing-1"><span>Auto-resizing</span></a></li><li><a class="tocitem" href="#Column-and-row-sizes-1"><span>Column and row sizes</span></a></li><li><a class="tocitem" href="#Trimming-empty-rows-and-columns-1"><span>Trimming empty rows and columns</span></a></li></ul></li><li><a class="tocitem" href="../laxis/">LAxis</a></li><li><a class="tocitem" href="../llegend/">LLegend</a></li><li><a class="tocitem" href="../layoutables_examples/">Layoutables Examples</a></li><li><a class="tocitem" href="../layoutables_reference/">Layoutables Reference</a></li><li><a class="tocitem" href="../theming/">Theming Layoutables</a></li><li><a class="tocitem" href="../layouting/">How Layouting Works</a></li><li><a class="tocitem" href="../faq/">Frequently Asked Questions</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>GridLayout</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>GridLayout</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jkrumbiegel/MakieLayout.jl/blob/master/docs/src/grids.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h2 id="Nesting-1"><a class="docs-heading-anchor" href="#Nesting-1">Nesting</a><a class="docs-heading-anchor-permalink" href="#Nesting-1" title="Permalink"></a></h2><p>Grids can be nested inside other grids, and so on, to arbitrary depths. The top grid&#39;s parent should be the scene in which the layout is placed. When you place a grid inside another grid, that grid is automatically made its parent. Grids also are by default set to alignmode Inside which means that the content edges are aligned to the grid&#39;s bounding box, excluding the outer protrusions. This way, plots in nested grids are nicely aligned along their spines.</p><pre><code class="language-julia">using MakieLayout
+using AbstractPlotting
+
+scene, layout = layoutscene(30, resolution = (1200, 900))
+
+subgl_left = GridLayout()
+subgl_left[1:2, 1:2] = [LAxis(scene) for i in 1:2, j in 1:2]
+
+subgl_right = GridLayout()
+subgl_right[1:3, 1] = [LAxis(scene) for i in 1:3]
+
+layout[1, 1] = subgl_left
+layout[1, 2] = subgl_right</code></pre><p><img src="../example_nested_grids.svg" alt="example nested grids"/></p><h2 id="Alignment-1"><a class="docs-heading-anchor" href="#Alignment-1">Alignment</a><a class="docs-heading-anchor-permalink" href="#Alignment-1" title="Permalink"></a></h2><p>Here you can see the difference between the align modes Outside with and without margins and the Inside alignmode. Only the standard Inside mode aligns the axis spines of the contained axes nicely. The Outside mode is mostly useful for the main GridLayout so that there some space between the window edges and the plots. You can see that the normal axis looks the same as the one placed inside the grid with Inside alignment, and they are both effectively aligned exactly the same.</p><pre><code class="language-julia">using MakieLayout
+using AbstractPlotting
+
+scene, layout = layoutscene(30, resolution = (1200, 1200))
+
+layout[1, 1] = LAxis(scene, title=&quot;No grid layout&quot;)
+layout[2, 1] = LAxis(scene, title=&quot;No grid layout&quot;)
+layout[3, 1] = LAxis(scene, title=&quot;No grid layout&quot;)
+
+subgl_1 = layout[1, 2] = GridLayout(alignmode=Inside())
+subgl_2 = layout[2, 2] = GridLayout(alignmode=Outside())
+subgl_3 = layout[3, 2] = GridLayout(alignmode=Outside(50))
+
+subgl_1[1, 1] = LAxis(scene, title=&quot;Inside&quot;)
+subgl_2[1, 1] = LAxis(scene, title=&quot;Outside&quot;)
+subgl_3[1, 1] = LAxis(scene, title=&quot;Outside(50)&quot;)
+
+layout[1:3, 2] = [LRect(scene, color = :transparent, strokecolor = :red) for i in 1:3]</code></pre><p><img src="../example_grid_alignment.svg" alt="example grid alignment"/></p><h2 id="Spanned-Placement-1"><a class="docs-heading-anchor" href="#Spanned-Placement-1">Spanned Placement</a><a class="docs-heading-anchor-permalink" href="#Spanned-Placement-1" title="Permalink"></a></h2><p>Elements in a grid layout can span multiple rows and columns. You can specify them with the range syntax and colons for the full width or height. You can also use end to specify the last row or column.</p><pre><code class="language-julia">using MakieLayout
+using AbstractPlotting
+
+scene, layout = layoutscene(4, 4, 30, resolution = (1200, 1200))
+
+layout[1, 1:2] = LAxis(scene, title=&quot;[1, 1:2]&quot;)
+layout[2:4, 1:2] = LAxis(scene, title=&quot;[2:4, 1:2]&quot;)
+layout[:, 3] = LAxis(scene, title=&quot;[:, 3]&quot;)
+layout[1:3, end] = LAxis(scene, title=&quot;[1:3, end]&quot;)
+layout[end, end] = LAxis(scene, title=&quot;[end, end]&quot;)</code></pre><p><img src="../example_spanned_grid_content.svg" alt="spanned grid content"/></p><h2 id="Auto-resizing-1"><a class="docs-heading-anchor" href="#Auto-resizing-1">Auto-resizing</a><a class="docs-heading-anchor-permalink" href="#Auto-resizing-1" title="Permalink"></a></h2><p>If you index outside of the current range of a grid layout, you do not get an error. Instead, the layout automatically resizes to contain the new indices. This is very useful if you want to iteratively build a layout, or add super or side titles.</p><pre><code class="language-julia">using MakieLayout
+using AbstractPlotting
+
+scene, layout = layoutscene(30, resolution = (1200, 1200))
+
+layout[1, 1] = LAxis(scene)
+for i in 1:3
+    layout[:, end+1] = LAxis(scene)
+    layout[end+1, :] = LAxis(scene)
+end
+
+layout[0, :] = LText(scene, text=&quot;Super Title&quot;, textsize=50)
+layout[end+1, :] = LText(scene, text=&quot;Sub Title&quot;, textsize=50)
+layout[2:end-1, 0] = LText(scene, text=&quot;Left Text&quot;, textsize=50,
+    rotation=pi/2)
+layout[2:end-1, end+1] = LText(scene, text=&quot;Right Text&quot;, textsize=50,
+    rotation=-pi/2)</code></pre><p><img src="../example_indexing_outside_grid.svg" alt="indexing outside grid"/></p><h2 id="Column-and-row-sizes-1"><a class="docs-heading-anchor" href="#Column-and-row-sizes-1">Column and row sizes</a><a class="docs-heading-anchor-permalink" href="#Column-and-row-sizes-1" title="Permalink"></a></h2><p>You can manipulate the sizes of rows and columns in a grid. The choices are between fixed widths in pixels, relative widths in fractions of one, aspect ratio widths that are relative to a selected row or column, and auto widths. Auto widths depend on the content of the row or column. Some elements like LText have a determinable width or height. If there are single-span elements in a row that have a determinable height and the row&#39;s height is set to auto, it will assume the largest height of all determinable elements it contains. This is very useful for placement of text, or other GUI elements like buttons and sliders. If a row or column does not have a determinable height or width, it defaults to an equal share of the remaining space with all other auto rows or columns. You can adjust the ratio of this share with the Integer argument of the Auto struct.</p><pre><code class="language-julia">using MakieLayout
+using AbstractPlotting
+
+scene = Scene(resolution = (1200, 900), camera=campixel!)
+
+layout = GridLayout(
+    scene, 6, 6,
+    colsizes = [Fixed(200), Relative(0.25), Auto(), Auto(), Auto(2), Auto()],
+    rowsizes = [Auto(), Fixed(100), Relative(0.25), Aspect(2, 1), Auto(), Auto()],
+    alignmode = Outside(30, 30, 30, 30))
+
+
+for i in 2:6, j in 1:5
+    if i == 6 &amp;&amp; j == 3
+        layout[i, j] = LText(scene, text=&quot;My Size is Inferred&quot;)
+    else
+        layout[i, j] = LRect(scene)
+    end
+end
+
+for (j, label) in enumerate([&quot;Fixed(200)&quot;, &quot;Relative(0.25)&quot;, &quot;Auto()&quot;, &quot;Auto()&quot;, &quot;Auto(2)&quot;])
+    layout[1, j] = LText(scene, tellwidth = false, text = label)
+end
+
+for (i, label) in enumerate([&quot;Fixed(100)&quot;, &quot;Relative(0.25)&quot;, &quot;Aspect(2, 1)&quot;, &quot;Auto()&quot;, &quot;Auto()&quot;])
+    layout[i + 1, 6] = LText(scene, tellheight = false, text = label)
+end</code></pre><p><img src="../example_row_col_sizes.svg" alt="row col sizes"/></p><h2 id="Trimming-empty-rows-and-columns-1"><a class="docs-heading-anchor" href="#Trimming-empty-rows-and-columns-1">Trimming empty rows and columns</a><a class="docs-heading-anchor-permalink" href="#Trimming-empty-rows-and-columns-1" title="Permalink"></a></h2><p>If you change a layout interactively and end up with unused rows or columns, <code>trim!</code> will remove those for you:</p><pre><code class="language-julia">using MakieLayout
+using AbstractPlotting
+
+scene, layout = layoutscene(resolution = (600, 600))
+
+record(scene, &quot;example_trimming.mp4&quot;, framerate=1) do io
+
+    ax1 = layout[1, 1] = LAxis(scene, title = &quot;Axis 1&quot;)
+    recordframe!(io)
+
+    ax2 = layout[1, 2] = LAxis(scene, title = &quot;Axis 2&quot;)
+    recordframe!(io)
+
+    layout[2, 1] = ax2
+    recordframe!(io)
+
+    trim!(layout)
+    recordframe!(io)
+
+    layout[2, 3:4] = ax1
+    recordframe!(io)
+
+    trim!(layout)
+    recordframe!(io)
+end</code></pre><p><video src="../example_trimming.mp4" controls="true" title="hiding decorations"><a href="../example_trimming.mp4">hiding decorations</a></video></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« MakieLayout.jl Tutorial</a><a class="docs-footer-nextpage" href="../laxis/">LAxis »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 14 May 2020 12:15">Thursday 14 May 2020</span>. Using Julia version 1.4.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

@@ -4,6 +4,8 @@ A simple slider without a label. You can create a label using an `LText` object,
 for example. You need to specify a range that constrains the slider's possible values.
 You can then lift the `value` observable to make interactive plots.
 
+To create a horizontal layout containing a label, a slider, and a value label, use the convenience function [`labelslider!`](@ref).
+
 ```@example
 using AbstractPlotting
 using MakieLayout

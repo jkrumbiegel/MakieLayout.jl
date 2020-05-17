@@ -25,7 +25,7 @@ save("example_lslider.svg", scene); nothing # hide
 
 ![example lslider](example_lslider.svg)
 
-If you want to programmatically move the slider, use the function `set_close_to!(ls::LSlider, value)`.
+If you want to programmatically move the slider, use the function [`set_close_to!`](@ref).
 Don't manipulate the `value` attribute directly, as there is no guarantee that
 this value exists in the range underlying the slider, and the slider's displayed value would
 not change anyway by changing the slider's output.

@@ -12,10 +12,10 @@ makedocs(
         "LAxis" => "laxis.md",
         "LLegend" => "llegend.md",
         "Layoutables Examples" => "layoutables_examples.md",
-        "Layoutables Reference" => "layoutables_reference.md",
         "Theming Layoutables" => "theming.md",
         "How Layouting Works" => "layouting.md",
         "Frequently Asked Questions" => "faq.md",
+        "API Reference" => "api_reference.md",
     ],
     format = Documenter.HTML(
             prettyurls = get(ENV, "CI", nothing) == "true"

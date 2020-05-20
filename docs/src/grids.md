@@ -84,7 +84,7 @@ save("example_spanned_grid_content.svg", scene); nothing # hide
 
 ![spanned grid content](example_spanned_grid_content.svg)
 
-## Auto-resizing
+## Adding rows and columns by indexing
 
 If you index outside of the current range of a grid layout, you do not get an
 error. Instead, the layout automatically resizes to contain the new indices.
@@ -115,54 +115,131 @@ save("example_indexing_outside_grid.svg", scene); nothing # hide
 
 ![indexing outside grid](example_indexing_outside_grid.svg)
 
-## Column and row sizes
+## Setting column and row sizes correctly
 
-You can manipulate the sizes of rows and columns in a grid. The choices are
-between fixed widths in pixels, relative widths in fractions of one, aspect
-ratio widths that are relative to a selected row or column, and auto widths.
-Auto widths depend on the content of the row or column. Some elements like
-LText have a determinable width or height. If there are single-span
-elements in a row that have a determinable height and the row's height is set
-to auto, it will assume the largest height of all determinable elements it contains.
-This is very useful for placement of text, or other GUI elements like buttons
-and sliders. If a row or column does not have a determinable height or width,
-it defaults to an equal share of the remaining space with all other auto rows or
-columns. You can adjust the ratio of this share with the Integer argument of the
-Auto struct.
+There are four different types of sizes you can give rows and columns.
+
+### Fixed
+
+`Fixed(scene_units)` is used to set a column or row to an absolute size, independent of its content.
+This only really makes sense if there is variable width content in the column or row, that can shrink or expand to meet this size. You will probably not need `Fixed` sizes very often.
 
 ```@example
 using MakieLayout
 using AbstractPlotting
 
-scene = Scene(resolution = (1200, 900), camera=campixel!)
+scene, layout = layoutscene(resolution = (1200, 900))
 
-layout = GridLayout(
-    scene, 6, 6,
-    colsizes = [Fixed(200), Relative(0.25), Auto(), Auto(), Auto(2), Auto()],
-    rowsizes = [Auto(), Fixed(100), Relative(0.25), Aspect(2, 1), Auto(), Auto()],
-    alignmode = Outside(30, 30, 30, 30))
+layout[1, 1] = LAxis(scene, title = "My column has size Fixed(400)")
+layout[1, 2] = LAxis(scene, title = "My column has size Auto()")
 
+colsize!(layout, 1, Fixed(400))
+# colsize!(layout, 1, 400) would also work
 
-for i in 2:6, j in 1:5
-    if i == 6 && j == 3
-        layout[i, j] = LText(scene, text="My Size is Inferred")
-    else
-        layout[i, j] = LRect(scene)
-    end
-end
-
-for (j, label) in enumerate(["Fixed(200)", "Relative(0.25)", "Auto()", "Auto()", "Auto(2)"])
-    layout[1, j] = LText(scene, tellwidth = false, text = label)
-end
-
-for (i, label) in enumerate(["Fixed(100)", "Relative(0.25)", "Aspect(2, 1)", "Auto()", "Auto()"])
-    layout[i + 1, 6] = LText(scene, tellheight = false, text = label)
-end
-
-save("example_row_col_sizes.svg", scene); nothing # hide
+scene
+save("example_fixed_size.svg", scene); nothing # hide
 ```
 
-![row col sizes](example_row_col_sizes.svg)
+![fixed size](example_fixed_size.svg)
+
+
+### Relative
+
+`Relative(fraction)` is used to set a column or row to a size that is a certain fraction of the available width or height.
+This is useful, e.g., if you want a column to span 50% of the available width, no matter what other content is there.
+In this case, you would use `Relative(1/2)`. The available width is the width of the GridLayout minus the space taken by row or column gaps including protrusions.
+
+```@example
+using MakieLayout
+using AbstractPlotting
+
+scene, layout = layoutscene(resolution = (1200, 900))
+
+layout[1, 1] = LAxis(scene, title = "My column has size Relative(2/3)")
+layout[1, 2] = LAxis(scene, title = "My column has size Auto()")
+layout[1, 3] = LColorbar(scene, width = 30)
+
+colsize!(layout, 1, Relative(2/3))
+
+scene
+save("example_relative_size.svg", scene); nothing # hide
+```
+
+![relative size](example_relative_size.svg)
+
+
+### Auto
+
+The `Auto` size is a bit more complex to understand. It has two parameters, the Boolean `trydetermine` and the number `ratio`. The default is `Auto() == Auto(true, 1)`. This is also the default row height and column width.
+
+A column or row that is sized `Auto(true)` tries to fit its own size to its content.
+
+When a `GridLayout` is solved, it looks at the content in each row or column and checks if it reports a fixed size.
+Many objects can report their own width or height because their content has a specific size, such as `LText`.
+Other objects are often used with a user-set width or height, for example `LColorbar(scene, width = 30)`.
+In this case, the `GridLayout` can also see that the colorbar has a width of 30 units and fit the column width to that value.
+Objects like `LAxis` on the other hand are usually not set to a specific size.
+
+Only objects that span a *single* row or column report their width or height, respectively. If *multiple* rows or columns are spanned, it's not well defined how the space that the object needs should be distributed.
+
+If there is more than one object with a fixed width or height in an `Auto(true)` sized column, the maximum size is used.
+
+If a column or row is sized `Auto(false)`, fixed-size objects are ignored. It can also happen of course, that there is no fixed-size object in a row or column with `Auto(true)` size. In both these cases, columns or rows determine their size by what remains after all `Fixed`, `Relative`, `Aspect` and size-inferred `Auto(true)` columns or rows have been calculated. Each undetermined `Auto` column gets a share of the remaining space that is proportional to its `ratio` parameter.
+
+For example, let's say there are two columns left with undetermined `Auto` size when 300 units space remain.
+Column 1 has ratio `1` while column 2 has ratio `2`.
+The first column will get `1 / (1 + 2) * 300 == 100` units, while the second column gets `2 / (1 + 2) * 300 == 200` units.
+
+
+```@example
+using MakieLayout
+using AbstractPlotting
+
+scene, layout = layoutscene(resolution = (1200, 900))
+
+layout[1, 1] = LAxis(scene, title = "My column infers my width\nof 200 units")
+layout[1, 2] = LAxis(scene, title = "My column gets 1/3rd\nof the remaining space")
+layout[1, 3] = LAxis(scene, title = "My column gets 2/3rds\nof the remaining space")
+
+colsize!(layout, 2, Auto(1)) # equivalent to Auto(true, 1)
+colsize!(layout, 3, Auto(2)) # equivalent to Auto(true, 2)
+
+scene
+save("example_auto_size.svg", scene); nothing # hide
+```
+
+![auto size](example_auto_size.svg)
+
+
+### Aspect
+
+This size is also a little bit trickier to understand. The syntax is `Aspect(reference, ratio)`. A column with a width of `Aspect(1, 2.0)` is set to 2.0 times the height of row 1, no matter what that height is. Therefore, the grid cell at [1, 1] will always have an aspect ratio of 2 to 1. The opposite pattern applies to rows with `Aspect` size.
+
+Aspect sized columns or rows are very useful when you want to constrain the aspect ratio of a grid cell. For example, a plot that is always supposed to be square. Enforcing the aspect *on the layout level is better* than setting `axis.aspect = AxisAspect(1)` in most cases, because it ensures an *intact layout* where all grid cell borders are aligned visually. An `LAxis` with `aspect = AxisAspect(1)` on the other hand simply shrinks so it remains square, but this will break alignment with other grid content.
+
+```@example
+using MakieLayout
+using AbstractPlotting
+
+scene, layout = layoutscene(resolution = (1200, 900))
+
+layout[1, 1] = LAxis(scene, title = "I'm square and aligned")
+layout[1, 2] = LAxis(scene, aspect = AxisAspect(1),
+    title = "I'm square but break the layout")
+layout[2, 1] = LAxis(scene)
+layout[2, 2] = LAxis(scene)
+
+colsize!(layout, 1, Aspect(1, 1))
+
+scene
+save("example_aspect_size.svg", scene); nothing # hide
+```
+
+![aspect size](example_aspect_size.svg)
+
+!!! note
+
+    Keep in mind that if you set too many constraints on row and column sizes, a GridLayout can easily be too big or too small. It's good to have variable-width elements to fill the remaining space if you use an element with fixed size or fixed aspect ratio.
 
 
 ## Trimming empty rows and columns

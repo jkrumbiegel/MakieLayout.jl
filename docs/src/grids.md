@@ -1,120 +1,3 @@
-## Nesting
-
-Grids can be nested inside other grids, and so on, to arbitrary depths. The top
-grid's parent should be the scene in which the layout is placed. When you place
-a grid inside another grid, that grid is automatically made its parent. Grids
-also are by default set to alignmode Inside which means that the content edges
-are aligned to the grid's bounding box, excluding the outer protrusions. This way,
-plots in nested grids are nicely aligned along their spines.
-
-```@example
-using MakieLayout
-using AbstractPlotting
-
-scene, layout = layoutscene(30, resolution = (1200, 900))
-
-subgl_left = GridLayout()
-subgl_left[1:2, 1:2] = [LAxis(scene) for i in 1:2, j in 1:2]
-
-subgl_right = GridLayout()
-subgl_right[1:3, 1] = [LAxis(scene) for i in 1:3]
-
-layout[1, 1] = subgl_left
-layout[1, 2] = subgl_right
-
-save("example_nested_grids.svg", scene); nothing # hide
-```
-
-![example nested grids](example_nested_grids.svg)
-
-## Alignment
-
-Here you can see the difference between the align modes Outside with and without
-margins and the Inside alignmode. Only the standard Inside mode aligns the axis
-spines of the contained axes nicely. The Outside mode is mostly useful for the
-main GridLayout so that there some space between the window edges and the plots.
-You can see that the normal axis looks the same as the one placed inside the
-grid with Inside alignment, and they are both effectively aligned exactly the same.
-
-```@example
-using MakieLayout
-using AbstractPlotting
-
-scene, layout = layoutscene(30, resolution = (1200, 1200))
-
-layout[1, 1] = LAxis(scene, title="No grid layout")
-layout[2, 1] = LAxis(scene, title="No grid layout")
-layout[3, 1] = LAxis(scene, title="No grid layout")
-
-subgl_1 = layout[1, 2] = GridLayout(alignmode=Inside())
-subgl_2 = layout[2, 2] = GridLayout(alignmode=Outside())
-subgl_3 = layout[3, 2] = GridLayout(alignmode=Outside(50))
-
-subgl_1[1, 1] = LAxis(scene, title="Inside")
-subgl_2[1, 1] = LAxis(scene, title="Outside")
-subgl_3[1, 1] = LAxis(scene, title="Outside(50)")
-
-layout[1:3, 2] = [LRect(scene, color = :transparent, strokecolor = :red) for i in 1:3]
-
-save("example_grid_alignment.svg", scene); nothing # hide
-```
-
-![example grid alignment](example_grid_alignment.svg)
-
-## Spanned Placement
-
-Elements in a grid layout can span multiple rows and columns. You can specify
-them with the range syntax and colons for the full width or height. You can
-also use end to specify the last row or column.
-
-```@example
-using MakieLayout
-using AbstractPlotting
-
-scene, layout = layoutscene(4, 4, 30, resolution = (1200, 1200))
-
-layout[1, 1:2] = LAxis(scene, title="[1, 1:2]")
-layout[2:4, 1:2] = LAxis(scene, title="[2:4, 1:2]")
-layout[:, 3] = LAxis(scene, title="[:, 3]")
-layout[1:3, end] = LAxis(scene, title="[1:3, end]")
-layout[end, end] = LAxis(scene, title="[end, end]")
-
-save("example_spanned_grid_content.svg", scene); nothing # hide
-```
-
-![spanned grid content](example_spanned_grid_content.svg)
-
-## Adding rows and columns by indexing
-
-If you index outside of the current range of a grid layout, you do not get an
-error. Instead, the layout automatically resizes to contain the new indices.
-This is very useful if you want to iteratively build a layout, or add super or
-side titles.
-
-```@example
-using MakieLayout
-using AbstractPlotting
-
-scene, layout = layoutscene(30, resolution = (1200, 1200))
-
-layout[1, 1] = LAxis(scene)
-for i in 1:3
-    layout[:, end+1] = LAxis(scene)
-    layout[end+1, :] = LAxis(scene)
-end
-
-layout[0, :] = LText(scene, text="Super Title", textsize=50)
-layout[end+1, :] = LText(scene, text="Sub Title", textsize=50)
-layout[2:end-1, 0] = LText(scene, text="Left Text", textsize=50,
-    rotation=pi/2)
-layout[2:end-1, end+1] = LText(scene, text="Right Text", textsize=50,
-    rotation=-pi/2)
-
-save("example_indexing_outside_grid.svg", scene); nothing # hide
-```
-
-![indexing outside grid](example_indexing_outside_grid.svg)
-
 ## Setting column and row sizes correctly
 
 There are four different types of sizes you can give rows and columns.
@@ -224,11 +107,13 @@ using AbstractPlotting
 scene, layout = layoutscene(resolution = (1200, 900))
 
 layout[1, 1] = LAxis(scene, title = "I'm square and aligned")
+layout[1, 2] = LRect(scene, color = (blue, 0.1), strokecolor = :transparent)
 layout[1, 2] = LAxis(scene, aspect = AxisAspect(1),
-    title = "I'm square but break the layout")
+    title = "I'm square but break the layout.\nMy actual cell is the blue rect.")
 layout[2, 1] = LAxis(scene)
 layout[2, 2] = LAxis(scene)
 
+rowsize!(layout, 2, Relative(2/3))
 colsize!(layout, 1, Aspect(1, 1))
 
 scene
@@ -241,40 +126,165 @@ save("example_aspect_size.svg", scene); nothing # hide
 
     Keep in mind that if you set too many constraints on row and column sizes, a GridLayout can easily be too big or too small. It's good to have variable-width elements to fill the remaining space if you use an element with fixed size or fixed aspect ratio.
 
+## Nesting
 
-## Trimming empty rows and columns
-
-If you change a layout interactively and end up with unused rows or columns, `trim!`
-will remove those for you:
+Grids can be nested inside other grids, and so on, to arbitrary depths. The top
+grid's parent should be the scene in which the layout is placed. When you place
+a grid inside another grid, that grid is automatically made its parent. Grids
+also are by default set to alignmode Inside which means that the content edges
+are aligned to the grid's bounding box, excluding the outer protrusions. This way,
+plots in nested grids are nicely aligned along their spines.
 
 ```@example
 using MakieLayout
 using AbstractPlotting
 
-scene, layout = layoutscene(resolution = (600, 600))
+scene, layout = layoutscene(30, resolution = (1200, 900))
 
-record(scene, "example_trimming.mp4", framerate=1) do io
+subgl_left = GridLayout()
+subgl_left[1:2, 1:2] = [LAxis(scene) for i in 1:2, j in 1:2]
 
-    ax1 = layout[1, 1] = LAxis(scene, title = "Axis 1")
-    recordframe!(io)
+subgl_right = GridLayout()
+subgl_right[1:3, 1] = [LAxis(scene) for i in 1:3]
 
-    ax2 = layout[1, 2] = LAxis(scene, title = "Axis 2")
-    recordframe!(io)
+layout[1, 1] = subgl_left
+layout[1, 2] = subgl_right
 
-    layout[2, 1] = ax2
-    recordframe!(io)
-
-    trim!(layout)
-    recordframe!(io)
-
-    layout[2, 3:4] = ax1
-    recordframe!(io)
-
-    trim!(layout)
-    recordframe!(io)
-end
-
-nothing # hide
+save("example_nested_grids.svg", scene); nothing # hide
 ```
 
-![hiding decorations](example_trimming.mp4)
+![example nested grids](example_nested_grids.svg)
+
+## Alignment
+
+Here you can see the difference between the align modes Outside with and without
+margins and the Inside alignmode. Only the standard Inside mode aligns the axis
+spines of the contained axes nicely. The Outside mode is mostly useful for the
+main GridLayout so that there some space between the window edges and the plots.
+You can see that the normal axis looks the same as the one placed inside the
+grid with Inside alignment, and they are both effectively aligned exactly the same.
+
+```@example
+using MakieLayout
+using AbstractPlotting
+
+scene, layout = layoutscene(resolution = (1200, 1200))
+
+layout[1, 1] = LAxis(scene, title="No grid layout")
+layout[2, 1] = LAxis(scene, title="No grid layout")
+layout[3, 1] = LAxis(scene, title="No grid layout")
+
+subgl_1 = layout[1, 2] = GridLayout(alignmode=Inside())
+subgl_2 = layout[2, 2] = GridLayout(alignmode=Outside())
+subgl_3 = layout[3, 2] = GridLayout(alignmode=Outside(50))
+
+subgl_1[1, 1] = LAxis(scene, title="Inside")
+subgl_2[1, 1] = LAxis(scene, title="Outside")
+subgl_3[1, 1] = LAxis(scene, title="Outside(50)")
+
+layout[1:3, 2] = [LRect(scene, color = :transparent, strokecolor = :red) for i in 1:3]
+
+save("example_grid_alignment.svg", scene); nothing # hide
+```
+
+![example grid alignment](example_grid_alignment.svg)
+
+## Spanned Placement
+
+Elements in a grid layout can span multiple rows and columns. You can specify
+them with the range syntax and colons for the full width or height. You can
+also use end to specify the last row or column.
+
+```@example
+using MakieLayout
+using AbstractPlotting
+
+scene, layout = layoutscene(4, 4, resolution = (1200, 1200))
+
+layout[1, 1:2] = LAxis(scene, title="[1, 1:2]")
+layout[2:4, 1:2] = LAxis(scene, title="[2:4, 1:2]")
+layout[:, 3] = LAxis(scene, title="[:, 3]")
+layout[1:3, end] = LAxis(scene, title="[1:3, end]")
+layout[end, end] = LAxis(scene, title="[end, end]")
+
+save("example_spanned_grid_content.svg", scene); nothing # hide
+```
+
+![spanned grid content](example_spanned_grid_content.svg)
+
+## Adding rows and columns by indexing
+
+If you index outside of the current range of a grid layout, you do not get an
+error. Instead, the layout automatically resizes to contain the new indices.
+This is very useful if you want to iteratively build a layout, or add super or
+side titles.
+
+```@example
+using MakieLayout
+using AbstractPlotting
+
+scene, layout = layoutscene(resolution = (1200, 1200))
+
+layout[1, 1] = LAxis(scene)
+for i in 1:3
+    layout[:, end+1] = LAxis(scene)
+    layout[end+1, :] = LAxis(scene)
+end
+
+layout[0, :] = LText(scene, text="Super Title", textsize=50)
+layout[end+1, :] = LText(scene, text="Sub Title", textsize=50)
+layout[2:end-1, 0] = LText(scene, text="Left Text", textsize=50,
+    rotation=pi/2)
+layout[2:end-1, end+1] = LText(scene, text="Right Text", textsize=50,
+    rotation=-pi/2)
+
+save("example_indexing_outside_grid.svg", scene); nothing # hide
+```
+
+![indexing outside grid](example_indexing_outside_grid.svg)
+
+
+## Trimming empty rows and columns
+
+If you change a layout interactively and end up with unused rows or columns, `trim!`
+will remove those for you.
+
+Here we start with two axes:
+
+```@example trimming
+using MakieLayout
+using AbstractPlotting
+
+scene, layout = layoutscene(resolution = (1200, 900))
+
+ax1 = layout[1, 1] = LAxis(scene, title = "Axis 1")
+ax2 = layout[1, 2] = LAxis(scene, title = "Axis 2")
+
+scene
+save("example_trimming_1.svg", scene); nothing # hide
+```
+
+![trimming 1](example_trimming_1.svg)
+
+Now we decide we'd like the second axis better if it was below the first one.
+We move it two the new cell, and the old unused column is left blank.
+
+```@example trimming
+layout[2, 1] = ax2
+
+scene
+save("example_trimming_2.svg", scene); nothing # hide
+```
+
+![trimming 2](example_trimming_2.svg)
+
+We can get rid of the unused space with `trim!`:
+
+```@example trimming
+trim!(layout)
+
+scene
+save("example_trimming_3.svg", scene); nothing # hide
+```
+
+![trimming 3](example_trimming_3.svg)

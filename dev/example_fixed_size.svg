@@ -91,7 +91,7 @@
 </symbol>
 </g>
 </defs>
-<g id="surface31">
+<g id="surface11">
 <rect x="0" y="0" width="1200" height="900" style="fill:rgb(100%,100%,100%);fill-opacity:1;stroke:none;"/>
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 81 831 L 481 831 L 481 65 L 81 65 Z M 81 831 "/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:0.1;stroke-miterlimit:10;" d="M 81 831 L 81 65 M 161 831 L 161 65 M 241 831 L 241 65 M 321 831 L 321 65 M 401 831 L 401 65 M 481 831 L 481 65 "/>

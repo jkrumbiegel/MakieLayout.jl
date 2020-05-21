@@ -96,12 +96,12 @@
 <path style="stroke:none;" d="M 2.140625 -2.484375 L 4.203125 -2.484375 L 4.203125 0 L 2.140625 0 Z M 2.140625 -2.484375 "/>
 </symbol>
 </g>
-<image id="image40" width="1" height="100" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABkCAIAAADITs03AAAABmJLR0QA/wD/AP+gvaeTAAAAnElEQVQYlV2JwXEDMQzESEguJf2XlRokc5d5nHy288AAS4Z+f9hd7C5WmN3N6mY17IbVg9Xz+HH6we55tU97snuy/erB05Ptwfbgedge1L2hBOWBDGWQEhlssBI7aUMraSehJJyEg1CSTkJBOkkF6e+O+xbv/z/ztfuyAhyk+r6j177goy9MyOQh6lgiZKJ0dYlQ0SWiipboKrrqD1jHsmD+pGxHAAAAAElFTkSuQmCC"/>
+<image id="image20" width="1" height="100" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABkCAIAAADITs03AAAABmJLR0QA/wD/AP+gvaeTAAAAnElEQVQYlV2JwXEDMQzESEguJf2XlRokc5d5nHy288AAS4Z+f9hd7C5WmN3N6mY17IbVg9Xz+HH6we55tU97snuy/erB05Ptwfbgedge1L2hBOWBDGWQEhlssBI7aUMraSehJJyEg1CSTkJBOkkF6e+O+xbv/z/ztfuyAhyk+r6j177goy9MyOQh6lgiZKJ0dYlQ0SWiipboKrrqD1jHsmD+pGxHAAAAAElFTkSuQmCC"/>
 <pattern id="pattern0" patternUnits="userSpaceOnUse" width="1" height="100"  patternTransform="matrix(30,0,0,7.664375,1095.634766,64.281235)">
-  <use xlink:href="#image40"/>
+  <use xlink:href="#image20"/>
 </pattern>
 </defs>
-<g id="surface36">
+<g id="surface16">
 <rect x="0" y="0" width="1200" height="900" style="fill:rgb(100%,100%,100%);fill-opacity:1;stroke:none;"/>
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 81 831 L 716 831 L 716 65 L 81 65 Z M 81 831 "/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:0.1;stroke-miterlimit:10;" d="M 81 831 L 81 65 M 208 831 L 208 65 M 335 831 L 335 65 M 462 831 L 462 65 M 589 831 L 589 65 M 716 831 L 716 65 "/>

@@ -107,7 +107,7 @@ using AbstractPlotting
 scene, layout = layoutscene(resolution = (1200, 900))
 
 layout[1, 1] = LAxis(scene, title = "I'm square and aligned")
-layout[1, 2] = LRect(scene, color = (blue, 0.1), strokecolor = :transparent)
+layout[1, 2] = LRect(scene, color = (:blue, 0.1), strokecolor = :transparent)
 layout[1, 2] = LAxis(scene, aspect = AxisAspect(1),
     title = "I'm square but break the layout.\nMy actual cell is the blue rect.")
 layout[2, 1] = LAxis(scene)

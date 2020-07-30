@@ -1,8 +1,6 @@
 # MakieLayout.jl
 
-## Note: MakieLayout is in the process of being merged into Makie.jl / AbstractPlotting.jl. All future development will go into that package.
-
-Currently, you can `]add AbstractPlotting#master` and then do `using AbstractPlotting.MakieLayout`
+## Note: MakieLayout has been absorbed by AbstractPlotting. Don't install it separately, instead use it via `using AbstractPlotting.MakieLayout`
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://jkrumbiegel.github.io/MakieLayout.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://jkrumbiegel.github.io/MakieLayout.jl/dev/)

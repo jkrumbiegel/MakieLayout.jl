@@ -18,6 +18,12 @@ push!(AbstractPlotting.FreeTypeAbstraction.valid_fontpaths, joinpath(@__DIR__, "
 nothing
 ```
 
+!!! note
+    MakieLayout.jl has been absorbed by AbstractPlotting.jl. MakieLayout.jl will not be updated anymore, and all
+    new functionality will go into AbstractPlotting.
+    Visit the Makie docs at [http://makie.juliaplots.org/](http://makie.juliaplots.org/) to
+    find out how to use it.
+
 # MakieLayout.jl Tutorial
 
 In this tutorial, we will see some of the capabilities of MakieLayout.jl while

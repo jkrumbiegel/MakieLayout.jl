@@ -23,6 +23,13 @@ const COLOR_ACCENT_DIMMED = Ref(RGBf0(((174, 192, 230) ./ 255)...))
 # This mutates module-level state so it could mess up other libraries using
 # GridLayoutBase at the same time as MakieLayout, which is unlikely, though
 function __init__()
+
+    @warn """
+    MakieLayout.jl has been absorbed by AbstractPlotting.jl and will not receive any more updates.
+    It is enough to install AbstractPlotting to receive the newest functionality.
+    Visit the Makie docs at http://makie.juliaplots.org/ for more information on how to use it.
+    """
+
     GridLayoutBase.DEFAULT_COLGAP_GETTER[] = function()
         ct = AbstractPlotting.current_default_theme()
         if haskey(ct, :colgap)

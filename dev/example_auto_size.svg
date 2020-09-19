@@ -100,7 +100,7 @@
 </symbol>
 </g>
 </defs>
-<g id="surface23">
+<g id="surface21">
 <rect x="0" y="0" width="1200" height="900" style="fill:rgb(100%,100%,100%);fill-opacity:1;stroke:none;"/>
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 81 831 L 317 831 L 317 88 L 81 88 Z M 81 831 "/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:0.1;stroke-miterlimit:10;" d="M 81 831 L 81 88 M 128.199219 831 L 128.199219 88 M 175.398438 831 L 175.398438 88 M 222.601562 831 L 222.601562 88 M 269.800781 831 L 269.800781 88 M 317 831 L 317 88 "/>

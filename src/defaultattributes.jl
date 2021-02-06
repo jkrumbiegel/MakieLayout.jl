@@ -335,6 +335,10 @@ function default_attributes(::Type{LText}, scene)
         rotation = 0f0
         "The extra space added to the sides of the text boundingbox."
         padding = (0f0, 0f0, 0f0, 0f0)
+        "The justification of the text when multiline."
+        justification = 0.5
+        "The height of each line, in font units."
+        lineheight = 1.0
         "The height setting of the text."
         height = Auto()
         "The width setting of the text."

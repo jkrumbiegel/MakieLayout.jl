@@ -248,7 +248,7 @@ function LLegend(
     # trigger suggestedbbox
     layoutobservables.suggestedbbox[] = layoutobservables.suggestedbbox[]
 
-    leg = LLegend(scene, entry_groups, layoutobservables, attrs, decorations)
+    leg = LLegend(scene, entry_groups, layoutobservables, attrs, decorations, LText[], Vector{Vector{AbstractPlot}}(), grid, scene)
     # trigger first relayout
     entry_groups[] = entry_groups[]
     leg

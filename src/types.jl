@@ -130,6 +130,10 @@ struct LLegend <: LObject
     layoutobservables::LayoutObservables
     attributes::Attributes
     decorations::Dict{Symbol, Any}
+    entrytexts::Vector{LText}
+    entryplots::Vector{Vector{AbstractPlot}}
+    grid::GridLayout
+    child::Scene
 end
 
 const Indexables = Union{UnitRange, Int, Colon}

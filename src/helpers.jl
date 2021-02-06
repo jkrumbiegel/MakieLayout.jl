@@ -402,9 +402,25 @@ end
 function subtheme(scene, key::Symbol)
     sub = haskey(theme(scene), key) ? theme(scene, key) : Attributes()
     if !(sub isa Attributes)
-        error("Subtheme is not of type Attributes but is $sub")
+        if sub isa Observable{Any}
+            error("""
+            The subtheme $key was not of type `Attributes`,
+            but an `Observable`.  This may be because the
+            nested element did not resolve to a NamedTuple,
+            or similar iterable.
+
+            If you only provided a single attribute to the
+            subtheme, then please make sure that your syntax
+            was of the form `(key = value,)` (note the comma).
+            """)
+        else
+            error("""
+                Subtheme is not of type Attributes but is $sub
+                """)
+            end
+        end
     end
-    sub
+    return sub
 end
 
 """
